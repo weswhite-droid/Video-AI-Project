@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – Master Project Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f7fafc;
+      line-height: 1.2;
+    }
+    .header h1 span { color: #63b3ed; }
+    .header .subtitle {
+      font-size: 0.875rem;
+      color: #718096;
+      margin-top: 4px;
+    }
+    .phase-badge {
+      background: #2b6cb0;
+      color: #bee3f8;
+      border: 1px solid #3182ce;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .meta-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .meta-item .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; }
+    .meta-item .value { font-size: 0.875rem; font-weight: 600; color: #e2e8f0; margin-top: 2px; }
+
+    /* ── Legend ─────────────────────────────────────────── */
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+    .legend-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; margin-right: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.825rem; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .dot-red    { background: #fc8181; box-shadow: 0 0 6px rgba(252,129,129,0.5); }
+    .dot-green  { background: #68d391; box-shadow: 0 0 6px rgba(104,211,145,0.5); }
+    .dot-blue   { background: #63b3ed; box-shadow: 0 0 6px rgba(99,179,237,0.5); }
+    .dot-grey   { background: #718096; }
+
+    /* ── Sections ───────────────────────────────────────── */
+    .sections {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .section {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* collapsible via <details> */
+    .section details { }
+    .section details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .section details summary::-webkit-details-marker { display: none; }
+    .section details summary:hover { background: rgba(255,255,255,0.07); }
+    .section details[open] summary { border-bottom: 1px solid #2d3748; }
+    .section details:not([open]) summary { border-bottom: none; }
+
+    .chevron {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #4a5568;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    details[open] .chevron { transform: rotate(180deg); }
+
+    .section-icon { font-size: 1rem; }
+    .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; }
+    .section-count { font-size: 0.75rem; color: #718096; }
+
+    .task-list { padding: 8px 0; }
+
+    /* RAID table also collapsible */
+    .raid-section details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .raid-section details summary::-webkit-details-marker { display: none; }
+    .raid-section details summary:hover { background: rgba(255,255,255,0.07); }
+    .raid-section details:not([open]) summary { border-bottom: none; }
+    .raid-section details[open] summary { border-bottom: 1px solid #2d3748; }
+
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 18px;
+      border-left: 3px solid transparent;
+      transition: background 0.15s;
+    }
+    .task:hover { background: rgba(255,255,255,0.03); }
+
+    /* status stripe */
+    .task.red    { border-left-color: #fc8181; }
+    .task.green  { border-left-color: #68d391; }
+    .task.blue   { border-left-color: #63b3ed; }
+    .task.grey   { border-left-color: #4a5568; }
+
+    .task-status {
+      flex-shrink: 0;
+      margin-top: 2px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .task.red   .task-status { background: #fc8181; box-shadow: 0 0 5px rgba(252,129,129,0.6); }
+    .task.green .task-status { background: #68d391; box-shadow: 0 0 5px rgba(104,211,145,0.6); }
+    .task.blue  .task-status { background: #63b3ed; box-shadow: 0 0 5px rgba(99,179,237,0.6); }
+    .task.grey  .task-status { background: #4a5568; }
+
+    .task-body { flex: 1; }
+    .task-name { font-size: 0.875rem; font-weight: 500; color: #e2e8f0; line-height: 1.4; }
+    .task-sub  { font-size: 0.75rem; color: #718096; margin-top: 2px; }
+
+    .badge {
+      flex-shrink: 0;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      align-self: center;
+    }
+    .badge.red    { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+    .badge.green  { background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3); }
+    .badge.blue   { background: rgba(99,179,237,0.15);  color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+    .badge.grey   { background: rgba(74,85,104,0.3);    color: #a0aec0; border: 1px solid #4a5568; }
+
+    .divider { height: 1px; background: #2d3748; margin: 0 18px; }
+
+    /* ── Stats bar ──────────────────────────────────────── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-card .num { font-size: 1.75rem; font-weight: 700; }
+    .stat-card .lbl { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.07em; color: #718096; margin-top: 2px; }
+    .stat-card.red-card   .num { color: #fc8181; }
+    .stat-card.green-card .num { color: #68d391; }
+    .stat-card.blue-card  .num { color: #63b3ed; }
+    .stat-card.grey-card  .num { color: #a0aec0; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #4a5568;
+    }
+
+    /* ── RAID Log ───────────────────────────────────────── */
+    .raid-section {
+      margin-top: 28px;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .raid-section-header {
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .raid-section-header .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; }
+    .raid-section-header .section-count { margin-left: auto; font-size: 0.75rem; color: #718096; }
+
+    .raid-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 10px 20px;
+      border-bottom: 1px solid #2d3748;
+      background: rgba(0,0,0,0.15);
+      font-size: 0.73rem;
+      color: #a0aec0;
+    }
+    .raid-legend-group { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .raid-legend-label { color: #718096; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; margin-right: 4px; }
+    .rl-item { display: flex; align-items: center; gap: 5px; }
+    .rl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .rl-dot.high    { background: #fc8181; }
+    .rl-dot.medium  { background: #f6ad55; }
+    .rl-dot.low     { background: #b794f4; }
+    .rl-dot.closed  { background: #68d391; }
+    .rl-dot.open    { background: #fc8181; box-shadow: 0 0 4px rgba(252,129,129,0.5); }
+    .rl-dot.inprog  { background: #ecc94b; }
+    .rl-dot.notstart{ background: #b794f4; opacity: 0.6; }
+    .rl-dot.watching{ background: #f6ad55; opacity: 0.7; }
+
+    .raid-table-wrap { overflow-x: auto; }
+    table.raid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    table.raid thead tr {
+      background: rgba(255,255,255,0.04);
+    }
+    table.raid th {
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+      border-bottom: 1px solid #2d3748;
+      white-space: nowrap;
+    }
+    table.raid td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e2538;
+      vertical-align: top;
+      color: #cbd5e0;
+      line-height: 1.45;
+    }
+    table.raid tr:last-child td { border-bottom: none; }
+    table.raid tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* impact/likelihood color pills */
+    .pill {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .pill.high   { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+    .pill.medium { background: rgba(246,173,85,0.15);  color: #f6ad55; border: 1px solid rgba(246,173,85,0.3); }
+    .pill.low    { background: rgba(183,148,244,0.15); color: #b794f4; border: 1px solid rgba(183,148,244,0.3); }
+    .pill.lowmed { background: rgba(183,148,244,0.12); color: #d6bcfa; border: 1px solid rgba(183,148,244,0.25); }
+
+    /* status icons */
+    .rs { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+    .rs-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .rs.closed   { color: #68d391; } .rs.closed   .rs-dot { background: #68d391; }
+    .rs.open     { color: #fc8181; } .rs.open     .rs-dot { background: #fc8181; box-shadow: 0 0 4px rgba(252,129,129,0.6); }
+    .rs.inprog   { color: #ecc94b; } .rs.inprog   .rs-dot { background: #ecc94b; }
+    .rs.notstart { color: #b794f4; } .rs.notstart .rs-dot { background: #9f7aea; opacity: 0.7; }
+    .rs.watching { color: #f6ad55; } .rs.watching .rs-dot { background: #f6ad55; opacity: 0.8; }
+
+    .raid-id { font-weight: 700; color: #a0aec0; white-space: nowrap; }
+
+    /* ── Risk Chart ─────────────────────────────────────── */
+    .risk-chart-block {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 20px 24px 24px;
+      margin-bottom: 24px;
+    }
+    .risk-chart-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    @media (max-width: 640px) { .chart-grid { grid-template-columns: 1fr; } }
+
+    /* Bar chart */
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; }
+    .bar-label { font-size: 0.72rem; color: #a0aec0; width: 80px; flex-shrink: 0; text-align: right; }
+    .bar-track { flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; height: 22px; overflow: hidden; position: relative; }
+    .bar-fill  { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.7rem; font-weight: 700; transition: width 0.6s ease; }
+    .bar-fill.open    { background: linear-gradient(90deg, #c53030, #fc8181); color: #fff; }
+    .bar-fill.inprog  { background: linear-gradient(90deg, #b7791f, #ecc94b); color: #1a1208; }
+    .bar-fill.closed  { background: linear-gradient(90deg, #276749, #68d391); color: #fff; }
+    .bar-fill.notstart{ background: linear-gradient(90deg, #553c9a, #b794f4); color: #fff; }
+    .bar-fill.watching{ background: linear-gradient(90deg, #c05621, #f6ad55); color: #1a0e00; }
+
+    /* Donut chart via conic-gradient */
+    .donut-wrap { display: flex; align-items: center; gap: 20px; }
+    .donut {
+      width: 130px; height: 130px; flex-shrink: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        #fc8181 0% 40%,
+        #ecc94b 40% 60%,
+        #68d391 60% 80%,
+        #b794f4 80% 93.3%,
+        #f6ad55 93.3% 100%
+      );
+      position: relative;
+    }
+    .donut::after {
+      content: '15';
+      position: absolute;
+      inset: 22px;
+      background: #1a1f2e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      text-align: center;
+      line-height: 86px;
+    }
+    .donut-legend { display: flex; flex-direction: column; gap: 7px; }
+    .dl-item { display: flex; align-items: center; gap: 7px; font-size: 0.75rem; color: #cbd5e0; }
+    .dl-swatch { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+    .dl-swatch.open    { background: #fc8181; }
+    .dl-swatch.inprog  { background: #ecc94b; }
+    .dl-swatch.closed  { background: #68d391; }
+    .dl-swatch.notstart{ background: #b794f4; }
+    .dl-swatch.watching{ background: #f6ad55; }
+    .dl-count { font-weight: 700; margin-left: auto; padding-left: 12px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>Video AI – <span>Master Project Dashboard</span></h1>
+      <div class="subtitle">Cobalt Video Analytics · Tier 1 Global Office Rollout</div>
+    </div>
+    <div class="phase-badge">▶ Phase 1 – AMER · Q2 FY27</div>
+  </div>
+  <div class="meta-grid">
+    <div class="meta-item"><div class="label">Project Sponsor</div><div class="value">Bill Inzeo</div></div>
+    <div class="meta-item"><div class="label">Program Leader</div><div class="value">Jeff Toler</div></div>
+    <div class="meta-item"><div class="label">Program Lead / PM</div><div class="value">Jerry Wu / Wes White</div></div>
+    <div class="meta-item"><div class="label">FY27 Budget</div><div class="value">$400,140 (FY28: $1,612,800)</div></div>
+    <div class="meta-item"><div class="label">Pilot Alarm Resolution</div><div class="value">98%</div></div>
+    <div class="meta-item"><div class="label">Guard Dispatch Reduction</div><div class="value">80%</div></div>
+    <div class="meta-item"><div class="label">Nuisance Alarms Eliminated</div><div class="value">780K+</div></div>
+    <div class="meta-item"><div class="label">Phase 1 Sites</div><div class="value">San Francisco · Bellevue · Chicago · New York</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ LEGEND -->
+<div class="legend">
+  <span class="legend-title">Status Key</span>
+  <div class="legend-item"><div class="legend-dot dot-red"></div> At Risk / Show Stopper</div>
+  <div class="legend-item"><div class="legend-dot dot-green"></div> In Progress</div>
+  <div class="legend-item"><div class="legend-dot dot-blue"></div> Completed</div>
+  <div class="legend-item"><div class="legend-dot dot-grey"></div> Not Started</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ RISK CHART -->
+<div class="risk-chart-block">
+  <div class="risk-chart-title">⚠️ RAID Risk Summary — 15 Total Risks</div>
+  <div class="chart-grid">
+
+    <!-- Bar chart -->
+    <div>
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:10px;">Count by Status</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">Open</div>
+          <div class="bar-track">
+            <div class="bar-fill open" style="width:40%">6</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">In Progress</div>
+          <div class="bar-track">
+            <div class="bar-fill inprog" style="width:20%">3</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Closed</div>
+          <div class="bar-track">
+            <div class="bar-fill closed" style="width:20%">3</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Not Started</div>
+          <div class="bar-track">
+            <div class="bar-fill notstart" style="width:13.3%">2</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Watching</div>
+          <div class="bar-track">
+            <div class="bar-fill watching" style="width:6.7%">1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut chart -->
+    <div>
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:10px;">Distribution</div>
+      <div class="donut-wrap">
+        <div class="donut"></div>
+        <div class="donut-legend">
+          <div class="dl-item"><div class="dl-swatch open"></div> Open <span class="dl-count">6</span></div>
+          <div class="dl-item"><div class="dl-swatch inprog"></div> In Progress <span class="dl-count">3</span></div>
+          <div class="dl-item"><div class="dl-swatch closed"></div> Closed <span class="dl-count">3</span></div>
+          <div class="dl-item"><div class="dl-swatch notstart"></div> Not Started <span class="dl-count">2</span></div>
+          <div class="dl-item"><div class="dl-swatch watching"></div> Watching <span class="dl-count">1</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ STATS -->
+<div class="stats-bar">
+  <div class="stat-card red-card">
+    <div class="num">1</div>
+    <div class="lbl">At Risk / Blockers</div>
+  </div>
+  <div class="stat-card green-card">
+    <div class="num">9</div>
+    <div class="lbl">In Progress</div>
+  </div>
+  <div class="stat-card blue-card">
+    <div class="num">13</div>
+    <div class="lbl">Completed</div>
+  </div>
+  <div class="stat-card grey-card">
+    <div class="num">5</div>
+    <div class="lbl">Not Started</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TASK SECTIONS -->
+<div class="sections">
+
+  <!-- ─── Planning & Governance ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📋</span>
+      <span class="section-title">Planning &amp; Governance</span>
+      <span class="section-count">5 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Charter &amp; Overview</div>
+          <div class="task-sub">Purpose, objectives, scope, stakeholders, timeline &amp; approvals</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-raid-log.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">RAID Log ↗</a></div>
+          <div class="task-sub">Risks, Assumptions, Issues &amp; Dependencies tracking — ongoing</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Plan &amp; Milestones</div>
+          <div class="task-sub">Phased rollout plan by region with milestones &amp; deliverables</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-raci.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">RACI Matrix ↗</a></div>
+          <div class="task-sub">RACI assignments and communication plan</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Stakeholders (Restricted)</div>
+          <div class="task-sub">Core working group identified and access restricted</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Requirements & Change Management ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📐</span>
+      <span class="section-title">Requirements &amp; Change Management</span>
+      <span class="section-count">3 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-requirements.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">System Requirements ↗</a></div>
+          <div class="task-sub">Business, functional, non-functional requirements &amp; out-of-scope</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Change Management Plan</div>
+          <div class="task-sub">Change management strategy and execution plan</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Pre-Read: Video AI Program</div>
+          <div class="task-sub">VP-level briefing — pilot results, vendor rec, budget, Phase 2 sign-off</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Financial & Quality ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">💰</span>
+      <span class="section-title">Financial &amp; Quality</span>
+      <span class="section-count">2 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Budget &amp; Financial Tracking</div>
+          <div class="task-sub">PRs submitted May 26 · Awaiting PO/budget confirmation from Rob &amp; Gary</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Quality &amp; Acceptance Criteria</div>
+          <div class="task-sub">Quality standards and phase-specific acceptance criteria</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Knowledge & Closure ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📦</span>
+      <span class="section-title">Knowledge &amp; Closure</span>
+      <span class="section-count">2 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Lessons Learned</div>
+          <div class="task-sub">Pilot lessons and ongoing log for continuous improvement</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Closure &amp; Handoff Checklist + Package</div>
+          <div class="task-sub">Closure checklist, handoff package &amp; final sign-off</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── High-Level Deliverables ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🎯</span>
+      <span class="section-title">High-Level Deliverables</span>
+      <span class="section-count">1 item</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Video AI Project Slide Deck</div>
+          <div class="task-sub">High-level overview presentation for stakeholders</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Procurement & Financials ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🧾</span>
+      <span class="section-title">Procurement Milestones</span>
+      <span class="section-count">6 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Budget ($1.6M) Tentative Approval</div>
+          <div class="task-sub">Apr 10 · Pending VP sign-off at time of update</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">VP Sign-off – Orlaith Murphy</div>
+          <div class="task-sub">Apr 16 · Formal VP approval obtained</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Cobalt FY27 Quote Received</div>
+          <div class="task-sub">May 5 · Revised ~$754,620 FY27 (Q2–Q4) quote from Cobalt</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PO / Budget Confirmation</div>
+          <div class="task-sub">May 6 · Quote shared with Rob Mirakaj &amp; Gary Lunetta — awaiting confirmation</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PIR Submission – "Cobalt Video AI Continuation"</div>
+          <div class="task-sub">May 19 · Submitted in procurement system</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Purchase Request (PR) Approvals</div>
+          <div class="task-sub">May 26 · All PRs submitted — awaiting approval routing</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Staffing / Resources ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">👥</span>
+      <span class="section-title">Staffing &amp; Resources</span>
+      <span class="section-count">13 roles</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Sponsor</div>
+          <div class="task-sub">Bill Inzeo</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Program Manager</div>
+          <div class="task-sub">Jeff Toler</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Program Lead</div>
+          <div class="task-sub">Jerry Wu / Wes White</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Manager / Coordinator</div>
+          <div class="task-sub">Wes White (PMP, FTE) · ~20 hrs/wk · Greenlit by Bill &amp; Orlaith</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecOps Director</div>
+          <div class="task-sub">Robert Mirakaj</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">GOC Director</div>
+          <div class="task-sub">Suzanne Paleologos</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">H&amp;S Senior Manager</div>
+          <div class="task-sub">Aaron Patkin</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">VP Resilience</div>
+          <div class="task-sub">Stasha Wyskiel</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PhySec Lead</div>
+          <div class="task-sub">Kory Turnbow</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Security Technology Director</div>
+          <div class="task-sub">Gary Lunetta</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">GS&amp;S Financial Ops</div>
+          <div class="task-sub">James Herrera</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecTech SOW Worker 1</div>
+          <div class="task-sub">Steven Hord</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task red">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecTech SOW Worker 2</div>
+          <div class="task-sub">TBD · Resource not yet identified</div>
+        </div>
+        <div class="badge red">Show Stopper</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Phase Rollout ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🗺️</span>
+      <span class="section-title">Phase Rollout</span>
+      <span class="section-count">2 phases</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Phase 1 – AMER (4 Sites)</div>
+          <div class="task-sub">San Francisco · Bellevue · Chicago · New York · Q2 FY27</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Phase 2 – Full Scale (15 Tier 1 Sites)</div>
+          <div class="task-sub">Global rollout · FY28 · Budget: $1,612,800 TCV</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════ REQUIREMENTS LINK -->
+<div class="raid-section" style="margin-top:28px;">
+  <a href="video-ai-requirements.html" style="text-decoration:none;display:block;">
+    <div style="padding:18px 24px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background=''">
+      <span style="font-size:1.1rem;">📐</span>
+      <div style="flex:1;">
+        <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a0aec0;">System Requirements</div>
+        <div style="font-size:0.75rem;color:#718096;margin-top:3px;">Business objectives · Integration architecture · Functional &amp; non-functional requirements · Operational · Rollout phasing</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        <span style="background:rgba(252,129,129,0.15);color:#fc8181;border:1px solid rgba(252,129,129,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">3 At Risk</span>
+        <span style="background:rgba(99,179,237,0.15);color:#63b3ed;border:1px solid rgba(99,179,237,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">Open Reqs ↗</span>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ RAID LOG LINK -->
+<div class="raid-section" style="margin-top:16px;">
+  <a href="video-ai-raid-log.html" style="text-decoration:none;display:block;">
+    <div style="padding:18px 24px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background=''">
+      <span style="font-size:1.1rem;">⚠️</span>
+      <div style="flex:1;">
+        <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a0aec0;">RAID Log — Risks</div>
+        <div style="font-size:0.75rem;color:#718096;margin-top:3px;">15 risks · Open: 6 · In Progress: 3 · Closed: 3 · Not Started: 2 · Watching: 1</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        <span style="background:rgba(252,129,129,0.15);color:#fc8181;border:1px solid rgba(252,129,129,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">6 Open</span>
+        <span style="background:rgba(104,211,145,0.15);color:#68d391;border:1px solid rgba(104,211,145,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">Open Log ↗</span>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  Generated from #proj-gss-video-ai-working-group Master Project Plan · Last updated Jun 5, 2026 · Statuses inferred from project context — update as needed
+</div>
+
+</body>
+</html>

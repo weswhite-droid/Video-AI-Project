@@ -406,6 +406,430 @@
     .dl-swatch.notstart{ background: #b794f4; }
     .dl-swatch.watching{ background: #f6ad55; }
     .dl-count { font-weight: 700; margin-left: auto; padding-left: 12px; }
+
+    /* ── New enhancements ─────────────────────────────────── */
+    /* Project Health Badge */
+    .health-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #2d3748;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      margin-left: 12px;
+      transition: all 0.2s ease;
+    }
+    .health-badge.on-track { background: rgba(104,211,145,0.15); border-color: rgba(104,211,145,0.3); color: #68d391; }
+    .health-badge.at-risk { background: rgba(236,201,75,0.15); border-color: rgba(236,201,75,0.3); color: #ecc94b; }
+    .health-badge.critical { background: rgba(252,129,129,0.15); border-color: rgba(252,129,129,0.3); color: #fc8181; }
+
+    /* Last Updated Timestamp */
+    .last-updated {
+      font-size: 0.7rem;
+      color: #4a5568;
+      text-align: right;
+      margin-left: auto;
+    }
+
+    /* Quick Stats Dashboard */
+    .quick-stats {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    .stats-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .stats-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      border: 1px solid #2d3748;
+      transition: all 0.2s ease;
+    }
+    .stat-item:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-2px);
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #718096;
+    }
+    .progress-bar-container {
+      margin-top: 16px;
+    }
+    .progress-label {
+      font-size: 0.75rem;
+      color: #a0aec0;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .progress-bar {
+      height: 24px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2b6cb0, #63b3ed);
+      border-radius: 12px;
+      transition: width 0.6s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Search/Filter Bar */
+    .filter-bar {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 240px;
+      background: #0f1117;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 10px 16px;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .search-input:focus {
+      border-color: #63b3ed;
+      box-shadow: 0 0 0 3px rgba(99,179,237,0.1);
+    }
+    .filter-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #2d3748;
+      background: rgba(255,255,255,0.05);
+      color: #a0aec0;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .filter-btn:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: #4a5568;
+    }
+    .filter-btn.active {
+      background: #2b6cb0;
+      border-color: #3182ce;
+      color: #bee3f8;
+    }
+
+    /* Upcoming Milestones */
+    .upcoming-milestones {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .um-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .um-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+    }
+    .milestone-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      border-left: 3px solid #63b3ed;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+    }
+    .milestone-item:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateX(4px);
+    }
+    .milestone-item.overdue {
+      border-left-color: #fc8181;
+    }
+    .milestone-date {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #63b3ed;
+      min-width: 70px;
+    }
+    .milestone-item.overdue .milestone-date {
+      color: #fc8181;
+    }
+    .milestone-name {
+      flex: 1;
+      font-size: 0.8rem;
+      color: #e2e8f0;
+    }
+    .milestone-owner {
+      font-size: 0.7rem;
+      color: #718096;
+    }
+
+    /* Back to Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 48px;
+      height: 48px;
+      background: #2b6cb0;
+      border: 1px solid #3182ce;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #bee3f8;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 999;
+    }
+    .back-to-top.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .back-to-top:hover {
+      background: #3182ce;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+
+    /* Loading States */
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(99,179,237,0.3);
+      border-top-color: #63b3ed;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s ease-in-out infinite;
+      border-radius: 8px;
+    }
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Error States */
+    .error-message {
+      background: rgba(252,129,129,0.15);
+      border: 1px solid rgba(252,129,129,0.3);
+      border-radius: 8px;
+      padding: 16px;
+      color: #fc8181;
+      font-size: 0.875rem;
+      margin: 12px 0;
+    }
+    .retry-btn {
+      background: rgba(252,129,129,0.2);
+      border: 1px solid rgba(252,129,129,0.4);
+      color: #fc8181;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s ease;
+    }
+    .retry-btn:hover {
+      background: rgba(252,129,129,0.3);
+    }
+
+    /* Keyboard Shortcuts Modal */
+    .shortcuts-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    .shortcuts-content {
+      background: #1a1f2e;
+      border: 1px solid #3d4f6e;
+      border-radius: 12px;
+      padding: 28px 32px;
+      max-width: 600px;
+      width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .shortcuts-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f7fafc;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #2d3748;
+    }
+    .shortcut-desc {
+      color: #e2e8f0;
+      font-size: 0.875rem;
+    }
+    .shortcut-keys {
+      display: flex;
+      gap: 6px;
+    }
+    .key {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #4a5568;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: #a0aec0;
+    }
+
+    /* Enhanced Animations */
+    .section, .stat-card, .raid-section {
+      transition: all 0.2s ease;
+    }
+    .section:hover, .stat-card:hover, .raid-section a > div:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Hidden class for filtering */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Sync button enhancements */
+    .sync-btn, .milestones-sync-btn {
+      transition: all 0.2s ease;
+    }
+    .sync-btn:hover, .milestones-sync-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(99,179,237,0.3);
+    }
+    .sync-btn.syncing::before, .milestones-sync-btn.syncing::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-input {
+        min-width: 100%;
+      }
+      .filter-buttons {
+        justify-content: center;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -417,7 +841,14 @@
       <h1>Video AI – <span>Master Project Dashboard</span></h1>
       <div class="subtitle">Cobalt Video Analytics · Tier 1 Global Office Rollout</div>
     </div>
-    <div class="phase-badge">▶ Phase 1 – AMER · Q2 FY27</div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <div class="phase-badge">▶ Phase 1 – AMER · Q2 FY27</div>
+      <div class="health-badge on-track" id="projectHealthBadge">
+        <span id="healthIcon">🟢</span>
+        <span id="healthLabel">On Track</span>
+      </div>
+    </div>
+    <div class="last-updated" id="lastUpdated">Last updated: Loading...</div>
   </div>
   <div class="meta-grid">
     <div class="meta-item"><div class="label">Project Sponsor</div><div class="value">Bill Inzeo</div></div>
@@ -438,6 +869,70 @@
   <div class="legend-item"><div class="legend-dot dot-green"></div> In Progress</div>
   <div class="legend-item"><div class="legend-dot dot-blue"></div> Completed</div>
   <div class="legend-item"><div class="legend-dot dot-grey"></div> Not Started</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ QUICK STATS DASHBOARD -->
+<div class="quick-stats">
+  <div class="stats-header">
+    <span style="font-size: 1rem;">📊</span>
+    <span class="stats-title">Project Overview</span>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-value" style="color: #63b3ed;" id="statTotal">31</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color: #68d391;" id="statCompleted">42%</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color: #68d391;" id="statInProgress">29%</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color: #fc8181;" id="statAtRisk">13%</div>
+      <div class="stat-label">At Risk</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color: #a0aec0;" id="statNotStarted">16%</div>
+      <div class="stat-label">Not Started</div>
+    </div>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-label">
+      <span>Overall Completion</span>
+      <span id="progressPercent">42%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 42%;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SEARCH/FILTER BAR -->
+<div class="filter-bar">
+  <input type="text" class="search-input" id="searchInput" placeholder="Search tasks, filter by status, owner...">
+  <div class="filter-buttons">
+    <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">All</button>
+    <button class="filter-btn" data-filter="red" onclick="filterTasks('red')">At Risk</button>
+    <button class="filter-btn" data-filter="green" onclick="filterTasks('green')">In Progress</button>
+    <button class="filter-btn" data-filter="blue" onclick="filterTasks('blue')">Completed</button>
+    <button class="filter-btn" data-filter="grey" onclick="filterTasks('grey')">Not Started</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ UPCOMING MILESTONES -->
+<div class="upcoming-milestones" id="upcomingMilestones">
+  <div class="um-header">
+    <span style="font-size: 1rem;">📅</span>
+    <span class="um-title">Upcoming Milestones</span>
+  </div>
+  <div id="milestonesListShort">
+    <div style="padding: 20px; text-align: center; color: #4a5568; font-size: 0.8rem;">
+      No milestones data yet. Sync from Canvas to see upcoming milestones.
+    </div>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════ RISK CHART -->
@@ -983,9 +1478,15 @@
   </a>
 </div>
 
+<!-- ══════════════════════════════════════════════════════ BACK TO TOP BUTTON -->
+<div class="back-to-top" id="backToTop" onclick="scrollToTop()">
+  ↑
+</div>
+
 <!-- ══════════════════════════════════════════════════════ FOOTER -->
 <div class="footer">
-  Generated from #proj-gss-video-ai-working-group Master Project Plan · Last updated Jun 5, 2026 · Statuses inferred from project context — update as needed
+  Generated from #proj-gss-video-ai-working-group Master Project Plan · Last updated Jun 5, 2026 · Statuses inferred from project context — update as needed<br>
+  Press <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; font-size: 0.7rem;">?</kbd> for keyboard shortcuts
 </div>
 
 <!-- ══════════════════════════════════════════════════════ SYNC MODAL -->
@@ -1034,6 +1535,7 @@ function openSyncModal() {
   parsedRisks = null;
   var overlay = document.getElementById('syncOverlay');
   overlay.style.display = 'flex';
+  overlay.style.animation = 'fadeIn 0.2s ease';
 }
 
 function closeSyncModal() {
@@ -1145,6 +1647,25 @@ function previewSync() {
 
 function applySync() {
   if (!parsedRisks) return;
+
+  // Show loading state
+  var btn = document.getElementById('applyBtn');
+  var originalText = btn.textContent;
+  btn.disabled = true;
+  btn.classList.add('syncing');
+  btn.textContent = 'Applying...';
+
+  // Small delay to show loading animation
+  setTimeout(function() {
+    performSync();
+    btn.classList.remove('syncing');
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }, 300);
+}
+
+function performSync() {
+  if (!parsedRisks) return;
   var c = countByStatus(parsedRisks);
   var total = parsedRisks.length;
 
@@ -1188,6 +1709,10 @@ function applySync() {
   if (lastEl) lastEl.textContent = 'Last synced ' + ts;
 
   closeSyncModal();
+
+  // Update all dashboard metrics
+  updateLastUpdated();
+  calculateProjectHealth();
 
   // Show success message
   alert('✅ Dashboard updated successfully!\n\n' + total + ' risks synced from Slack Canvas.\n\n⚠️ Remember: These changes are local only. To persist them, you need to update the HTML file and push to GitHub.');
@@ -1336,7 +1861,7 @@ function previewMilestones() {
   btn.disabled = false;
 }
 
-function applyMilestones() {
+function applyMilestonesCore() {
   if (!parsedMilestones) return;
   var items = parsedMilestones;
   var tbody = document.getElementById('milestonesTableBody');
@@ -1399,7 +1924,332 @@ function applyMilestones() {
   closeMilestonesModal();
 
   alert('✅ Video AI Plan & Milestones updated successfully!\n\n' + items.length + ' milestones synced from Slack Canvas.\n\n⚠️ Remember: These changes are local only. To persist them, you need to update the HTML file and push to GitHub.');
+
+  // Update upcoming milestones short list
+  updateUpcomingMilestones(items);
 }
+
+function applyMilestones() {
+  if (!parsedMilestones) return;
+
+  // Show loading state
+  var btn = document.getElementById('milestonesApplyBtn');
+  var originalText = btn.textContent;
+  btn.disabled = true;
+  btn.classList.add('syncing');
+  btn.textContent = 'Applying...';
+
+  setTimeout(function() {
+    applyMilestonesCore();
+    updateLastUpdated();
+    btn.classList.remove('syncing');
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }, 300);
+}
+
+// ── Enhanced Dashboard Features ────────────────────────────────
+function updateLastUpdated() {
+  var now = new Date();
+  var formatted = now.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) + ' at ' + now.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
+  document.getElementById('lastUpdated').textContent = 'Last updated: ' + formatted;
+}
+
+function calculateProjectHealth() {
+  var tasks = document.querySelectorAll('.task');
+  var atRiskCount = 0;
+  var blockerCount = 0;
+
+  tasks.forEach(function(task) {
+    if (task.classList.contains('red')) {
+      var badgeText = task.querySelector('.badge') ? task.querySelector('.badge').textContent.toLowerCase() : '';
+      if (badgeText.indexOf('blocker') !== -1 || badgeText.indexOf('show stopper') !== -1) {
+        blockerCount++;
+      } else {
+        atRiskCount++;
+      }
+    }
+  });
+
+  var badge = document.getElementById('projectHealthBadge');
+  var icon = document.getElementById('healthIcon');
+  var label = document.getElementById('healthLabel');
+
+  badge.className = 'health-badge';
+
+  if (blockerCount >= 4 || atRiskCount >= 4) {
+    badge.classList.add('critical');
+    icon.textContent = '🔴';
+    label.textContent = 'Critical';
+  } else if (blockerCount >= 1 && blockerCount <= 3 || atRiskCount >= 4) {
+    badge.classList.add('at-risk');
+    icon.textContent = '🟡';
+    label.textContent = 'At Risk';
+  } else {
+    badge.classList.add('on-track');
+    icon.textContent = '🟢';
+    label.textContent = 'On Track';
+  }
+}
+
+function calculateQuickStats() {
+  var tasks = document.querySelectorAll('.task');
+  var total = tasks.length;
+  var completed = 0;
+  var inProgress = 0;
+  var atRisk = 0;
+  var notStarted = 0;
+
+  tasks.forEach(function(task) {
+    if (task.classList.contains('blue')) completed++;
+    else if (task.classList.contains('green')) inProgress++;
+    else if (task.classList.contains('red')) atRisk++;
+    else if (task.classList.contains('grey')) notStarted++;
+  });
+
+  var completedPct = Math.round((completed / total) * 100);
+  var inProgressPct = Math.round((inProgress / total) * 100);
+  var atRiskPct = Math.round((atRisk / total) * 100);
+  var notStartedPct = Math.round((notStarted / total) * 100);
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statCompleted').textContent = completedPct + '%';
+  document.getElementById('statInProgress').textContent = inProgressPct + '%';
+  document.getElementById('statAtRisk').textContent = atRiskPct + '%';
+  document.getElementById('statNotStarted').textContent = notStartedPct + '%';
+
+  document.getElementById('progressPercent').textContent = completedPct + '%';
+  document.getElementById('progressFill').style.width = completedPct + '%';
+  document.getElementById('progressFill').textContent = completedPct + '%';
+}
+
+// Search and filter functionality
+var currentFilter = 'all';
+
+function filterTasks(filter) {
+  currentFilter = filter;
+  var buttons = document.querySelectorAll('.filter-btn');
+  buttons.forEach(function(btn) {
+    btn.classList.remove('active');
+    if (btn.getAttribute('data-filter') === filter) {
+      btn.classList.add('active');
+    }
+  });
+  applyFilters();
+}
+
+function applyFilters() {
+  var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  var sections = document.querySelectorAll('.section');
+
+  sections.forEach(function(section) {
+    var tasks = section.querySelectorAll('.task');
+    var visibleCount = 0;
+
+    tasks.forEach(function(task) {
+      var matchesFilter = currentFilter === 'all' || task.classList.contains(currentFilter);
+      var matchesSearch = true;
+
+      if (searchTerm) {
+        var taskText = task.textContent.toLowerCase();
+        matchesSearch = taskText.indexOf(searchTerm) !== -1;
+      }
+
+      if (matchesFilter && matchesSearch) {
+        task.style.display = '';
+        visibleCount++;
+      } else {
+        task.style.display = 'none';
+      }
+    });
+
+    // Hide dividers between hidden tasks
+    var dividers = section.querySelectorAll('.divider');
+    dividers.forEach(function(div) {
+      div.style.display = 'none';
+    });
+
+    // Show section only if it has visible tasks
+    if (visibleCount === 0) {
+      section.style.display = 'none';
+    } else {
+      section.style.display = '';
+    }
+  });
+}
+
+// Search input handler
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+// Back to top button
+window.addEventListener('scroll', function() {
+  var btn = document.getElementById('backToTop');
+  if (window.scrollY > 500) {
+    btn.classList.add('visible');
+  } else {
+    btn.classList.remove('visible');
+  }
+});
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Collapsible sections with localStorage
+function saveCollapsedState() {
+  var details = document.querySelectorAll('details');
+  var state = {};
+  details.forEach(function(detail, idx) {
+    state['detail_' + idx] = detail.open;
+  });
+  localStorage.setItem('dashboardCollapsedState', JSON.stringify(state));
+}
+
+function restoreCollapsedState() {
+  var state = localStorage.getItem('dashboardCollapsedState');
+  if (!state) return;
+
+  try {
+    state = JSON.parse(state);
+    var details = document.querySelectorAll('details');
+    details.forEach(function(detail, idx) {
+      if (state['detail_' + idx] !== undefined) {
+        detail.open = state['detail_' + idx];
+      }
+    });
+  } catch(e) {}
+}
+
+// Save state when details are toggled
+document.addEventListener('DOMContentLoaded', function() {
+  var details = document.querySelectorAll('details');
+  details.forEach(function(detail) {
+    detail.addEventListener('toggle', saveCollapsedState);
+  });
+});
+
+// Update upcoming milestones
+function updateUpcomingMilestones(items) {
+  if (!items || items.length === 0) return;
+
+  var container = document.getElementById('milestonesListShort');
+  container.innerHTML = '';
+
+  var today = new Date();
+  var upcoming = [];
+
+  items.forEach(function(m) {
+    if (m.due && m.statusKey !== 'done') {
+      var dueDate = parseDate(m.due);
+      if (dueDate) {
+        m.parsedDate = dueDate;
+        upcoming.push(m);
+      }
+    }
+  });
+
+  upcoming.sort(function(a, b) {
+    return a.parsedDate - b.parsedDate;
+  });
+
+  var toShow = upcoming.slice(0, 5);
+
+  if (toShow.length === 0) {
+    container.innerHTML = '<div style="padding: 20px; text-align: center; color: #4a5568; font-size: 0.8rem;">No upcoming milestones</div>';
+    return;
+  }
+
+  toShow.forEach(function(m) {
+    var div = document.createElement('div');
+    div.className = 'milestone-item';
+
+    if (m.parsedDate < today) {
+      div.classList.add('overdue');
+    }
+
+    var dateSpan = document.createElement('span');
+    dateSpan.className = 'milestone-date';
+    dateSpan.textContent = formatShortDate(m.parsedDate);
+
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'milestone-name';
+    nameSpan.textContent = m.task;
+
+    var ownerSpan = document.createElement('span');
+    ownerSpan.className = 'milestone-owner';
+    ownerSpan.textContent = m.owner || '';
+
+    div.appendChild(dateSpan);
+    div.appendChild(nameSpan);
+    if (m.owner) div.appendChild(ownerSpan);
+
+    container.appendChild(div);
+  });
+}
+
+function parseDate(dateStr) {
+  try {
+    var d = new Date(dateStr);
+    if (!isNaN(d.getTime())) return d;
+  } catch(e) {}
+  return null;
+}
+
+function formatShortDate(date) {
+  var month = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][date.getMonth()];
+  return month + ' ' + date.getDate();
+}
+
+// Keyboard shortcuts
+var shortcutsModal = null;
+
+function showShortcuts() {
+  if (!shortcutsModal) {
+    shortcutsModal = document.createElement('div');
+    shortcutsModal.className = 'shortcuts-modal';
+    shortcutsModal.innerHTML = '<div class="shortcuts-content"><div class="shortcuts-title">⌨️ Keyboard Shortcuts</div><div class="shortcut-item"><span class="shortcut-desc">Search tasks</span><div class="shortcut-keys"><span class="key">/</span></div></div><div class="shortcut-item"><span class="shortcut-desc">Show this help</span><div class="shortcut-keys"><span class="key">?</span></div></div><div class="shortcut-item"><span class="shortcut-desc">Scroll to top</span><div class="shortcut-keys"><span class="key">Home</span></div></div><div class="shortcut-item"><span class="shortcut-desc">Scroll to bottom</span><div class="shortcut-keys"><span class="key">End</span></div></div><div class="shortcut-item"><span class="shortcut-desc">Close modal</span><div class="shortcut-keys"><span class="key">Esc</span></div></div><div style="margin-top: 20px; text-align: center;"><button onclick="hideShortcuts()" style="padding: 8px 24px; background: #2b6cb0; border: none; border-radius: 6px; color: #fff; font-weight: 600; cursor: pointer;">Close</button></div></div>';
+    document.body.appendChild(shortcutsModal);
+
+    shortcutsModal.addEventListener('click', function(e) {
+      if (e.target === shortcutsModal) hideShortcuts();
+    });
+  }
+  shortcutsModal.style.display = 'flex';
+}
+
+function hideShortcuts() {
+  if (shortcutsModal) {
+    shortcutsModal.style.display = 'none';
+  }
+}
+
+// Keyboard event listeners
+document.addEventListener('keydown', function(e) {
+  // Ignore if typing in input
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    if (e.key === 'Escape') e.target.blur();
+    return;
+  }
+
+  if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+    e.preventDefault();
+    showShortcuts();
+  } else if (e.key === '/') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  } else if (e.key === 'Escape') {
+    hideShortcuts();
+  }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  updateLastUpdated();
+  calculateProjectHealth();
+  calculateQuickStats();
+  restoreCollapsedState();
+});
+
 </script>
 
 <!-- ══════════════════════════════════════════════════════ MILESTONES SYNC MODAL -->

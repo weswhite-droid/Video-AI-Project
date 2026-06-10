@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – Master Project Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f7fafc;
+      line-height: 1.2;
+    }
+    .header h1 span { color: #63b3ed; }
+    .header .subtitle {
+      font-size: 0.875rem;
+      color: #718096;
+      margin-top: 4px;
+    }
+    .phase-badge {
+      background: #2b6cb0;
+      color: #bee3f8;
+      border: 1px solid #3182ce;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .meta-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .meta-item .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; }
+    .meta-item .value { font-size: 0.875rem; font-weight: 600; color: #e2e8f0; margin-top: 2px; }
+
+    /* ── Legend ─────────────────────────────────────────── */
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+    .legend-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; margin-right: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.825rem; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .dot-red    { background: #fc8181; box-shadow: 0 0 6px rgba(252,129,129,0.5); }
+    .dot-green  { background: #68d391; box-shadow: 0 0 6px rgba(104,211,145,0.5); }
+    .dot-blue   { background: #63b3ed; box-shadow: 0 0 6px rgba(99,179,237,0.5); }
+    .dot-grey   { background: #718096; }
+
+    /* ── Sections ───────────────────────────────────────── */
+    .sections {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .section {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* collapsible via <details> */
+    .section details { }
+    .section details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .section details summary::-webkit-details-marker { display: none; }
+    .section details summary:hover { background: rgba(255,255,255,0.07); }
+    .section details[open] summary { border-bottom: 1px solid #2d3748; }
+    .section details:not([open]) summary { border-bottom: none; }
+
+    .chevron {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #4a5568;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    details[open] .chevron { transform: rotate(180deg); }
+
+    .section-icon { font-size: 1rem; }
+    .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; }
+    .section-count { font-size: 0.75rem; color: #718096; }
+
+    .task-list { padding: 8px 0; }
+
+    /* RAID table also collapsible */
+    .raid-section details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .raid-section details summary::-webkit-details-marker { display: none; }
+    .raid-section details summary:hover { background: rgba(255,255,255,0.07); }
+    .raid-section details:not([open]) summary { border-bottom: none; }
+    .raid-section details[open] summary { border-bottom: 1px solid #2d3748; }
+
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 18px;
+      border-left: 3px solid transparent;
+      transition: background 0.15s;
+    }
+    .task:hover { background: rgba(255,255,255,0.03); }
+
+    /* status stripe */
+    .task.red    { border-left-color: #fc8181; }
+    .task.green  { border-left-color: #68d391; }
+    .task.blue   { border-left-color: #63b3ed; }
+    .task.grey   { border-left-color: #4a5568; }
+
+    .task-status {
+      flex-shrink: 0;
+      margin-top: 2px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .task.red   .task-status { background: #fc8181; box-shadow: 0 0 5px rgba(252,129,129,0.6); }
+    .task.green .task-status { background: #68d391; box-shadow: 0 0 5px rgba(104,211,145,0.6); }
+    .task.blue  .task-status { background: #63b3ed; box-shadow: 0 0 5px rgba(99,179,237,0.6); }
+    .task.grey  .task-status { background: #4a5568; }
+
+    .task-body { flex: 1; }
+    .task-name { font-size: 0.875rem; font-weight: 500; color: #e2e8f0; line-height: 1.4; }
+    .task-sub  { font-size: 0.75rem; color: #718096; margin-top: 2px; }
+
+    .badge {
+      flex-shrink: 0;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      align-self: center;
+    }
+    .badge.red    { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+    .badge.green  { background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3); }
+    .badge.blue   { background: rgba(99,179,237,0.15);  color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+    .badge.grey   { background: rgba(74,85,104,0.3);    color: #a0aec0; border: 1px solid #4a5568; }
+
+    .divider { height: 1px; background: #2d3748; margin: 0 18px; }
+
+    /* ── Stats bar ──────────────────────────────────────── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-card .num { font-size: 1.75rem; font-weight: 700; }
+    .stat-card .lbl { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.07em; color: #718096; margin-top: 2px; }
+    .stat-card.red-card   .num { color: #fc8181; }
+    .stat-card.green-card .num { color: #68d391; }
+    .stat-card.blue-card  .num { color: #63b3ed; }
+    .stat-card.grey-card  .num { color: #a0aec0; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #4a5568;
+    }
+
+    /* ── RAID Log ───────────────────────────────────────── */
+    .raid-section {
+      margin-top: 28px;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .raid-section-header {
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .raid-section-header .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; }
+    .raid-section-header .section-count { margin-left: auto; font-size: 0.75rem; color: #718096; }
+
+    .raid-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 10px 20px;
+      border-bottom: 1px solid #2d3748;
+      background: rgba(0,0,0,0.15);
+      font-size: 0.73rem;
+      color: #a0aec0;
+    }
+    .raid-legend-group { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .raid-legend-label { color: #718096; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; margin-right: 4px; }
+    .rl-item { display: flex; align-items: center; gap: 5px; }
+    .rl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .rl-dot.high    { background: #fc8181; }
+    .rl-dot.medium  { background: #f6ad55; }
+    .rl-dot.low     { background: #b794f4; }
+    .rl-dot.closed  { background: #68d391; }
+    .rl-dot.open    { background: #fc8181; box-shadow: 0 0 4px rgba(252,129,129,0.5); }
+    .rl-dot.inprog  { background: #ecc94b; }
+    .rl-dot.notstart{ background: #b794f4; opacity: 0.6; }
+    .rl-dot.watching{ background: #f6ad55; opacity: 0.7; }
+
+    .raid-table-wrap { overflow-x: auto; }
+    table.raid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    table.raid thead tr {
+      background: rgba(255,255,255,0.04);
+    }
+    table.raid th {
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+      border-bottom: 1px solid #2d3748;
+      white-space: nowrap;
+    }
+    table.raid td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e2538;
+      vertical-align: top;
+      color: #cbd5e0;
+      line-height: 1.45;
+    }
+    table.raid tr:last-child td { border-bottom: none; }
+    table.raid tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* impact/likelihood color pills */
+    .pill {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .pill.high   { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+    .pill.medium { background: rgba(246,173,85,0.15);  color: #f6ad55; border: 1px solid rgba(246,173,85,0.3); }
+    .pill.low    { background: rgba(183,148,244,0.15); color: #b794f4; border: 1px solid rgba(183,148,244,0.3); }
+    .pill.lowmed { background: rgba(183,148,244,0.12); color: #d6bcfa; border: 1px solid rgba(183,148,244,0.25); }
+
+    /* status icons */
+    .rs { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+    .rs-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .rs.closed   { color: #68d391; } .rs.closed   .rs-dot { background: #68d391; }
+    .rs.open     { color: #fc8181; } .rs.open     .rs-dot { background: #fc8181; box-shadow: 0 0 4px rgba(252,129,129,0.6); }
+    .rs.inprog   { color: #ecc94b; } .rs.inprog   .rs-dot { background: #ecc94b; }
+    .rs.notstart { color: #b794f4; } .rs.notstart .rs-dot { background: #9f7aea; opacity: 0.7; }
+    .rs.watching { color: #f6ad55; } .rs.watching .rs-dot { background: #f6ad55; opacity: 0.8; }
+
+    .raid-id { font-weight: 700; color: #a0aec0; white-space: nowrap; }
+
+    /* ── Risk Chart ─────────────────────────────────────── */
+    .risk-chart-block {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 20px 24px 24px;
+      margin-bottom: 24px;
+    }
+    .risk-chart-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    @media (max-width: 640px) { .chart-grid { grid-template-columns: 1fr; } }
+
+    /* Bar chart */
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; }
+    .bar-label { font-size: 0.72rem; color: #a0aec0; width: 80px; flex-shrink: 0; text-align: right; }
+    .bar-track { flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; height: 22px; overflow: hidden; position: relative; }
+    .bar-fill  { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.7rem; font-weight: 700; transition: width 0.6s ease; }
+    .bar-fill.open    { background: linear-gradient(90deg, #c53030, #fc8181); color: #fff; }
+    .bar-fill.inprog  { background: linear-gradient(90deg, #b7791f, #ecc94b); color: #1a1208; }
+    .bar-fill.closed  { background: linear-gradient(90deg, #276749, #68d391); color: #fff; }
+    .bar-fill.notstart{ background: linear-gradient(90deg, #553c9a, #b794f4); color: #fff; }
+    .bar-fill.watching{ background: linear-gradient(90deg, #c05621, #f6ad55); color: #1a0e00; }
+
+    /* Donut chart via conic-gradient */
+    .donut-wrap { display: flex; align-items: center; gap: 20px; }
+    .donut {
+      width: 130px; height: 130px; flex-shrink: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        #fc8181 0% 40%,
+        #ecc94b 40% 60%,
+        #68d391 60% 80%,
+        #b794f4 80% 93.3%,
+        #f6ad55 93.3% 100%
+      );
+      position: relative;
+    }
+    .donut::after {
+      content: '15';
+      position: absolute;
+      inset: 22px;
+      background: #1a1f2e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      text-align: center;
+      line-height: 86px;
+    }
+    .donut-legend { display: flex; flex-direction: column; gap: 7px; }
+    .dl-item { display: flex; align-items: center; gap: 7px; font-size: 0.75rem; color: #cbd5e0; }
+    .dl-swatch { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+    .dl-swatch.open    { background: #fc8181; }
+    .dl-swatch.inprog  { background: #ecc94b; }
+    .dl-swatch.closed  { background: #68d391; }
+    .dl-swatch.notstart{ background: #b794f4; }
+    .dl-swatch.watching{ background: #f6ad55; }
+    .dl-count { font-weight: 700; margin-left: auto; padding-left: 12px; }
+
+    /* ── New enhancements ─────────────────────────────────── */
+    /* Project Health Badge */
+    .health-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #2d3748;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      margin-left: 12px;
+      transition: all 0.2s ease;
+    }
+    .health-badge.on-track { background: rgba(104,211,145,0.15); border-color: rgba(104,211,145,0.3); color: #68d391; }
+    .health-badge.at-risk { background: rgba(236,201,75,0.15); border-color: rgba(236,201,75,0.3); color: #ecc94b; }
+    .health-badge.critical { background: rgba(252,129,129,0.15); border-color: rgba(252,129,129,0.3); color: #fc8181; }
+
+    /* Last Updated Timestamp */
+    .last-updated {
+      font-size: 0.7rem;
+      color: #4a5568;
+      text-align: right;
+      margin-left: auto;
+    }
+
+    /* Quick Stats Dashboard */
+    .quick-stats {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    .stats-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .stats-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      border: 1px solid #2d3748;
+      transition: all 0.2s ease;
+    }
+    .stat-item:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-2px);
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #718096;
+    }
+    .progress-bar-container {
+      margin-top: 16px;
+    }
+    .progress-label {
+      font-size: 0.75rem;
+      color: #a0aec0;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .progress-bar {
+      height: 24px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2b6cb0, #63b3ed);
+      border-radius: 12px;
+      transition: width 0.6s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Search/Filter Bar */
+    .filter-bar {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 240px;
+      background: #0f1117;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 10px 16px;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .search-input:focus {
+      border-color: #63b3ed;
+      box-shadow: 0 0 0 3px rgba(99,179,237,0.1);
+    }
+    .filter-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #2d3748;
+      background: rgba(255,255,255,0.05);
+      color: #a0aec0;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .filter-btn:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: #4a5568;
+    }
+    .filter-btn.active {
+      background: #2b6cb0;
+      border-color: #3182ce;
+      color: #bee3f8;
+    }
+
+    /* Upcoming Milestones */
+    .upcoming-milestones {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .um-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .um-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+    }
+    .milestone-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      border-left: 3px solid #63b3ed;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+    }
+    .milestone-item:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateX(4px);
+    }
+    .milestone-item.overdue {
+      border-left-color: #fc8181;
+    }
+    .milestone-date {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #63b3ed;
+      min-width: 70px;
+    }
+    .milestone-item.overdue .milestone-date {
+      color: #fc8181;
+    }
+    .milestone-name {
+      flex: 1;
+      font-size: 0.8rem;
+      color: #e2e8f0;
+    }
+    .milestone-owner {
+      font-size: 0.7rem;
+      color: #718096;
+    }
+
+    /* Back to Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 48px;
+      height: 48px;
+      background: #2b6cb0;
+      border: 1px solid #3182ce;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #bee3f8;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 999;
+    }
+    .back-to-top.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .back-to-top:hover {
+      background: #3182ce;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+
+    /* Loading States */
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(99,179,237,0.3);
+      border-top-color: #63b3ed;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s ease-in-out infinite;
+      border-radius: 8px;
+    }
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Error States */
+    .error-message {
+      background: rgba(252,129,129,0.15);
+      border: 1px solid rgba(252,129,129,0.3);
+      border-radius: 8px;
+      padding: 16px;
+      color: #fc8181;
+      font-size: 0.875rem;
+      margin: 12px 0;
+    }
+    .retry-btn {
+      background: rgba(252,129,129,0.2);
+      border: 1px solid rgba(252,129,129,0.4);
+      color: #fc8181;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s ease;
+    }
+    .retry-btn:hover {
+      background: rgba(252,129,129,0.3);
+    }
+
+    /* Keyboard Shortcuts Modal */
+    .shortcuts-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    .shortcuts-content {
+      background: #1a1f2e;
+      border: 1px solid #3d4f6e;
+      border-radius: 12px;
+      padding: 28px 32px;
+      max-width: 600px;
+      width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .shortcuts-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f7fafc;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #2d3748;
+    }
+    .shortcut-desc {
+      color: #e2e8f0;
+      font-size: 0.875rem;
+    }
+    .shortcut-keys {
+      display: flex;
+      gap: 6px;
+    }
+    .key {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #4a5568;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: #a0aec0;
+    }
+
+    /* Enhanced Animations */
+    .section, .stat-card, .raid-section {
+      transition: all 0.2s ease;
+    }
+    .section:hover, .stat-card:hover, .raid-section a > div:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Hidden class for filtering */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Sync button enhancements */
+    .sync-btn, .milestones-sync-btn {
+      transition: all 0.2s ease;
+    }
+    .sync-btn:hover, .milestones-sync-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(99,179,237,0.3);
+    }
+    .sync-btn.syncing::before, .milestones-sync-btn.syncing::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-input {
+        min-width: 100%;
+      }
+      .filter-buttons {
+        justify-content: center;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>Video AI – <span>Master Project Dashboard</span></h1>
+      <div class="subtitle">Cobalt Video Analytics · Tier 1 Global Office Rollout</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <div class="phase-badge">▶ Phase 1 – AMER · Q2 FY27</div>
+      <div class="health-badge on-track" id="projectHealthBadge">
+        <span id="healthIcon">🟢</span>
+        <span id="healthLabel">On Track</span>
+      </div>
+    </div>
+    <div class="last-updated" id="lastUpdated">Last updated: Loading...</div>
+  </div>
+  <div class="meta-grid">
+    <div class="meta-item"><div class="label">Project Sponsor</div><div class="value">Bill Inzeo</div></div>
+    <div class="meta-item"><div class="label">Program Leader</div><div class="value">Jeff Toler</div></div>
+    <div class="meta-item"><div class="label">Program Lead / PM</div><div class="value">Jerry Wu / Wes White</div></div>
+    <div class="meta-item"><div class="label">FY27 Budget</div><div class="value">$400,140 (FY28: $1,612,800)</div></div>
+    <div class="meta-item"><div class="label">Pilot Alarm Resolution</div><div class="value">98%</div></div>
+    <div class="meta-item"><div class="label">Guard Dispatch Reduction</div><div class="value">80%</div></div>
+    <div class="meta-item"><div class="label">Nuisance Alarms Eliminated</div><div class="value">780K+</div></div>
+    <div class="meta-item"><div class="label">Phase 1 Sites</div><div class="value">San Francisco · Bellevue · Chicago · New York</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ LEGEND -->
+<div class="legend">
+  <span class="legend-title">Status Key</span>
+  <div class="legend-item"><div class="legend-dot dot-red"></div> At Risk / Show Stopper</div>
+  <div class="legend-item"><div class="legend-dot dot-green"></div> In Progress</div>
+  <div class="legend-item"><div class="legend-dot dot-blue"></div> Completed</div>
+  <div class="legend-item"><div class="legend-dot dot-grey"></div> Not Started</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ QUICK STATS DASHBOARD -->
+<div class="quick-stats">
+  <div class="stats-header">
+    <span style="font-size: 1rem;">📊</span>
+    <span class="stats-title">Project Overview</span>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-value" style="color: #63b3ed;" id="statTotal">31</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color: #68d391;" id="statCompleted">42%</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color: #68d391;" id="statInProgress">29%</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color: #fc8181;" id="statAtRisk">13%</div>
+      <div class="stat-label">At Risk</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" style="color: #a0aec0;" id="statNotStarted">16%</div>
+      <div class="stat-label">Not Started</div>
+    </div>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-label">
+      <span>Overall Completion</span>
+      <span id="progressPercent">42%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 42%;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SEARCH/FILTER BAR -->
+<div class="filter-bar">
+  <input type="text" class="search-input" id="searchInput" placeholder="Search tasks, filter by status, owner...">
+  <div class="filter-buttons">
+    <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">All</button>
+    <button class="filter-btn" data-filter="red" onclick="filterTasks('red')">At Risk</button>
+    <button class="filter-btn" data-filter="green" onclick="filterTasks('green')">In Progress</button>
+    <button class="filter-btn" data-filter="blue" onclick="filterTasks('blue')">Completed</button>
+    <button class="filter-btn" data-filter="grey" onclick="filterTasks('grey')">Not Started</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ UPCOMING MILESTONES -->
+<div class="upcoming-milestones" id="upcomingMilestones">
+  <div class="um-header">
+    <span style="font-size: 1rem;">📅</span>
+    <span class="um-title">Upcoming Milestones</span>
+  </div>
+  <div id="milestonesListShort">
+    <div style="padding: 20px; text-align: center; color: #4a5568; font-size: 0.8rem;">
+      No milestones data yet. Sync from Canvas to see upcoming milestones.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ RISK CHART -->
+<div class="risk-chart-block">
+  <div class="risk-chart-title" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <span>⚠️ RAID Risk Summary — <span id="raidTotalLabel">15 Total Risks</span></span>
+    <button class="sync-btn" onclick="openSyncModal()" style="margin-left: auto;">⟳ Sync from Canvas</button>
+    <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4" target="_blank" class="canvas-link" style="font-size: 0.72rem; color: #63b3ed; text-decoration: none; border: 1px solid rgba(99,179,237,0.35); padding: 5px 12px; border-radius: 6px; background: rgba(99,179,237,0.1); white-space: nowrap; transition: background 0.15s, border-color 0.15s;" onmouseover="this.style.background='rgba(99,179,237,0.2)'; this.style.borderColor='#63b3ed';" onmouseout="this.style.background='rgba(99,179,237,0.1)'; this.style.borderColor='rgba(99,179,237,0.35)';">📋 Open Canvas</a>
+    <span class="sync-last" id="syncLastLabel" style="font-size: 0.65rem; color: #4a5568; margin-left: 0;"></span>
+  </div>
+  <div style="display: flex; justify-content: center; padding: 20px 0;">
+    <!-- Donut chart -->
+    <div>
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:10px;text-align:center;">Distribution</div>
+      <div class="donut-wrap">
+        <div class="donut"></div>
+        <div class="donut-legend">
+          <div class="dl-item"><div class="dl-swatch open"></div> Open <span class="dl-count">6</span></div>
+          <div class="dl-item"><div class="dl-swatch inprog"></div> In Progress <span class="dl-count">3</span></div>
+          <div class="dl-item"><div class="dl-swatch closed"></div> Closed <span class="dl-count">3</span></div>
+          <div class="dl-item"><div class="dl-swatch notstart"></div> Not Started <span class="dl-count">2</span></div>
+          <div class="dl-item"><div class="dl-swatch watching"></div> Watching <span class="dl-count">1</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ MASTER PROJECT PLAN -->
+<div class="milestones-block" id="milestonesBlock" style="background: #1a1f2e; border: 1px solid #2d3748; border-radius: 10px; margin-bottom: 24px; overflow: hidden;">
+  <div class="milestones-header" style="padding: 14px 20px; background: rgba(255,255,255,0.04); border-bottom: 1px solid #2d3748; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <span style="font-size: 1rem;">📅</span>
+    <span class="mh-title" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0;">Video AI Plan &amp; Milestones</span>
+    <span class="mh-sub" id="milestonesCountLabel" style="font-size: 0.7rem; color: #4a5568; margin-left: 6px;"></span>
+    <button class="milestones-sync-btn" onclick="openMilestonesModal()" style="margin-left: auto; background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.35); color: #63b3ed; border-radius: 6px; padding: 5px 12px; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s; white-space: nowrap; flex-shrink: 0;">⟳ Sync from Canvas</button>
+    <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q" target="_blank" style="background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.35); color: #63b3ed; border-radius: 6px; padding: 5px 12px; font-size: 0.72rem; font-weight: 600; text-decoration: none; white-space: nowrap; flex-shrink: 0; transition: background 0.15s, border-color 0.15s;" onmouseover="this.style.background='rgba(99,179,237,0.2)'; this.style.borderColor='#63b3ed';" onmouseout="this.style.background='rgba(99,179,237,0.1)'; this.style.borderColor='rgba(99,179,237,0.35)';">📋 Open Canvas</a>
+    <span class="milestones-last" id="milestonesLastLabel" style="font-size: 0.65rem; color: #4a5568; white-space: nowrap;"></span>
+  </div>
+  <div id="milestonesBody">
+    <div class="milestones-empty" id="milestonesEmpty" style="padding: 28px; text-align: center; color: #4a5568; font-size: 0.8rem;">
+      No milestones loaded yet — click <strong>⟳ Sync from Canvas</strong> to import from the Video AI Plan & Milestones canvas.
+    </div>
+    <div class="milestones-table-wrap" id="milestonesTableWrap" style="display: none; overflow-x: auto;">
+      <table class="milestones" id="milestonesTable" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+        <thead>
+          <tr style="background: rgba(255,255,255,0.04);">
+            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Phase</th>
+            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Task / Milestone</th>
+            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Owner</th>
+            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Due</th>
+            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="milestonesTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ STATS -->
+<div class="stats-bar">
+  <div class="stat-card red-card">
+    <div class="num">4</div>
+    <div class="lbl">At Risk / Blockers</div>
+  </div>
+  <div class="stat-card green-card">
+    <div class="num">9</div>
+    <div class="lbl">In Progress</div>
+  </div>
+  <div class="stat-card blue-card">
+    <div class="num">13</div>
+    <div class="lbl">Completed</div>
+  </div>
+  <div class="stat-card grey-card">
+    <div class="num">5</div>
+    <div class="lbl">Not Started</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TASK SECTIONS -->
+<div class="sections">
+
+  <!-- ─── Planning & Governance ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📋</span>
+      <span class="section-title">Planning &amp; Governance</span>
+      <span class="section-count">5 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Charter &amp; Overview</div>
+          <div class="task-sub">Purpose, objectives, scope, stakeholders, timeline &amp; approvals</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-raid-log.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">RAID Log ↗</a></div>
+          <div class="task-sub">Risks, Assumptions, Issues &amp; Dependencies tracking — ongoing</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Plan &amp; Milestones</div>
+          <div class="task-sub">Phased rollout plan by region with milestones &amp; deliverables</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-raci.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">RACI Matrix ↗</a></div>
+          <div class="task-sub">RACI assignments and communication plan</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Stakeholders (Restricted)</div>
+          <div class="task-sub">Core working group identified and access restricted</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Requirements & Change Management ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📐</span>
+      <span class="section-title">Requirements &amp; Change Management</span>
+      <span class="section-count">3 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-requirements.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">System Requirements ↗</a></div>
+          <div class="task-sub">Business, functional, non-functional requirements &amp; out-of-scope</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Change Management Plan</div>
+          <div class="task-sub">Change management strategy and execution plan</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Pre-Read: Video AI Program</div>
+          <div class="task-sub">VP-level briefing — pilot results, vendor rec, budget, Phase 2 sign-off</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Financial & Quality ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">💰</span>
+      <span class="section-title">Financial &amp; Quality</span>
+      <span class="section-count">2 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Budget &amp; Financial Tracking</div>
+          <div class="task-sub">PRs submitted May 26 · Awaiting PO/budget confirmation from Rob &amp; Gary</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Quality &amp; Acceptance Criteria</div>
+          <div class="task-sub">Quality standards and phase-specific acceptance criteria</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Knowledge & Closure ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📦</span>
+      <span class="section-title">Knowledge &amp; Closure</span>
+      <span class="section-count">2 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Lessons Learned</div>
+          <div class="task-sub">Pilot lessons and ongoing log for continuous improvement</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Closure &amp; Handoff Checklist + Package</div>
+          <div class="task-sub">Closure checklist, handoff package &amp; final sign-off</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── High-Level Deliverables ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🎯</span>
+      <span class="section-title">High-Level Deliverables</span>
+      <span class="section-count">1 item</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Video AI Project Slide Deck</div>
+          <div class="task-sub">High-level overview presentation for stakeholders</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Procurement & Financials ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🧾</span>
+      <span class="section-title">Procurement Milestones</span>
+      <span class="section-count">6 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Budget ($1.6M) Tentative Approval</div>
+          <div class="task-sub">Apr 10 · Pending VP sign-off at time of update</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">VP Sign-off – Orlaith Murphy</div>
+          <div class="task-sub">Apr 16 · Formal VP approval obtained</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Cobalt FY27 Quote Received</div>
+          <div class="task-sub">May 5 · Revised ~$754,620 FY27 (Q2–Q4) quote from Cobalt</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PO / Budget Confirmation</div>
+          <div class="task-sub">May 6 · Quote shared with Rob Mirakaj &amp; Gary Lunetta — awaiting confirmation</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PIR Submission – "Cobalt Video AI Continuation"</div>
+          <div class="task-sub">May 19 · Submitted in procurement system</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Purchase Request (PR) Approvals</div>
+          <div class="task-sub">May 26 · All PRs submitted — awaiting approval routing</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Staffing / Resources ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">👥</span>
+      <span class="section-title">Staffing &amp; Resources</span>
+      <span class="section-count">13 roles</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Sponsor</div>
+          <div class="task-sub">Bill Inzeo</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Program Manager</div>
+          <div class="task-sub">Jeff Toler</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Program Lead</div>
+          <div class="task-sub">Jerry Wu / Wes White</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Manager / Coordinator</div>
+          <div class="task-sub">Wes White (PMP, FTE) · ~20 hrs/wk · Greenlit by Bill &amp; Orlaith</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecOps Director</div>
+          <div class="task-sub">Robert Mirakaj</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">GOC Director</div>
+          <div class="task-sub">Suzanne Paleologos</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">H&amp;S Senior Manager</div>
+          <div class="task-sub">Aaron Patkin</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">VP Resilience</div>
+          <div class="task-sub">Stasha Wyskiel</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PhySec Lead</div>
+          <div class="task-sub">Kory Turnbow</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Security Technology Director</div>
+          <div class="task-sub">Gary Lunetta</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">GS&amp;S Financial Ops</div>
+          <div class="task-sub">James Herrera</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecTech SOW Worker 1</div>
+          <div class="task-sub">Steven Hord</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task orange">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecTech SOW Worker 2</div>
+          <div class="task-sub">TBD · Resource not yet identified</div>
+        </div>
+        <div class="badge orange">At Risk</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- ─── Phase Rollout ─── -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🗺️</span>
+      <span class="section-title">Phase Rollout</span>
+      <span class="section-count">2 phases</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Phase 1 – AMER (4 Sites)</div>
+          <div class="task-sub">San Francisco · Bellevue · Chicago · New York · Q2 FY27</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Phase 2 – Full Scale (15 Tier 1 Sites)</div>
+          <div class="task-sub">Global rollout · FY28 · Budget: $1,612,800 TCV</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════ REQUIREMENTS LINK -->
+<div class="raid-section" style="margin-top:28px;">
+  <a href="video-ai-requirements.html" style="text-decoration:none;display:block;">
+    <div style="padding:18px 24px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background=''">
+      <span style="font-size:1.1rem;">📐</span>
+      <div style="flex:1;">
+        <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a0aec0;">System Requirements</div>
+        <div style="font-size:0.75rem;color:#718096;margin-top:3px;">Business objectives · Integration architecture · Functional &amp; non-functional requirements · Operational · Rollout phasing</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        <span style="background:rgba(252,129,129,0.15);color:#fc8181;border:1px solid rgba(252,129,129,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">3 At Risk</span>
+        <span style="background:rgba(99,179,237,0.15);color:#63b3ed;border:1px solid rgba(99,179,237,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">Open Reqs ↗</span>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ RAID LOG LINK -->
+<div class="raid-section" style="margin-top:16px;">
+  <a href="video-ai-raid-log.html" style="text-decoration:none;display:block;">
+    <div style="padding:18px 24px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background=''">
+      <span style="font-size:1.1rem;">⚠️</span>
+      <div style="flex:1;">
+        <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a0aec0;">RAID Log — Risks</div>
+        <div style="font-size:0.75rem;color:#718096;margin-top:3px;">15 risks · Open: 6 · In Progress: 3 · Closed: 3 · Not Started: 2 · Watching: 1</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        <span style="background:rgba(252,129,129,0.15);color:#fc8181;border:1px solid rgba(252,129,129,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">6 Open</span>
+        <span style="background:rgba(104,211,145,0.15);color:#68d391;border:1px solid rgba(104,211,145,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">Open Log ↗</span>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ BUDGET LINK -->
+<div class="raid-section" style="margin-top:16px;">
+  <a href="video-ai-budget.html" style="text-decoration:none;display:block;">
+    <div style="padding:18px 24px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background=''">
+      <span style="font-size:1.1rem;">💰</span>
+      <div style="flex:1;">
+        <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a0aec0;">Budget & Financial Tracking</div>
+        <div style="font-size:0.75rem;color:#718096;margin-top:3px;">FY27 Budget: $400,140 · Spent: $0 · Utilization: 0% · Purchase orders & expense tracking</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        <span style="background:rgba(99,179,237,0.15);color:#63b3ed;border:1px solid rgba(99,179,237,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">$400K FY27</span>
+        <span style="background:rgba(104,211,145,0.15);color:#68d391;border:1px solid rgba(104,211,145,0.3);border-radius:4px;padding:2px 8px;font-size:0.65rem;font-weight:700;">View Budget ↗</span>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ BACK TO TOP BUTTON -->
+<div class="back-to-top" id="backToTop" onclick="scrollToTop()">
+  ↑
+</div>
+
+<!-- ══════════════════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  Generated from #proj-gss-video-ai-working-group Master Project Plan · Last updated Jun 5, 2026 · Statuses inferred from project context — update as needed<br>
+  Press <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; font-size: 0.7rem;">?</kbd> for keyboard shortcuts
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SYNC MODAL -->
+<div class="sync-overlay" id="syncOverlay" onclick="closeSyncOnBackdrop(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+  <div class="sync-modal" style="background: #1a1f2e; border: 1px solid #3d4f6e; border-radius: 12px; padding: 28px 32px; width: min(680px, 95vw); max-height: 90vh; overflow-y: auto;">
+    <h2 style="font-size: 1rem; font-weight: 700; color: #f7fafc; margin-bottom: 6px;">⟳ Sync RAID Log from Slack Canvas</h2>
+    <div class="sync-instructions" style="font-size: 0.78rem; color: #718096; margin-bottom: 16px; line-height: 1.6;">
+      <strong>Step 1:</strong> Open the <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4" target="_blank" style="color: #63b3ed; text-decoration: none;">Slack Canvas</a> in <strong>#proj-gss-video-ai-working-group</strong><br>
+      <strong>Step 2:</strong> Select all rows of the RAID log table (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+A</code> inside table)<br>
+      <strong>Step 3:</strong> Copy (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+C</code>) and paste below<br>
+      <strong>Expected columns:</strong> ID · Description · Likelihood · Impact · Status · Owner
+    </div>
+    <textarea id="syncInput" placeholder="Paste canvas RAID table content here…" oninput="previewSync()" style="width: 100%; height: 220px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; color: #e2e8f0; font-size: 0.78rem; font-family: 'Courier New', monospace; padding: 12px; resize: vertical; outline: none;"></textarea>
+    <div class="sync-error" id="syncError" style="color: #fc8181; font-size: 0.75rem; margin-top: 8px; display: none;"></div>
+    <div class="sync-preview" id="syncPreview" style="margin-top: 14px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 16px; font-size: 0.75rem; color: #a0aec0; display: none;"></div>
+    <div class="sync-modal-actions" style="display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end;">
+      <button class="btn-cancel" onclick="closeSyncModal()" style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #2d3748; background: rgba(255,255,255,0.07); color: #a0aec0;">Cancel</button>
+      <button class="btn-apply" id="applyBtn" onclick="applySync()" disabled style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; background: #2b6cb0; color: #fff;">Apply to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Sync functionality ──────────────────────────────────────────
+var STATUS_MAP = {
+  'open': 'open', 'in progress': 'inprog', 'in-progress': 'inprog', 'inprogress': 'inprog',
+  'closed': 'closed', 'complete': 'closed', 'completed': 'closed', 'done': 'closed',
+  'not started': 'notstart', 'not-started': 'notstart', 'notstarted': 'notstart',
+  'watching': 'watching', 'watch': 'watching', 'monitor': 'watching'
+};
+
+var parsedRisks = null;
+
+// Helper function to safely escape HTML
+function escapeHtml(text) {
+  var div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function openSyncModal() {
+  document.getElementById('syncInput').value = '';
+  document.getElementById('syncError').style.display = 'none';
+  document.getElementById('syncPreview').style.display = 'none';
+  document.getElementById('applyBtn').disabled = true;
+  parsedRisks = null;
+  var overlay = document.getElementById('syncOverlay');
+  overlay.style.display = 'flex';
+  overlay.style.animation = 'fadeIn 0.2s ease';
+}
+
+function closeSyncModal() {
+  document.getElementById('syncOverlay').style.display = 'none';
+}
+
+function closeSyncOnBackdrop(e) {
+  if (e.target === document.getElementById('syncOverlay')) closeSyncModal();
+}
+
+function parseCanvasText(raw) {
+  var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
+  if (lines.length < 2) return null;
+
+  var delim = (lines[0].indexOf('|') !== -1) ? '|' : '\t';
+  var rows = lines.map(function(l) {
+    return l.split(delim).map(function(c){ return c.trim().replace(/^\||\|$/g,'').trim(); });
+  });
+
+  var headerIdx = 0;
+  for (var i = 0; i < Math.min(rows.length, 4); i++) {
+    var lower = rows[i].map(function(c){ return c.toLowerCase(); });
+    if (lower.indexOf('status') !== -1 || lower.indexOf('id') !== -1) { headerIdx = i; break; }
+  }
+
+  var headers = rows[headerIdx].map(function(c){ return c.toLowerCase(); });
+  var statusCol = headers.indexOf('status');
+  if (statusCol === -1) {
+    for (var j = 0; j < headers.length; j++) {
+      if (headers[j].indexOf('status') !== -1) { statusCol = j; break; }
+    }
+  }
+  if (statusCol === -1) return null;
+
+  var idCol = headers.indexOf('id');
+  var descCol = -1;
+  ['description','risk','issue','item','title','name'].forEach(function(k){
+    if (descCol === -1 && headers.indexOf(k) !== -1) descCol = headers.indexOf(k);
+  });
+  var ownerCol = headers.indexOf('owner');
+
+  var risks = [];
+  for (var r = headerIdx + 1; r < rows.length; r++) {
+    var row = rows[r];
+    if (row.length <= statusCol) continue;
+    var rawStatus = (row[statusCol] || '').toLowerCase().trim();
+    var normStatus = STATUS_MAP[rawStatus] || null;
+    if (!normStatus) continue;
+    risks.push({
+      id: idCol !== -1 ? row[idCol] || '' : '',
+      desc: descCol !== -1 ? row[descCol] || '' : '',
+      owner: ownerCol !== -1 ? row[ownerCol] || '' : '',
+      status: normStatus,
+      rawStatus: row[statusCol]
+    });
+  }
+  return risks.length > 0 ? risks : null;
+}
+
+function countByStatus(risks) {
+  var c = { open:0, inprog:0, closed:0, notstart:0, watching:0 };
+  risks.forEach(function(r){ if (c[r.status] !== undefined) c[r.status]++; });
+  return c;
+}
+
+function previewSync() {
+  var raw = document.getElementById('syncInput').value;
+  var errEl = document.getElementById('syncError');
+  var prevEl = document.getElementById('syncPreview');
+  var applyBtn = document.getElementById('applyBtn');
+  errEl.style.display = 'none';
+  prevEl.style.display = 'none';
+  applyBtn.disabled = true;
+  parsedRisks = null;
+
+  if (!raw.trim()) return;
+
+  var risks = parseCanvasText(raw);
+  if (!risks) {
+    errEl.textContent = 'Could not parse the pasted content. Make sure you copied the table rows from the canvas (including the header row). Accepts tab-separated or pipe-delimited format.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  parsedRisks = risks;
+  var c = countByStatus(risks);
+  var total = risks.length;
+
+  // Build preview table using DOM methods (secure)
+  var previewHtml = '<strong style="color:#e2e8f0;">Preview — ' + total + ' risk' + (total !== 1 ? 's' : '') + ' parsed</strong>';
+  previewHtml += '<table style="margin-top:10px; width: 100%; border-collapse: collapse;"><tr style="border-bottom: 1px solid #2d3748;"><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">ID</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Description</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Status</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Owner</th></tr>';
+
+  risks.forEach(function(r) {
+    var sc = r.status === 'open' ? '#fc8181' : r.status === 'inprog' ? '#ecc94b' : r.status === 'closed' ? '#68d391' : r.status === 'watching' ? '#f6ad55' : '#b794f4';
+    var safeId = escapeHtml(r.id || '—');
+    var safeDesc = escapeHtml((r.desc || '—').substring(0,55)) + (r.desc.length>55?'…':'');
+    var safeStatus = escapeHtml(r.rawStatus);
+    var safeOwner = escapeHtml(r.owner || '—');
+    previewHtml += '<tr style="border-bottom: 1px solid #1e2538;"><td style="padding: 5px 8px; color: #cbd5e0;">' + safeId + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeDesc + '</td><td style="color:' + sc + ';font-weight:600; padding: 5px 8px;">' + safeStatus + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeOwner + '</td></tr>';
+  });
+
+  previewHtml += '</table>';
+  previewHtml += '<div style="margin-top:10px;color:#718096;">Open: <b style="color:#fc8181;">' + c.open + '</b> · In Progress: <b style="color:#ecc94b;">' + c.inprog + '</b> · Closed: <b style="color:#68d391;">' + c.closed + '</b> · Not Started: <b style="color:#b794f4;">' + c.notstart + '</b> · Watching: <b style="color:#f6ad55;">' + c.watching + '</b></div>';
+
+  prevEl.innerHTML = previewHtml;
+  prevEl.style.display = 'block';
+  applyBtn.disabled = false;
+}
+
+function applySync() {
+  if (!parsedRisks) return;
+
+  // Show loading state
+  var btn = document.getElementById('applyBtn');
+  var originalText = btn.textContent;
+  btn.disabled = true;
+  btn.classList.add('syncing');
+  btn.textContent = 'Applying...';
+
+  // Small delay to show loading animation
+  setTimeout(function() {
+    performSync();
+    btn.classList.remove('syncing');
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }, 300);
+}
+
+function performSync() {
+  if (!parsedRisks) return;
+  var c = countByStatus(parsedRisks);
+  var total = parsedRisks.length;
+
+  // Update donut chart
+  var pOpen = c.open / total * 100;
+  var pInp = c.inprog / total * 100;
+  var pClo = c.closed / total * 100;
+  var pNot = c.notstart / total * 100;
+  var s1 = pOpen, s2 = s1 + pInp, s3 = s2 + pClo, s4 = s3 + pNot;
+
+  var donut = document.querySelector('.donut');
+  if (donut) {
+    donut.style.background = 'conic-gradient(#fc8181 0% ' + s1.toFixed(1) + '%, #ecc94b ' + s1.toFixed(1) + '% ' + s2.toFixed(1) + '%, #68d391 ' + s2.toFixed(1) + '% ' + s3.toFixed(1) + '%, #b794f4 ' + s3.toFixed(1) + '% ' + s4.toFixed(1) + '%, #f6ad55 ' + s4.toFixed(1) + '% 100%)';
+
+    // Update donut center number
+    var styleId = 'donutStyle';
+    var existing = document.getElementById(styleId);
+    if (existing) existing.remove();
+    var st = document.createElement('style');
+    st.id = styleId;
+    st.textContent = '.donut::after { content: "' + total + '"; position: absolute; inset: 22px; background: #1a1f2e; border-radius: 50%; display: block; font-size: 1.4rem; font-weight: 700; color: #e2e8f0; text-align: center; line-height: 86px; }';
+    document.head.appendChild(st);
+  }
+
+  // Update legend counts
+  var counts = document.querySelectorAll('.dl-count');
+  if (counts[0]) counts[0].textContent = c.open;
+  if (counts[1]) counts[1].textContent = c.inprog;
+  if (counts[2]) counts[2].textContent = c.closed;
+  if (counts[3]) counts[3].textContent = c.notstart;
+  if (counts[4]) counts[4].textContent = c.watching;
+
+  // Update title
+  var titleEl = document.getElementById('raidTotalLabel');
+  if (titleEl) titleEl.textContent = total + ' Total Risks';
+
+  // Update timestamp
+  var now = new Date();
+  var ts = now.toLocaleDateString('en-US', {month:'short',day:'numeric'}) + ' ' + now.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
+  var lastEl = document.getElementById('syncLastLabel');
+  if (lastEl) lastEl.textContent = 'Last synced ' + ts;
+
+  closeSyncModal();
+
+  // Update all dashboard metrics
+  updateLastUpdated();
+  calculateProjectHealth();
+
+  // Show success message
+  alert('✅ Dashboard updated successfully!\n\n' + total + ' risks synced from Slack Canvas.\n\n⚠️ Remember: These changes are local only. To persist them, you need to update the HTML file and push to GitHub.');
+}
+
+// ── Milestones Sync functionality ──────────────────────────────
+var MS_STATUS_MAP = {
+  'not started': { key: 'notstarted', label: 'Not Started', cls: 'grey' },
+  'not-started': { key: 'notstarted', label: 'Not Started', cls: 'grey' },
+  'notstarted': { key: 'notstarted', label: 'Not Started', cls: 'grey' },
+  'in progress': { key: 'inprog', label: 'In Progress', cls: 'green' },
+  'in-progress': { key: 'inprog', label: 'In Progress', cls: 'green' },
+  'inprogress': { key: 'inprog', label: 'In Progress', cls: 'green' },
+  'active': { key: 'inprog', label: 'In Progress', cls: 'green' },
+  'complete': { key: 'done', label: 'Completed', cls: 'blue' },
+  'completed': { key: 'done', label: 'Completed', cls: 'blue' },
+  'done': { key: 'done', label: 'Completed', cls: 'blue' },
+  'closed': { key: 'done', label: 'Completed', cls: 'blue' },
+  'at risk': { key: 'atrisk', label: 'At Risk', cls: 'red' },
+  'at-risk': { key: 'atrisk', label: 'At Risk', cls: 'red' },
+  'atrisk': { key: 'atrisk', label: 'At Risk', cls: 'red' },
+  'blocked': { key: 'atrisk', label: 'Blocked', cls: 'red' },
+  'on hold': { key: 'onhold', label: 'On Hold', cls: 'orange' },
+  'on-hold': { key: 'onhold', label: 'On Hold', cls: 'orange' },
+  'onhold': { key: 'onhold', label: 'On Hold', cls: 'orange' },
+  'pending': { key: 'onhold', label: 'Pending', cls: 'yellow' },
+  'planned': { key: 'notstarted', label: 'Planned', cls: 'grey' }
+};
+
+var parsedMilestones = null;
+
+function openMilestonesModal() {
+  document.getElementById('milestonesInput').value = '';
+  document.getElementById('milestonesError').style.display = 'none';
+  document.getElementById('milestonesPreview').style.display = 'none';
+  document.getElementById('milestonesApplyBtn').disabled = true;
+  parsedMilestones = null;
+  document.getElementById('milestonesOverlay').style.display = 'flex';
+}
+
+function closeMilestonesModal() {
+  document.getElementById('milestonesOverlay').style.display = 'none';
+}
+
+function closeMilestonesOnBackdrop(e) {
+  if (e.target === document.getElementById('milestonesOverlay')) closeMilestonesModal();
+}
+
+function parseMilestonesText(raw) {
+  var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
+  if (lines.length < 2) return null;
+
+  var delim = (lines[0].indexOf('|') !== -1) ? '|' : '\t';
+  var rows = lines.map(function(l) {
+    return l.split(delim).map(function(c){ return c.trim().replace(/^\||\|$/g,'').trim(); });
+  });
+
+  var headerIdx = 0;
+  for (var i = 0; i < Math.min(rows.length, 4); i++) {
+    var lower = rows[i].map(function(c){ return c.toLowerCase(); });
+    if (lower.some(function(c){ return c === 'status' || c === 'task' || c === 'milestone' || c === 'phase'; })) {
+      headerIdx = i; break;
+    }
+  }
+
+  var headers = rows[headerIdx].map(function(c){ return c.toLowerCase(); });
+
+  function findCol(candidates) {
+    for (var i = 0; i < candidates.length; i++) {
+      var idx = headers.indexOf(candidates[i]);
+      if (idx !== -1) return idx;
+    }
+    for (var j = 0; j < headers.length; j++) {
+      for (var k = 0; k < candidates.length; k++) {
+        if (headers[j].indexOf(candidates[k]) !== -1) return j;
+      }
+    }
+    return -1;
+  }
+
+  var phaseCol = findCol(['phase', 'workstream', 'area', 'category']);
+  var taskCol = findCol(['task', 'milestone', 'item', 'deliverable', 'name', 'title', 'description']);
+  var ownerCol = findCol(['owner', 'assigned', 'responsible', 'dri']);
+  var dueCol = findCol(['due', 'date', 'target', 'deadline', 'eta']);
+  var statusCol = findCol(['status', 'state']);
+
+  if (statusCol === -1 && taskCol === -1) return null;
+
+  var items = [];
+  for (var r = headerIdx + 1; r < rows.length; r++) {
+    var row = rows[r];
+    var taskName = taskCol !== -1 && row[taskCol] ? row[taskCol].trim() : '';
+    if (!taskName || taskName === '—' || taskName === '-') continue;
+
+    var rawStatus = statusCol !== -1 && row[statusCol] ? row[statusCol].toLowerCase().trim() : '';
+    var statusObj = MS_STATUS_MAP[rawStatus] || { key: 'notstarted', label: row[statusCol] || 'Not Started', cls: 'grey' };
+
+    items.push({
+      phase: phaseCol !== -1 && row[phaseCol] ? row[phaseCol].trim() : '',
+      task: taskName,
+      owner: ownerCol !== -1 && row[ownerCol] ? row[ownerCol].trim() : '',
+      due: dueCol !== -1 && row[dueCol] ? row[dueCol].trim() : '',
+      statusKey: statusObj.key,
+      statusLbl: statusObj.label,
+      statusCls: statusObj.cls
+    });
+  }
+  return items.length > 0 ? items : null;
+}
+
+function previewMilestones() {
+  var raw = document.getElementById('milestonesInput').value;
+  var errEl = document.getElementById('milestonesError');
+  var prevEl = document.getElementById('milestonesPreview');
+  var btn = document.getElementById('milestonesApplyBtn');
+  errEl.style.display = 'none';
+  prevEl.style.display = 'none';
+  btn.disabled = true;
+  parsedMilestones = null;
+  if (!raw.trim()) return;
+
+  var items = parseMilestonesText(raw);
+  if (!items) {
+    errEl.textContent = 'Could not parse the pasted content. Make sure you copied the table rows including the header row. Accepts tab-separated or pipe-delimited format.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  parsedMilestones = items;
+  var html = '<strong style="color:#e2e8f0;">Preview — ' + items.length + ' milestone' + (items.length !== 1 ? 's' : '') + ' parsed</strong>';
+  html += '<table style="margin-top:10px; width: 100%; border-collapse: collapse;"><tr style="border-bottom: 1px solid #2d3748;"><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Phase</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Task</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Owner</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Due</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Status</th></tr>';
+
+  items.forEach(function(m) {
+    var sc = m.statusCls === 'blue' ? '#63b3ed' : m.statusCls === 'green' ? '#68d391' : m.statusCls === 'red' ? '#fc8181' : m.statusCls === 'yellow' ? '#ecc94b' : m.statusCls === 'orange' ? '#f6ad55' : '#a0aec0';
+    var safePhase = escapeHtml(m.phase || '—');
+    var safeTask = escapeHtml(m.task.substring(0,50)) + (m.task.length>50?'…':'');
+    var safeOwner = escapeHtml(m.owner || '—');
+    var safeDue = escapeHtml(m.due || '—');
+    var safeStatus = escapeHtml(m.statusLbl);
+    html += '<tr style="border-bottom: 1px solid #1e2538;"><td style="padding: 5px 8px; color: #cbd5e0;">' + safePhase + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeTask + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeOwner + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeDue + '</td><td style="color:' + sc + ';font-weight:600; padding: 5px 8px;">' + safeStatus + '</td></tr>';
+  });
+
+  html += '</table>';
+  prevEl.innerHTML = html;
+  prevEl.style.display = 'block';
+  btn.disabled = false;
+}
+
+function applyMilestonesCore() {
+  if (!parsedMilestones) return;
+  var items = parsedMilestones;
+  var tbody = document.getElementById('milestonesTableBody');
+  tbody.innerHTML = '';
+
+  items.forEach(function(m) {
+    var tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid #1e2538';
+    tr.addEventListener('mouseover', function() { this.style.background = 'rgba(255,255,255,0.02)'; });
+    tr.addEventListener('mouseout', function() { this.style.background = ''; });
+
+    var tdPhase = document.createElement('td');
+    tdPhase.style.cssText = 'padding: 10px 14px; font-size: 0.68rem; font-weight: 600; color: #718096; white-space: nowrap;';
+    tdPhase.textContent = m.phase || '—';
+
+    var tdTask = document.createElement('td');
+    tdTask.style.cssText = 'padding: 10px 14px; font-weight: 500; color: #e2e8f0;';
+    tdTask.textContent = m.task;
+
+    var tdOwner = document.createElement('td');
+    tdOwner.style.cssText = 'padding: 10px 14px; font-size: 0.75rem; color: #718096;';
+    tdOwner.textContent = m.owner || '—';
+
+    var tdDue = document.createElement('td');
+    tdDue.style.cssText = 'padding: 10px 14px; font-size: 0.75rem; color: #a0aec0; white-space: nowrap;';
+    tdDue.textContent = m.due || '—';
+
+    var tdStatus = document.createElement('td');
+    var statusBadge = document.createElement('span');
+    statusBadge.style.cssText = 'font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 4px; white-space: nowrap;';
+
+    var badgeColors = {
+      'red': 'background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3);',
+      'green': 'background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3);',
+      'blue': 'background: rgba(99,179,237,0.15); color: #63b3ed; border: 1px solid rgba(99,179,237,0.3);',
+      'grey': 'background: rgba(74,85,104,0.3); color: #a0aec0; border: 1px solid #4a5568;',
+      'yellow': 'background: rgba(236,201,75,0.15); color: #ecc94b; border: 1px solid rgba(236,201,75,0.3);',
+      'orange': 'background: rgba(246,173,85,0.15); color: #f6ad55; border: 1px solid rgba(246,173,85,0.3);'
+    };
+    statusBadge.style.cssText += badgeColors[m.statusCls] || badgeColors['grey'];
+    statusBadge.textContent = m.statusLbl;
+    tdStatus.appendChild(statusBadge);
+
+    tr.appendChild(tdPhase);
+    tr.appendChild(tdTask);
+    tr.appendChild(tdOwner);
+    tr.appendChild(tdDue);
+    tr.appendChild(tdStatus);
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('milestonesEmpty').style.display = 'none';
+  document.getElementById('milestonesTableWrap').style.display = 'block';
+  document.getElementById('milestonesCountLabel').textContent = items.length + ' items';
+
+  var now = new Date();
+  var ts = now.toLocaleDateString('en-US', {month:'short',day:'numeric'}) + ' ' + now.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
+  document.getElementById('milestonesLastLabel').textContent = 'Last synced ' + ts;
+
+  closeMilestonesModal();
+
+  alert('✅ Video AI Plan & Milestones updated successfully!\n\n' + items.length + ' milestones synced from Slack Canvas.\n\n⚠️ Remember: These changes are local only. To persist them, you need to update the HTML file and push to GitHub.');
+
+  // Update upcoming milestones short list
+  updateUpcomingMilestones(items);
+}
+
+function applyMilestones() {
+  if (!parsedMilestones) return;
+
+  // Show loading state
+  var btn = document.getElementById('milestonesApplyBtn');
+  var originalText = btn.textContent;
+  btn.disabled = true;
+  btn.classList.add('syncing');
+  btn.textContent = 'Applying...';
+
+  setTimeout(function() {
+    applyMilestonesCore();
+    updateLastUpdated();
+    btn.classList.remove('syncing');
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }, 300);
+}
+
+// ── Enhanced Dashboard Features ────────────────────────────────
+function updateLastUpdated() {
+  var now = new Date();
+  var formatted = now.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) + ' at ' + now.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
+  document.getElementById('lastUpdated').textContent = 'Last updated: ' + formatted;
+}
+
+function calculateProjectHealth() {
+  var tasks = document.querySelectorAll('.task');
+  var atRiskCount = 0;
+  var blockerCount = 0;
+
+  tasks.forEach(function(task) {
+    if (task.classList.contains('red')) {
+      var badgeText = task.querySelector('.badge') ? task.querySelector('.badge').textContent.toLowerCase() : '';
+      if (badgeText.indexOf('blocker') !== -1 || badgeText.indexOf('show stopper') !== -1) {
+        blockerCount++;
+      } else {
+        atRiskCount++;
+      }
+    }
+  });
+
+  var badge = document.getElementById('projectHealthBadge');
+  var icon = document.getElementById('healthIcon');
+  var label = document.getElementById('healthLabel');
+
+  badge.className = 'health-badge';
+
+  if (blockerCount >= 4 || atRiskCount >= 4) {
+    badge.classList.add('critical');
+    icon.textContent = '🔴';
+    label.textContent = 'Critical';
+  } else if (blockerCount >= 1 && blockerCount <= 3 || atRiskCount >= 4) {
+    badge.classList.add('at-risk');
+    icon.textContent = '🟡';
+    label.textContent = 'At Risk';
+  } else {
+    badge.classList.add('on-track');
+    icon.textContent = '🟢';
+    label.textContent = 'On Track';
+  }
+}
+
+function calculateQuickStats() {
+  var tasks = document.querySelectorAll('.task');
+  var total = tasks.length;
+  var completed = 0;
+  var inProgress = 0;
+  var atRisk = 0;
+  var notStarted = 0;
+
+  tasks.forEach(function(task) {
+    if (task.classList.contains('blue')) completed++;
+    else if (task.classList.contains('green')) inProgress++;
+    else if (task.classList.contains('red')) atRisk++;
+    else if (task.classList.contains('grey')) notStarted++;
+  });
+
+  var completedPct = Math.round((completed / total) * 100);
+  var inProgressPct = Math.round((inProgress / total) * 100);
+  var atRiskPct = Math.round((atRisk / total) * 100);
+  var notStartedPct = Math.round((notStarted / total) * 100);
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statCompleted').textContent = completedPct + '%';
+  document.getElementById('statInProgress').textContent = inProgressPct + '%';
+  document.getElementById('statAtRisk').textContent = atRiskPct + '%';
+  document.getElementById('statNotStarted').textContent = notStartedPct + '%';
+
+  document.getElementById('progressPercent').textContent = completedPct + '%';
+  document.getElementById('progressFill').style.width = completedPct + '%';
+  document.getElementById('progressFill').textContent = completedPct + '%';
+}
+
+// Search and filter functionality
+var currentFilter = 'all';
+
+function filterTasks(filter) {
+  currentFilter = filter;
+  var buttons = document.querySelectorAll('.filter-btn');
+  buttons.forEach(function(btn) {
+    btn.classList.remove('active');
+    if (btn.getAttribute('data-filter') === filter) {
+      btn.classList.add('active');
+    }
+  });
+  applyFilters();
+}
+
+function applyFilters() {
+  var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  var sections = document.querySelectorAll('.section');
+
+  sections.forEach(function(section) {
+    var tasks = section.querySelectorAll('.task');
+    var visibleCount = 0;
+
+    tasks.forEach(function(task) {
+      var matchesFilter = currentFilter === 'all' || task.classList.contains(currentFilter);
+      var matchesSearch = true;
+
+      if (searchTerm) {
+        var taskText = task.textContent.toLowerCase();
+        matchesSearch = taskText.indexOf(searchTerm) !== -1;
+      }
+
+      if (matchesFilter && matchesSearch) {
+        task.style.display = '';
+        visibleCount++;
+      } else {
+        task.style.display = 'none';
+      }
+    });
+
+    // Hide dividers between hidden tasks
+    var dividers = section.querySelectorAll('.divider');
+    dividers.forEach(function(div) {
+      div.style.display = 'none';
+    });
+
+    // Show section only if it has visible tasks
+    if (visibleCount === 0) {
+      section.style.display = 'none';
+    } else {
+      section.style.display = '';
+    }
+  });
+}
+
+// Search input handler
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+// Back to top button
+window.addEventListener('scroll', function() {
+  var btn = document.getElementById('backToTop');
+  if (window.scrollY > 500) {
+    btn.classList.add('visible');
+  } else {
+    btn.classList.remove('visible');
+  }
+});
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Collapsible sections with localStorage
+function saveCollapsedState() {
+  var details = document.querySelectorAll('details');
+  var state = {};
+  details.forEach(function(detail, idx) {
+    state['detail_' + idx] = detail.open;
+  });
+  localStorage.setItem('dashboardCollapsedState', JSON.stringify(state));
+}
+
+function restoreCollapsedState() {
+  var state = localStorage.getItem('dashboardCollapsedState');
+  if (!state) return;
+
+  try {
+    state = JSON.parse(state);
+    var details = document.querySelectorAll('details');
+    details.forEach(function(detail, idx) {
+      if (state['detail_' + idx] !== undefined) {
+        detail.open = state['detail_' + idx];
+      }
+    });
+  } catch(e) {}
+}
+
+// Save state when details are toggled
+document.addEventListener('DOMContentLoaded', function() {
+  var details = document.querySelectorAll('details');
+  details.forEach(function(detail) {
+    detail.addEventListener('toggle', saveCollapsedState);
+  });
+});
+
+// Update upcoming milestones
+function updateUpcomingMilestones(items) {
+  if (!items || items.length === 0) return;
+
+  var container = document.getElementById('milestonesListShort');
+  container.innerHTML = '';
+
+  var today = new Date();
+  var upcoming = [];
+
+  items.forEach(function(m) {
+    if (m.due && m.statusKey !== 'done') {
+      var dueDate = parseDate(m.due);
+      if (dueDate) {
+        m.parsedDate = dueDate;
+        upcoming.push(m);
+      }
+    }
+  });
+
+  upcoming.sort(function(a, b) {
+    return a.parsedDate - b.parsedDate;
+  });
+
+  var toShow = upcoming.slice(0, 5);
+
+  if (toShow.length === 0) {
+    container.innerHTML = '<div style="padding: 20px; text-align: center; color: #4a5568; font-size: 0.8rem;">No upcoming milestones</div>';
+    return;
+  }
+
+  toShow.forEach(function(m) {
+    var div = document.createElement('div');
+    div.className = 'milestone-item';
+
+    if (m.parsedDate < today) {
+      div.classList.add('overdue');
+    }
+
+    var dateSpan = document.createElement('span');
+    dateSpan.className = 'milestone-date';
+    dateSpan.textContent = formatShortDate(m.parsedDate);
+
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'milestone-name';
+    nameSpan.textContent = m.task;
+
+    var ownerSpan = document.createElement('span');
+    ownerSpan.className = 'milestone-owner';
+    ownerSpan.textContent = m.owner || '';
+
+    div.appendChild(dateSpan);
+    div.appendChild(nameSpan);
+    if (m.owner) div.appendChild(ownerSpan);
+
+    container.appendChild(div);
+  });
+}
+
+function parseDate(dateStr) {
+  try {
+    var d = new Date(dateStr);
+    if (!isNaN(d.getTime())) return d;
+  } catch(e) {}
+  return null;
+}
+
+function formatShortDate(date) {
+  var month = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][date.getMonth()];
+  return month + ' ' + date.getDate();
+}
+
+// Keyboard shortcuts
+var shortcutsModal = null;
+
+function showShortcuts() {
+  if (!shortcutsModal) {
+    shortcutsModal = document.createElement('div');
+    shortcutsModal.className = 'shortcuts-modal';
+    shortcutsModal.innerHTML = '<div class="shortcuts-content"><div class="shortcuts-title">⌨️ Keyboard Shortcuts</div><div class="shortcut-item"><span class="shortcut-desc">Search tasks</span><div class="shortcut-keys"><span class="key">/</span></div></div><div class="shortcut-item"><span class="shortcut-desc">Show this help</span><div class="shortcut-keys"><span class="key">?</span></div></div><div class="shortcut-item"><span class="shortcut-desc">Scroll to top</span><div class="shortcut-keys"><span class="key">Home</span></div></div><div class="shortcut-item"><span class="shortcut-desc">Scroll to bottom</span><div class="shortcut-keys"><span class="key">End</span></div></div><div class="shortcut-item"><span class="shortcut-desc">Close modal</span><div class="shortcut-keys"><span class="key">Esc</span></div></div><div style="margin-top: 20px; text-align: center;"><button onclick="hideShortcuts()" style="padding: 8px 24px; background: #2b6cb0; border: none; border-radius: 6px; color: #fff; font-weight: 600; cursor: pointer;">Close</button></div></div>';
+    document.body.appendChild(shortcutsModal);
+
+    shortcutsModal.addEventListener('click', function(e) {
+      if (e.target === shortcutsModal) hideShortcuts();
+    });
+  }
+  shortcutsModal.style.display = 'flex';
+}
+
+function hideShortcuts() {
+  if (shortcutsModal) {
+    shortcutsModal.style.display = 'none';
+  }
+}
+
+// Keyboard event listeners
+document.addEventListener('keydown', function(e) {
+  // Ignore if typing in input
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    if (e.key === 'Escape') e.target.blur();
+    return;
+  }
+
+  if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+    e.preventDefault();
+    showShortcuts();
+  } else if (e.key === '/') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  } else if (e.key === 'Escape') {
+    hideShortcuts();
+  }
+});
+
+// Auto-sync notification system
+var autoSyncInterval = null;
+var autoSyncEnabled = true;
+var SYNC_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+
+function showSyncReminder() {
+  // Check if auto-sync is enabled
+  var enabled = localStorage.getItem('autoSyncEnabled');
+  if (enabled === 'false') return;
+
+  // Create reminder notification
+  var reminder = document.createElement('div');
+  reminder.className = 'sync-reminder';
+  reminder.style.cssText = 'position: fixed; top: 80px; right: 24px; z-index: 999; background: linear-gradient(135deg, #2b6cb0 0%, #3182ce 100%); border: 1px solid #3182ce; border-radius: 12px; padding: 20px 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); animation: slideInRight 0.3s ease; max-width: 400px;';
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;';
+  title.innerHTML = '<span style="font-size: 1.2rem;">⟳</span> Time to Sync from Canvas';
+
+  var message = document.createElement('div');
+  message.style.cssText = 'font-size: 0.8rem; color: #bee3f8; margin-bottom: 16px; line-height: 1.5;';
+  message.textContent = "It's been 30 minutes since the last update. Sync your dashboard with the latest Canvas data to stay current.";
+
+  var buttons = document.createElement('div');
+  buttons.style.cssText = 'display: flex; gap: 10px;';
+
+  var syncBtn = document.createElement('button');
+  syncBtn.textContent = 'Sync Now';
+  syncBtn.style.cssText = 'flex: 1; padding: 10px 16px; background: #fff; color: #2b6cb0; border: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.15s;';
+  syncBtn.onmouseover = function() { this.style.background = '#f7fafc'; this.style.transform = 'translateY(-1px)'; };
+  syncBtn.onmouseout = function() { this.style.background = '#fff'; this.style.transform = 'translateY(0)'; };
+  syncBtn.onclick = function() {
+    document.body.removeChild(reminder);
+    openSyncModal();
+    resetSyncTimer();
+  };
+
+  var dismissBtn = document.createElement('button');
+  dismissBtn.textContent = 'Dismiss';
+  dismissBtn.style.cssText = 'padding: 10px 16px; background: rgba(255,255,255,0.1); color: #bee3f8; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.15s;';
+  dismissBtn.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.15)'; };
+  dismissBtn.onmouseout = function() { this.style.background = 'rgba(255,255,255,0.1)'; };
+  dismissBtn.onclick = function() {
+    document.body.removeChild(reminder);
+    resetSyncTimer();
+  };
+
+  var disableLink = document.createElement('div');
+  disableLink.style.cssText = 'margin-top: 12px; text-align: center;';
+  var link = document.createElement('a');
+  link.href = '#';
+  link.textContent = 'Disable auto-sync reminders';
+  link.style.cssText = 'font-size: 0.7rem; color: #bee3f8; text-decoration: none; opacity: 0.7; transition: opacity 0.15s;';
+  link.onmouseover = function() { this.style.opacity = '1'; };
+  link.onmouseout = function() { this.style.opacity = '0.7'; };
+  link.onclick = function(e) {
+    e.preventDefault();
+    disableAutoSync();
+    document.body.removeChild(reminder);
+  };
+  disableLink.appendChild(link);
+
+  buttons.appendChild(syncBtn);
+  buttons.appendChild(dismissBtn);
+
+  reminder.appendChild(title);
+  reminder.appendChild(message);
+  reminder.appendChild(buttons);
+  reminder.appendChild(disableLink);
+
+  // Add animation
+  var style = document.createElement('style');
+  style.textContent = '@keyframes slideInRight { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }';
+  document.head.appendChild(style);
+
+  document.body.appendChild(reminder);
+
+  // Auto-dismiss after 60 seconds
+  setTimeout(function() {
+    if (document.body.contains(reminder)) {
+      document.body.removeChild(reminder);
+      resetSyncTimer();
+    }
+  }, 60000);
+}
+
+function startSyncTimer() {
+  // Clear existing timer
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval);
+  }
+
+  // Start new timer
+  autoSyncInterval = setInterval(function() {
+    showSyncReminder();
+  }, SYNC_INTERVAL_MS);
+
+  // Store last sync time
+  localStorage.setItem('lastSyncTime', Date.now());
+}
+
+function resetSyncTimer() {
+  localStorage.setItem('lastSyncTime', Date.now());
+  startSyncTimer();
+}
+
+function disableAutoSync() {
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval);
+    autoSyncInterval = null;
+  }
+  localStorage.setItem('autoSyncEnabled', 'false');
+
+  // Show confirmation
+  var confirm = document.createElement('div');
+  confirm.style.cssText = 'position: fixed; top: 80px; right: 24px; z-index: 999; background: #2d3748; border: 1px solid #4a5568; border-radius: 10px; padding: 16px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideInRight 0.3s ease;';
+  confirm.innerHTML = '<div style="font-size: 0.85rem; color: #e2e8f0; margin-bottom: 8px;">✓ Auto-sync reminders disabled</div><div style="font-size: 0.75rem; color: #a0aec0;">You can re-enable in settings</div>';
+  document.body.appendChild(confirm);
+
+  setTimeout(function() {
+    if (document.body.contains(confirm)) {
+      document.body.removeChild(confirm);
+    }
+  }, 4000);
+}
+
+function enableAutoSync() {
+  localStorage.setItem('autoSyncEnabled', 'true');
+  startSyncTimer();
+
+  // Show confirmation
+  var confirm = document.createElement('div');
+  confirm.style.cssText = 'position: fixed; top: 80px; right: 24px; z-index: 999; background: #2b6cb0; border: 1px solid #3182ce; border-radius: 10px; padding: 16px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideInRight 0.3s ease;';
+  confirm.innerHTML = '<div style="font-size: 0.85rem; color: #fff; margin-bottom: 8px;">✓ Auto-sync reminders enabled</div><div style="font-size: 0.75rem; color: #bee3f8;">You\'ll be reminded every 30 minutes</div>';
+  document.body.appendChild(confirm);
+
+  setTimeout(function() {
+    if (document.body.contains(confirm)) {
+      document.body.removeChild(confirm);
+    }
+  }, 4000);
+}
+
+function checkInitialSyncTimer() {
+  var enabled = localStorage.getItem('autoSyncEnabled');
+  var lastSyncTime = localStorage.getItem('lastSyncTime');
+
+  // Enable by default
+  if (enabled === null) {
+    localStorage.setItem('autoSyncEnabled', 'true');
+  }
+
+  if (enabled !== 'false') {
+    // Check if it's been more than 30 minutes since last sync
+    if (lastSyncTime) {
+      var timeSinceSync = Date.now() - parseInt(lastSyncTime);
+      if (timeSinceSync >= SYNC_INTERVAL_MS) {
+        // Show reminder after 5 seconds on page load
+        setTimeout(showSyncReminder, 5000);
+      }
+    }
+
+    // Start the timer
+    startSyncTimer();
+  }
+}
+
+// Add settings button to header for auto-sync control
+function addAutoSyncSettings() {
+  // Find the header and add settings icon
+  var header = document.querySelector('.header-top');
+  if (header) {
+    var settingsBtn = document.createElement('button');
+    settingsBtn.innerHTML = '⚙️';
+    settingsBtn.title = 'Auto-sync settings';
+    settingsBtn.style.cssText = 'background: rgba(255,255,255,0.05); border: 1px solid #2d3748; border-radius: 8px; padding: 8px 12px; font-size: 1rem; cursor: pointer; transition: all 0.15s; margin-left: 12px;';
+    settingsBtn.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.1)'; };
+    settingsBtn.onmouseout = function() { this.style.background = 'rgba(255,255,255,0.05)'; };
+    settingsBtn.onclick = function() {
+      var enabled = localStorage.getItem('autoSyncEnabled') !== 'false';
+      if (confirm(enabled ? 'Disable auto-sync reminders?' : 'Enable auto-sync reminders every 30 minutes?')) {
+        if (enabled) {
+          disableAutoSync();
+        } else {
+          enableAutoSync();
+        }
+      }
+    };
+
+    var phaseBadgeParent = header.querySelector('.phase-badge').parentNode;
+    phaseBadgeParent.appendChild(settingsBtn);
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  updateLastUpdated();
+  calculateProjectHealth();
+  calculateQuickStats();
+  restoreCollapsedState();
+  checkInitialSyncTimer();
+  addAutoSyncSettings();
+});
+
+</script>
+
+<!-- ══════════════════════════════════════════════════════ MILESTONES SYNC MODAL -->
+<div class="sync-overlay" id="milestonesOverlay" onclick="closeMilestonesOnBackdrop(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+  <div class="sync-modal" style="background: #1a1f2e; border: 1px solid #3d4f6e; border-radius: 12px; padding: 28px 32px; width: min(680px, 95vw); max-height: 90vh; overflow-y: auto;">
+    <h2 style="font-size: 1rem; font-weight: 700; color: #f7fafc; margin-bottom: 6px;">📅 Sync Video AI Plan & Milestones from Canvas</h2>
+    <div class="sync-instructions" style="font-size: 0.78rem; color: #718096; margin-bottom: 16px; line-height: 1.6;">
+      <strong>Step 1:</strong> Open the <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q" target="_blank" style="color: #63b3ed; text-decoration: none;">Video AI Plan & Milestones Canvas</a> in <strong>#proj-gss-video-ai-working-group</strong><br>
+      <strong>Step 2:</strong> Find the Project Plan / Milestones table<br>
+      <strong>Step 3:</strong> Select all rows (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+A</code> inside table), copy (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+C</code>), and paste below<br>
+      <strong>Expected columns:</strong> Phase · Task/Milestone · Owner · Due Date · Status
+    </div>
+    <textarea id="milestonesInput" placeholder="Paste Video AI Plan & Milestones table content here…" oninput="previewMilestones()" style="width: 100%; height: 220px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; color: #e2e8f0; font-size: 0.78rem; font-family: 'Courier New', monospace; padding: 12px; resize: vertical; outline: none;"></textarea>
+    <div class="sync-error" id="milestonesError" style="color: #fc8181; font-size: 0.75rem; margin-top: 8px; display: none;"></div>
+    <div class="sync-preview" id="milestonesPreview" style="margin-top: 14px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 16px; font-size: 0.75rem; color: #a0aec0; display: none;"></div>
+    <div class="sync-modal-actions" style="display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end;">
+      <button class="btn-cancel" onclick="closeMilestonesModal()" style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #2d3748; background: rgba(255,255,255,0.07); color: #a0aec0;">Cancel</button>
+      <button class="btn-apply" id="milestonesApplyBtn" onclick="applyMilestones()" disabled style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; background: #2b6cb0; color: #fff;">Apply to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

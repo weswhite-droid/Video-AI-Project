@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – RACI Matrix</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── Back link ───────────────────────────────────────── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #63b3ed;
+      text-decoration: none;
+      font-size: 0.825rem;
+      margin-bottom: 20px;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: #90cdf4; }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+    .header h1 { font-size: 1.75rem; font-weight: 700; color: #f7fafc; line-height: 1.2; }
+    .header h1 span { color: #63b3ed; }
+    .header .subtitle { font-size: 0.875rem; color: #718096; margin-top: 4px; }
+
+    /* ── RACI Key ───────────────────────────────────────── */
+    .raci-key {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+    .raci-key-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; }
+    .raci-key-item { display: flex; align-items: center; gap: 8px; font-size: 0.825rem; color: #a0aec0; }
+    .raci-chip {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 5px;
+      font-size: 0.72rem; font-weight: 800;
+    }
+    .chip-R { background: rgba(99,179,237,0.2);  color: #63b3ed; border: 1px solid rgba(99,179,237,0.4); }
+    .chip-A { background: rgba(246,173,85,0.2);  color: #f6ad55; border: 1px solid rgba(246,173,85,0.4); }
+    .chip-C { background: rgba(104,211,145,0.2); color: #68d391; border: 1px solid rgba(104,211,145,0.4); }
+    .chip-I { background: rgba(113,128,150,0.2); color: #a0aec0; border: 1px solid rgba(113,128,150,0.3); }
+
+    /* ── Section ────────────────────────────────────────── */
+    .raci-section {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .raci-section details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .raci-section details summary::-webkit-details-marker { display: none; }
+    .raci-section details summary:hover { background: rgba(255,255,255,0.07); }
+    .raci-section details:not([open]) summary { border-bottom: none; }
+    .raci-section details[open] summary { border-bottom: 1px solid #2d3748; }
+
+    .section-icon { font-size: 1rem; }
+    .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; }
+    .section-count { font-size: 0.75rem; color: #718096; }
+    .chevron { margin-left: auto; font-size: 0.7rem; color: #4a5568; transition: transform 0.2s ease; flex-shrink: 0; }
+    details[open] .chevron { transform: rotate(180deg); }
+
+    /* ── Table ──────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+    table.raci-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    table.raci-table thead tr { background: rgba(255,255,255,0.04); }
+    table.raci-table th {
+      padding: 10px 14px;
+      text-align: center;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #718096;
+      border-bottom: 1px solid #2d3748;
+      white-space: nowrap;
+    }
+    table.raci-table th:first-child { text-align: left; min-width: 240px; }
+    table.raci-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e2538;
+      vertical-align: middle;
+      text-align: center;
+      line-height: 1.45;
+    }
+    table.raci-table td:first-child { text-align: left; color: #e2e8f0; font-size: 0.825rem; }
+    table.raci-table tr:last-child td { border-bottom: none; }
+    table.raci-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .cell-R { color: #63b3ed; font-weight: 800; font-size: 0.875rem; }
+    .cell-A { color: #f6ad55; font-weight: 800; font-size: 0.875rem; }
+    .cell-C { color: #68d391; font-weight: 700; font-size: 0.875rem; }
+    .cell-I { color: #4a5568;  font-weight: 600; font-size: 0.875rem; }
+
+    /* ── Pilot context ──────────────────────────────────── */
+    .pilot-body { padding: 20px 24px; }
+    .pilot-note {
+      background: rgba(246,173,85,0.07);
+      border: 1px solid rgba(246,173,85,0.2);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.825rem;
+      color: #a0aec0;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .pilot-note strong { color: #f6ad55; }
+
+    table.pilot-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-bottom: 20px;
+    }
+    table.pilot-table thead tr { background: rgba(255,255,255,0.04); }
+    table.pilot-table th {
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #718096;
+      border-bottom: 1px solid #2d3748;
+    }
+    table.pilot-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e2538;
+      color: #cbd5e0;
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+    table.pilot-table tr:last-child td { border-bottom: none; }
+    table.pilot-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .pct-high   { color: #68d391; font-weight: 700; }
+    .pct-warn   { color: #f6ad55; font-weight: 700; }
+    .pct-alert  { color: #fc8181; font-weight: 700; }
+
+    .feedback-list { padding-left: 0; list-style: none; }
+    .feedback-list li {
+      display: flex;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #1e2538;
+      font-size: 0.825rem;
+      color: #a0aec0;
+      line-height: 1.5;
+    }
+    .feedback-list li:last-child { border-bottom: none; }
+    .feedback-bullet { color: #f6ad55; flex-shrink: 0; margin-top: 2px; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .footer { margin-top: 24px; text-align: center; font-size: 0.7rem; color: #4a5568; }
+
+    /* ── Edit toolbar ───────────────────────────────────── */
+    .edit-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0f1117;
+      border-bottom: 1px solid #2d3748;
+      padding: 10px 0 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .edit-toolbar .toolbar-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+      margin-right: 4px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .btn-edit   { background: rgba(99,179,237,0.12); color: #63b3ed; border-color: rgba(99,179,237,0.35); }
+    .btn-edit:hover   { background: rgba(99,179,237,0.25); }
+    .btn-save   { background: rgba(104,211,145,0.12); color: #68d391; border-color: rgba(104,211,145,0.35); }
+    .btn-save:hover   { background: rgba(104,211,145,0.25); }
+    .btn-cancel { background: rgba(113,128,150,0.12); color: #a0aec0; border-color: rgba(113,128,150,0.3); }
+    .btn-cancel:hover { background: rgba(113,128,150,0.25); }
+    .btn-addrow { background: rgba(183,148,244,0.12); color: #b794f4; border-color: rgba(183,148,244,0.3); }
+    .btn-addrow:hover { background: rgba(183,148,244,0.22); }
+    .edit-status {
+      font-size: 0.75rem;
+      color: #718096;
+      margin-left: auto;
+    }
+    .edit-status.saved { color: #68d391; }
+
+    /* ── Editable state styles ──────────────────────────── */
+    body.edit-mode [contenteditable] {
+      outline: none;
+      border-radius: 4px;
+      min-width: 20px;
+      display: inline-block;
+    }
+    body.edit-mode td[contenteditable]:focus,
+    body.edit-mode th[contenteditable]:focus,
+    body.edit-mode [contenteditable]:focus {
+      background: rgba(99,179,237,0.1);
+      box-shadow: 0 0 0 2px rgba(99,179,237,0.4);
+      outline: none;
+    }
+    body.edit-mode td.raci-cell {
+      cursor: pointer;
+    }
+    body.edit-mode td.raci-cell:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    body.edit-mode table.raci-table th:not(:first-child) {
+      cursor: text;
+    }
+    body.edit-mode .editable-text {
+      cursor: text;
+    }
+    /* delete row button */
+    .del-row-btn {
+      display: none;
+      background: rgba(252,129,129,0.12);
+      border: 1px solid rgba(252,129,129,0.3);
+      color: #fc8181;
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    body.edit-mode .del-row-btn { display: inline; }
+    .del-row-btn:hover { background: rgba(252,129,129,0.28); }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ TOOLBAR -->
+<div class="edit-toolbar" id="toolbar">
+  <span class="toolbar-label">Page:</span>
+  <button class="btn btn-edit"   id="btn-edit"   onclick="enterEditMode()">✏️ Edit</button>
+  <button class="btn btn-save"   id="btn-save"   onclick="saveChanges()"  style="display:none">💾 Save to File</button>
+  <button class="btn btn-cancel" id="btn-cancel" onclick="cancelEdit()"   style="display:none">✕ Cancel</button>
+  <button class="btn btn-addrow" id="btn-addrow" onclick="addRow()"       style="display:none">+ Add Row</button>
+  <span class="edit-status" id="edit-status">View mode</span>
+</div>
+
+<a class="back-link" href="video-ai-dashboard.html">&#8592; Back to Master Project Dashboard</a>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<div class="header">
+  <h1>Video AI – <span>RACI Matrix</span></h1>
+  <div class="subtitle">Cobalt Video Analytics · Tier 1 Global Office Rollout · Roles &amp; Responsibilities</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ RACI KEY -->
+<div class="raci-key">
+  <span class="raci-key-title">RACI Key:</span>
+  <div class="raci-key-item"><span class="raci-chip chip-R">R</span> Responsible — does the work</div>
+  <div class="raci-key-item"><span class="raci-chip chip-A">A</span> Accountable — owns the outcome</div>
+  <div class="raci-key-item"><span class="raci-chip chip-C">C</span> Consulted — provides input</div>
+  <div class="raci-key-item"><span class="raci-chip chip-I">I</span> Informed — kept up to date</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PROGRAM MANAGEMENT -->
+<div class="raci-section">
+  <details open>
+  <summary>
+    <span class="section-icon">📋</span>
+    <span class="section-title">Program Management</span>
+    <span class="section-count">7 activities</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="raci-table">
+      <thead>
+        <tr>
+          <th>Activity</th>
+          <th>Bill Inzeo</th>
+          <th>Jeff Toler</th>
+          <th>Jerry Wu</th>
+          <th>James Herrera</th>
+          <th>Cobalt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Executive sponsor sign-off</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Program budget approval</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-C">C</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Vendor contract execution</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-I">I</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>Project documentation (SRD, RAID, RACI)</td>
+          <td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>Budget spreadsheet &amp; PO tracking</td>
+          <td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Stakeholder deck preparation</td>
+          <td class="cell-I">I</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Weekly sync &amp; EOD reporting</td>
+          <td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-I">I</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SITE ACTIVATION -->
+<div class="raci-section">
+  <details open>
+  <summary>
+    <span class="section-icon">🏢</span>
+    <span class="section-title">Site Activation &amp; Technical Delivery</span>
+    <span class="section-count">8 activities</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="raci-table">
+      <thead>
+        <tr>
+          <th>Activity</th>
+          <th>Jeff Toler</th>
+          <th>Jerry Wu</th>
+          <th>SecTech (TBD)</th>
+          <th>Cobalt</th>
+          <th>TekSystems TPM</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Per-site firewall &amp; network readiness</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Lenel OnGuard integration &amp; licensing</td>
+          <td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Milestone VMS integration</td>
+          <td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-R">R</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Agentforce integration setup</td>
+          <td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Cobalt Video Analytics platform deployment (per site)</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>AWS infrastructure setup</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-C">C</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>UAT sign-off per site</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-C">C</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>SOW project management (Phase 2+)</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-R">R</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ ALARM MANAGEMENT -->
+<div class="raci-section">
+  <details open>
+  <summary>
+    <span class="section-icon">🔔</span>
+    <span class="section-title">Alarm Management &amp; GOC Operations</span>
+    <span class="section-count">7 activities</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="raci-table">
+      <thead>
+        <tr>
+          <th>Activity</th>
+          <th>Jeff Toler</th>
+          <th>Jerry Wu</th>
+          <th>(TBD)</th>
+          <th>(TBD)</th>
+          <th>Cobalt (Human Agent)</th>
+          <th>GOC Team</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Alarm triage &amp; auto-resolution (Cobalt Video Analytics)</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Escalation to GOC (genuine threats)</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-C">C</td><td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-R">R</td>
+        </tr>
+        <tr>
+          <td>Human disposition of legitimate violations</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-C">C</td><td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-R">R</td>
+        </tr>
+        <tr>
+          <td>GOC alarm review ownership documentation</td>
+          <td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Division of responsibilities (Cobalt → GOC) doc</td>
+          <td class="cell-R">R</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Cobalt Video Analytics dashboard management ("clean")</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-R">R</td>
+        </tr>
+        <tr>
+          <td>SLA definition per violation tier</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-C">C</td><td class="cell-C">C</td><td class="cell-I">I</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TAILGATING -->
+<div class="raci-section">
+  <details open>
+  <summary>
+    <span class="section-icon">🚪</span>
+    <span class="section-title">Tailgating &amp; Incident Workflows</span>
+    <span class="section-count">8 activities</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="raci-table">
+      <thead>
+        <tr>
+          <th>Activity</th>
+          <th>Jerry Wu</th>
+          <th>(TBD)</th>
+          <th>(TBD)</th>
+          <th>ES Lead (TBD)</th>
+          <th>Cobalt</th>
+          <th>SecOps</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Tailgating detection (video AI)</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-R">R</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Badge identity lookup (Lenel ACS)</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-R">R</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Service Cloud case creation</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-R">R</td>
+        </tr>
+        <tr>
+          <td>Slack message to tailgatee (yes/no prompt)</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-I">I</td><td class="cell-R">R</td>
+        </tr>
+        <tr>
+          <td>Policy reminder to tailgator &amp; tailgatee</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-I">I</td><td class="cell-R">R</td>
+        </tr>
+        <tr>
+          <td>Case auto-close (YES response)</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-A">A</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-R">R</td>
+        </tr>
+        <tr>
+          <td>SecOps notification + guard dispatch (NO response)</td>
+          <td class="cell-I">I</td><td class="cell-R">R</td><td class="cell-A">A</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-R">R</td>
+        </tr>
+        <tr>
+          <td>Repeat offender escalation (3rd offense → manager)</td>
+          <td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-I">I</td><td class="cell-R">R</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ CHANGE MANAGEMENT -->
+<div class="raci-section">
+  <details open>
+  <summary>
+    <span class="section-icon">📣</span>
+    <span class="section-title">Change Management &amp; Training</span>
+    <span class="section-count">9 activities</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="raci-table">
+      <thead>
+        <tr>
+          <th>Activity</th>
+          <th>Jeff Toler</th>
+          <th>TPM (TBD)</th>
+          <th>OCM (TBD)</th>
+          <th>(TBD)</th>
+          <th>Site Directors</th>
+          <th>Cobalt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Change management plan (per site)</td>
+          <td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-C">C</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Training curriculum development</td>
+          <td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-C">C</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>SOP documentation (per site + per violation type)</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-I">I</td><td class="cell-C">C</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>Super user / champion identification &amp; onboarding</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-I">I</td><td class="cell-R">R</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Safetyforce newsletter — Video AI section</td>
+          <td class="cell-I">I</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-A">A</td><td class="cell-I">I</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Safetyforce HQ canvas — Video AI section</td>
+          <td class="cell-I">I</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-A">A</td><td class="cell-I">I</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Monthly alignment call — Video AI agenda item</td>
+          <td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>Feedback Frenzy — Video AI category</td>
+          <td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-C">C</td><td class="cell-A">A</td><td class="cell-I">I</td><td class="cell-I">I</td>
+        </tr>
+        <tr>
+          <td>UAT comms per site activation</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-C">C</td><td class="cell-I">I</td><td class="cell-I">I</td><td class="cell-C">C</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ COMPLIANCE & PRIVACY -->
+<div class="raci-section">
+  <details open>
+  <summary>
+    <span class="section-icon">🔒</span>
+    <span class="section-title">Compliance &amp; Privacy</span>
+    <span class="section-count">3 activities</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="raci-table">
+      <thead>
+        <tr>
+          <th>Activity</th>
+          <th>Jeff Toler</th>
+          <th>Jerry Wu</th>
+          <th>Legal / Privacy Team</th>
+          <th>(TBD)</th>
+          <th>Cobalt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GDPR/CCPA compliance sign-off (EU/CA sites)</td>
+          <td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>Data privacy review — video AI processing</td>
+          <td class="cell-A">A</td><td class="cell-C">C</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-C">C</td>
+        </tr>
+        <tr>
+          <td>Regional data privacy compliance (ongoing)</td>
+          <td class="cell-A">A</td><td class="cell-R">R</td><td class="cell-R">R</td><td class="cell-I">I</td><td class="cell-C">C</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ PILOT CONTEXT -->
+<div class="raci-section">
+  <details open>
+  <summary>
+    <span class="section-icon">📊</span>
+    <span class="section-title">Key Pilot Context</span>
+    <span class="section-count">SF Tower · Nov–Jan</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="pilot-body">
+
+    <div class="pilot-note">
+      <strong>Important context:</strong> The original Cobalt AI pilot at SF Tower (launched Sept 2025) was primarily focused on Cobalt + Service Cloud integration — it later expanded to include Video Analytics/Video AI elements. No formal division of responsibilities was documented between the ProServe/REWS team and the GOC before go-live, which likely explains why GOC never formally agreed to own tailgate alarm reviews. <strong>This must be corrected before any Phase 2 site activation.</strong>
+    </div>
+
+    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:#718096;margin-bottom:10px;">Pilot Performance Data — SF Tower, Nov–Jan, Floors 25 / 27 / 28 / 29</div>
+    <div class="table-wrap">
+      <table class="pilot-table">
+        <thead>
+          <tr>
+            <th>Alarm Type</th>
+            <th>Total Alarms</th>
+            <th>Cobalt Auto-Resolved</th>
+            <th>Escalated to GOC / SecOps</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>DFO (Door Forced Open)</td>
+            <td>573</td>
+            <td><span class="pct-high">494 (86%)</span></td>
+            <td><span class="pct-warn">79 (14%)</span></td>
+          </tr>
+          <tr>
+            <td>DHO (Door Held Open)</td>
+            <td>433</td>
+            <td><span class="pct-high">364 (84%)</span></td>
+            <td><span class="pct-warn">69 (16%)</span></td>
+          </tr>
+          <tr>
+            <td>Tailgate</td>
+            <td>1,293</td>
+            <td><span class="pct-alert">0 (0%)</span></td>
+            <td><span class="pct-alert">1,293 (100%) — Pending Process Alignment</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:#718096;margin-bottom:12px;margin-top:4px;">Key Pilot Feedback — SecOps Team, Nov 2025</div>
+    <ul class="feedback-list">
+      <li><span class="feedback-bullet">▸</span> Carts being pulled through doors triggering false tailgate cases</li>
+      <li><span class="feedback-bullet">▸</span> Video Analytics catching visitor badges on orange lanyards (false positives)</li>
+      <li><span class="feedback-bullet">▸</span> Image capture timing issues — wrong person in frame, or no one in frame</li>
+      <li><span class="feedback-bullet">▸</span> Video Analytics stopped sending images to Office Agent/Slack for DHO/DFO issues on one weekend</li>
+      <li><span class="feedback-bullet">▸</span> Voice Agent working well when functional, but had failures during filming on Nov 6, 2025</li>
+    </ul>
+
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ FOOTER -->
+<div class="footer" id="footer-text">
+  Video AI – RACI Matrix · Cobalt Video Analytics Tier 1 Global Rollout · Last updated Jun 5, 2026 · TBD columns require role confirmation before Phase 2 go-live
+</div>
+
+<script>
+  // ── RACI color map ───────────────────────────────────────
+  const RACI_CLASSES = { R:'cell-R', A:'cell-A', C:'cell-C', I:'cell-I' };
+
+  function applyRaciColor(td) {
+    const v = td.textContent.trim().toUpperCase();
+    td.className = 'raci-cell ' + (RACI_CLASSES[v] || 'cell-I');
+  }
+
+  // ── Enter edit mode ──────────────────────────────────────
+  function enterEditMode() {
+    document.body.classList.add('edit-mode');
+    document.getElementById('btn-edit').style.display   = 'none';
+    document.getElementById('btn-save').style.display   = '';
+    document.getElementById('btn-cancel').style.display = '';
+    document.getElementById('btn-addrow').style.display = '';
+    setStatus('✏️ Editing — click any cell or header to change it', false);
+
+    // Make column headers (th, not first) editable
+    document.querySelectorAll('table.raci-table thead th:not(:first-child)').forEach(th => {
+      th.contentEditable = 'true';
+    });
+
+    // Make activity column (first td) editable
+    document.querySelectorAll('table.raci-table tbody td:first-child').forEach(td => {
+      td.contentEditable = 'true';
+      td.classList.add('editable-text');
+    });
+
+    // Make RACI cells editable with color update on input
+    document.querySelectorAll('table.raci-table tbody td:not(:first-child)').forEach(td => {
+      td.contentEditable = 'true';
+      td.classList.add('raci-cell');
+      td.addEventListener('input', () => applyRaciColor(td));
+      td.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); td.blur(); }
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          const all = [...document.querySelectorAll('[contenteditable="true"]')];
+          const i = all.indexOf(td);
+          if (i >= 0 && i < all.length - 1) all[i + 1].focus();
+        }
+      });
+    });
+
+    // Show delete-row buttons
+    document.querySelectorAll('table.raci-table tbody tr').forEach(tr => addDelBtn(tr));
+
+    // Make section titles and pilot text editable
+    document.querySelectorAll('.section-title, .pilot-note, .feedback-list li').forEach(el => {
+      el.contentEditable = 'true';
+    });
+  }
+
+  function addDelBtn(tr) {
+    const firstTd = tr.querySelector('td:first-child');
+    if (!firstTd || firstTd.querySelector('.del-row-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'del-row-btn';
+    btn.textContent = '✕';
+    btn.title = 'Delete row';
+    btn.addEventListener('click', e => { e.stopPropagation(); tr.remove(); });
+    firstTd.appendChild(btn);
+  }
+
+  // ── Add a new blank row to the focused table ─────────────
+  function addRow() {
+    // Find which table is currently in view / last focused
+    const focused = document.activeElement;
+    let table = focused ? focused.closest('table.raci-table') : null;
+    if (!table) {
+      // Fall back to first visible open table
+      table = document.querySelector('details[open] table.raci-table');
+    }
+    if (!table) return;
+
+    const colCount = table.querySelector('thead tr').children.length;
+    const tr = document.createElement('tr');
+
+    for (let i = 0; i < colCount; i++) {
+      const td = document.createElement('td');
+      if (i === 0) {
+        td.contentEditable = 'true';
+        td.classList.add('editable-text');
+        td.textContent = 'New activity';
+        addDelBtn(tr);
+      } else {
+        td.contentEditable = 'true';
+        td.classList.add('raci-cell', 'cell-I');
+        td.textContent = 'I';
+        td.addEventListener('input', () => applyRaciColor(td));
+        td.addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); td.blur(); }
+        });
+      }
+      tr.appendChild(td);
+    }
+
+    // Append del button to first td
+    addDelBtn(tr);
+    table.querySelector('tbody').appendChild(tr);
+    tr.querySelector('td').focus();
+  }
+
+  // ── Save: serialize current DOM back to a downloadable HTML file ──
+  function saveChanges() {
+    // Strip edit-mode artifacts before saving
+    document.body.classList.remove('edit-mode');
+    document.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    document.querySelectorAll('.del-row-btn').forEach(btn => btn.remove());
+    document.querySelectorAll('.editable-text').forEach(el => el.classList.remove('editable-text'));
+    document.querySelectorAll('.raci-cell').forEach(td => {
+      // ensure correct class is set
+      const v = td.textContent.trim().toUpperCase();
+      td.className = 'raci-cell ' + (RACI_CLASSES[v] || 'cell-I');
+    });
+
+    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'video-ai-raci.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    document.getElementById('btn-edit').style.display   = '';
+    document.getElementById('btn-save').style.display   = 'none';
+    document.getElementById('btn-cancel').style.display = 'none';
+    document.getElementById('btn-addrow').style.display = 'none';
+    setStatus('✅ Saved — replace your Desktop file with the download', true);
+  }
+
+  // ── Cancel: reload the page to discard changes ───────────
+  function cancelEdit() {
+    if (confirm('Discard all unsaved changes?')) location.reload();
+  }
+
+  function setStatus(msg, saved) {
+    const el = document.getElementById('edit-status');
+    el.textContent = msg;
+    el.className = 'edit-status' + (saved ? ' saved' : '');
+  }
+</script>
+
+</body>
+</html>

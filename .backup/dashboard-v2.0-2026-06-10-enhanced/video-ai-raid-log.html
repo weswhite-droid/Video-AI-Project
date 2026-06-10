@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – RAID Log</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── Back link ───────────────────────────────────────── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #63b3ed;
+      text-decoration: none;
+      font-size: 0.825rem;
+      margin-bottom: 20px;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: #90cdf4; }
+
+    /* ── Edit toolbar ───────────────────────────────────── */
+    .edit-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0f1117;
+      border-bottom: 1px solid #2d3748;
+      padding: 10px 0;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .toolbar-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; margin-right: 4px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 6px;
+      font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; border: 1px solid;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .btn-edit   { background: rgba(99,179,237,0.12);  color: #63b3ed; border-color: rgba(99,179,237,0.35); }
+    .btn-edit:hover   { background: rgba(99,179,237,0.25); }
+    .btn-save   { background: rgba(104,211,145,0.12); color: #68d391; border-color: rgba(104,211,145,0.35); }
+    .btn-save:hover   { background: rgba(104,211,145,0.25); }
+    .btn-cancel { background: rgba(113,128,150,0.12); color: #a0aec0; border-color: rgba(113,128,150,0.3); }
+    .btn-cancel:hover { background: rgba(113,128,150,0.25); }
+    .btn-addrow { background: rgba(183,148,244,0.12); color: #b794f4; border-color: rgba(183,148,244,0.3); }
+    .btn-addrow:hover { background: rgba(183,148,244,0.22); }
+    .edit-status { font-size: 0.75rem; color: #718096; margin-left: auto; }
+    .edit-status.saved { color: #68d391; }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+    .header h1 { font-size: 1.75rem; font-weight: 700; color: #f7fafc; line-height: 1.2; }
+    .header h1 span { color: #63b3ed; }
+    .header .subtitle { font-size: 0.875rem; color: #718096; margin-top: 4px; }
+
+    /* ── Summary stat cards ─────────────────────────────── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 640px) { .stats-bar { grid-template-columns: repeat(3, 1fr); } }
+    .stat-card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-card .num { font-size: 1.6rem; font-weight: 700; }
+    .stat-card .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: #718096; margin-top: 2px; }
+    .stat-open    .num { color: #fc8181; }
+    .stat-inprog  .num { color: #ecc94b; }
+    .stat-closed  .num { color: #68d391; }
+    .stat-notstart .num { color: #b794f4; }
+    .stat-watching .num { color: #f6ad55; }
+
+    /* ── Legend ─────────────────────────────────────────── */
+    .raid-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 12px 20px;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      background: #1a1f2e;
+      font-size: 0.73rem;
+      color: #a0aec0;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .raid-legend-group { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .raid-legend-label { color: #718096; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; margin-right: 4px; }
+    .rl-item { display: flex; align-items: center; gap: 5px; }
+    .rl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .rl-dot.high    { background: #fc8181; }
+    .rl-dot.medium  { background: #f6ad55; }
+    .rl-dot.low     { background: #b794f4; }
+    .rl-dot.closed  { background: #68d391; }
+    .rl-dot.open    { background: #fc8181; box-shadow: 0 0 4px rgba(252,129,129,0.5); }
+    .rl-dot.inprog  { background: #ecc94b; }
+    .rl-dot.notstart{ background: #b794f4; opacity: 0.6; }
+    .rl-dot.watching{ background: #f6ad55; opacity: 0.7; }
+
+    /* ── Table wrapper ──────────────────────────────────── */
+    .raid-table-wrap {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; }
+
+    table.raid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    table.raid thead tr { background: rgba(255,255,255,0.04); }
+    table.raid th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+      border-bottom: 1px solid #2d3748;
+      white-space: nowrap;
+    }
+    table.raid td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e2538;
+      vertical-align: top;
+      color: #cbd5e0;
+      line-height: 1.5;
+    }
+    table.raid tr:last-child td { border-bottom: none; }
+    table.raid tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .raid-id { font-weight: 700; color: #a0aec0; white-space: nowrap; }
+
+    /* likelihood/impact pills */
+    .pill {
+      display: inline-block;
+      font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 2px 8px; border-radius: 4px; white-space: nowrap;
+    }
+    .pill.high   { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+    .pill.medium { background: rgba(246,173,85,0.15);  color: #f6ad55; border: 1px solid rgba(246,173,85,0.3); }
+    .pill.low    { background: rgba(183,148,244,0.15); color: #b794f4; border: 1px solid rgba(183,148,244,0.3); }
+    .pill.lowmed { background: rgba(183,148,244,0.12); color: #d6bcfa; border: 1px solid rgba(183,148,244,0.25); }
+
+    /* status badges */
+    .rs { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+    .rs-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .rs.closed   { color: #68d391; } .rs.closed   .rs-dot { background: #68d391; }
+    .rs.open     { color: #fc8181; } .rs.open     .rs-dot { background: #fc8181; box-shadow: 0 0 4px rgba(252,129,129,0.6); }
+    .rs.inprog   { color: #ecc94b; } .rs.inprog   .rs-dot { background: #ecc94b; }
+    .rs.notstart { color: #b794f4; } .rs.notstart .rs-dot { background: #9f7aea; opacity: 0.7; }
+    .rs.watching { color: #f6ad55; } .rs.watching .rs-dot { background: #f6ad55; opacity: 0.8; }
+
+    /* ── Edit-mode styles ───────────────────────────────── */
+    body.edit-mode [contenteditable] { outline: none; }
+    body.edit-mode [contenteditable]:focus {
+      background: rgba(99,179,237,0.1);
+      box-shadow: 0 0 0 2px rgba(99,179,237,0.4);
+      border-radius: 3px;
+    }
+    body.edit-mode td { cursor: text; }
+    body.edit-mode td:hover { background: rgba(255,255,255,0.04); }
+
+    .del-row-btn {
+      display: none;
+      background: rgba(252,129,129,0.12);
+      border: 1px solid rgba(252,129,129,0.3);
+      color: #fc8181;
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: 0.65rem; font-weight: 700;
+      cursor: pointer; margin-left: 8px;
+    }
+    body.edit-mode .del-row-btn { display: inline; }
+    .del-row-btn:hover { background: rgba(252,129,129,0.28); }
+
+    /* status dropdown in edit mode */
+    .status-select {
+      display: none;
+      background: #1e2538;
+      border: 1px solid #4a5568;
+      color: #e2e8f0;
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    body.edit-mode .status-select { display: inline-block; }
+    body.edit-mode .rs { display: none; }
+
+    /* pill dropdown in edit mode */
+    .pill-select {
+      display: none;
+      background: #1e2538;
+      border: 1px solid #4a5568;
+      color: #e2e8f0;
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      width: 90px;
+    }
+    body.edit-mode .pill-select { display: inline-block; }
+    body.edit-mode .pill { display: none; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .footer { margin-top: 24px; text-align: center; font-size: 0.7rem; color: #4a5568; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ TOOLBAR -->
+<div class="edit-toolbar" id="toolbar">
+  <span class="toolbar-label">Page:</span>
+  <button class="btn btn-edit"   id="btn-edit"   onclick="enterEditMode()">✏️ Edit</button>
+  <button class="btn btn-save"   id="btn-save"   onclick="saveChanges()"  style="display:none">💾 Save to File</button>
+  <button class="btn btn-cancel" id="btn-cancel" onclick="cancelEdit()"   style="display:none">✕ Cancel</button>
+  <button class="btn btn-addrow" id="btn-addrow" onclick="addRow()"       style="display:none">+ Add Risk</button>
+  <span class="edit-status" id="edit-status">View mode</span>
+</div>
+
+<a class="back-link" href="video-ai-dashboard.html">&#8592; Back to Master Project Dashboard</a>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<div class="header">
+  <h1>Video AI – <span>RAID Log</span></h1>
+  <div class="subtitle">Cobalt Video Analytics · Tier 1 Global Office Rollout · Risks, Assumptions, Issues &amp; Dependencies</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ STATS -->
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-card stat-open">    <div class="num" id="cnt-open">6</div>    <div class="lbl">Open</div></div>
+  <div class="stat-card stat-inprog">  <div class="num" id="cnt-inprog">3</div>  <div class="lbl">In Progress</div></div>
+  <div class="stat-card stat-closed">  <div class="num" id="cnt-closed">3</div>  <div class="lbl">Closed</div></div>
+  <div class="stat-card stat-notstart"><div class="num" id="cnt-notstart">2</div><div class="lbl">Not Started</div></div>
+  <div class="stat-card stat-watching"><div class="num" id="cnt-watching">1</div><div class="lbl">Watching</div></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ LEGEND -->
+<div class="raid-legend">
+  <span class="raid-legend-label">Likelihood / Impact:</span>
+  <div class="raid-legend-group">
+    <div class="rl-item"><div class="rl-dot high"></div> High</div>
+    <div class="rl-item"><div class="rl-dot medium"></div> Medium</div>
+    <div class="rl-item"><div class="rl-dot low"></div> Low</div>
+  </div>
+  <span class="raid-legend-label" style="margin-left:12px">Status:</span>
+  <div class="raid-legend-group">
+    <div class="rl-item"><div class="rl-dot closed"></div> ✔ Closed</div>
+    <div class="rl-item"><div class="rl-dot open"></div> Open</div>
+    <div class="rl-item"><div class="rl-dot inprog"></div> In Progress</div>
+    <div class="rl-item"><div class="rl-dot notstart"></div> Not Started</div>
+    <div class="rl-item"><div class="rl-dot watching"></div> Watching</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TABLE -->
+<div class="raid-table-wrap">
+  <div class="table-scroll">
+    <table class="raid" id="raid-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Risk Description</th>
+          <th>Likelihood</th>
+          <th>Impact</th>
+          <th>Owner</th>
+          <th>Mitigation / Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr data-status="closed">
+          <td class="raid-id">R-01</td>
+          <td>VP-level sign-off still pending — Phase 2 rollout cannot formally proceed without it</td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jeff Toler</td>
+          <td>FY27 budget approved ($400k for four Tier 1 sites). VP sign-off is the remaining blocker. TCO for full implementation across all cameras: ~$900k</td>
+          <td><span class="rs closed"><div class="rs-dot"></div>✔ Closed</span><select class="status-select"><option value="open">Open</option><option value="inprog">In Progress</option><option value="closed" selected>✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="open">
+          <td class="raid-id">R-02</td>
+          <td>GOC capacity insufficient to absorb incoming daily legitimate violations requiring human review at full scale</td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Suzanne Paleologos</td>
+          <td>GOC staffing assessment required before Phase 2 go-live. No formal assessment completed yet.</td>
+          <td><span class="rs open"><div class="rs-dot"></div>Open</span><select class="status-select"><option value="open" selected>Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="open">
+          <td class="raid-id">R-03</td>
+          <td>Cobalt Human Agent intermediary layer not accounted for in SLA chain — creates unknown escalation timing risk</td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jerry Wu</td>
+          <td>Escalation chain confirmed: Cobalt Video Analytics → Cobalt Human Agent → GO Center. Division of responsibilities not yet documented. Must be formalized before Phase 2.</td>
+          <td><span class="rs open"><div class="rs-dot"></div>Open</span><select class="status-select"><option value="open" selected>Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="inprog">
+          <td class="raid-id">R-04</td>
+          <td>GDPR/CCPA compliance not signed off for EU/CA sites — blocks Dublin, London, Paris, and Toronto activations</td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jerry Wu</td>
+          <td>Data privacy review required before any EU/CA site go-live. Video AI uses real-time edge anonymization (face/plate blurring) as a mitigant, but formal sign-off still needed.</td>
+          <td><span class="rs inprog"><div class="rs-dot"></div>In Progress</span><select class="status-select"><option value="open">Open</option><option value="inprog" selected>In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="inprog">
+          <td class="raid-id">R-05</td>
+          <td>Lenel logical device structure may require per-camera reconfiguration — significant rework risk</td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Timothy Ohtake</td>
+          <td>Identified in cobalt-salesforce-uplift channel: current logical source has one device for all cameras. Per-camera logical devices may be needed. Confirming with OpenAccess support.</td>
+          <td><span class="rs inprog"><div class="rs-dot"></div>In Progress</span><select class="status-select"><option value="open">Open</option><option value="inprog" selected>In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="inprog">
+          <td class="raid-id">R-06</td>
+          <td>Intermittent OnGuard server connectivity — could impact alarm monitoring reliability</td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Alen Cheng / Lukasz Skorowski</td>
+          <td>Intermittent connection to OnGuard server observed but not consistent. Needs root cause investigation before scaling.</td>
+          <td><span class="rs inprog"><div class="rs-dot"></div>In Progress</span><select class="status-select"><option value="open">Open</option><option value="inprog" selected>In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="open">
+          <td class="raid-id">R-07</td>
+          <td>Only 3–5% of detected violations currently receive human investigation; 95–97% auto-closed without resolution</td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Suzanne Paleologos</td>
+          <td>Critical compliance gap identified from pilot data. GOC alarm review ownership must be formalized. Core driver for requiring division of responsibilities documentation.</td>
+          <td><span class="rs open"><div class="rs-dot"></div>Open</span><select class="status-select"><option value="open" selected>Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="closed">
+          <td class="raid-id">R-08</td>
+          <td>Vendor not yet under signed contract — Cobalt Video Analytics selection pending final VP sign-off and contract execution</td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jeff Toler</td>
+          <td>FY27 budget approved ($1.6M, Tier 1 sites) as of April 10, 2026. VP sign-off obtained. $400k approved for Q2 FY27.</td>
+          <td><span class="rs closed"><div class="rs-dot"></div>✔ Closed</span><select class="status-select"><option value="open">Open</option><option value="inprog">In Progress</option><option value="closed" selected>✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="notstart">
+          <td class="raid-id">R-09</td>
+          <td>Model tuning / false positive feedback loop not yet defined — risk of alarm quality degradation over time</td>
+          <td><span class="pill low">Low</span><select class="pill-select"><option value="high">High</option><option value="medium">Medium</option><option value="low" selected>Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jerry Wu</td>
+          <td>Ongoing Cobalt Video Analytics model tuning process must be defined before Phase 2. Feedback loop for false positives/negatives required per SRD.</td>
+          <td><span class="rs notstart"><div class="rs-dot"></div>Not Started</span><select class="status-select"><option value="open">Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart" selected>Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="open">
+          <td class="raid-id">R-10</td>
+          <td>Ambient AI early withdrawal from Hyderabad — if they pull out before Cobalt is ready, GOC absorbs full nuisance alarm volume</td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jerry Wu</td>
+          <td>Accelerate Cobalt Hyderabad readiness; confirm Ambient contractual obligations; brief GOC on contingency.</td>
+          <td><span class="rs open"><div class="rs-dot"></div>Open</span><select class="status-select"><option value="open" selected>Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="open">
+          <td class="raid-id">R-11</td>
+          <td>InfoSec &amp; Privacy approvals required per region — pilot approvals do not carry over to new regions (e.g., GDPR for EU sites)</td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jerry Wu</td>
+          <td>Engage InfoSec early in each site's phase. No deployment begins without privacy/legal sign-off for that region.</td>
+          <td><span class="rs open"><div class="rs-dot"></div>Open</span><select class="status-select"><option value="open" selected>Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="notstart">
+          <td class="raid-id">R-12</td>
+          <td>H&amp;S integration not yet defined — person-on-ground use case has Health &amp; Safety implications not yet designed into response protocols</td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Aaron Patkin / Prescott Delaware</td>
+          <td>Prescott Delaware from H&amp;S to define employee welfare response protocols before Phase 2 go-live.</td>
+          <td><span class="rs notstart"><div class="rs-dot"></div>Not Started</span><select class="status-select"><option value="open">Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart" selected>Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="closed">
+          <td class="raid-id">R-13</td>
+          <td>Budget ambiguity between approval levels — active uncertainty on whether $1.6M is fully approved or still requires formal pitching</td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jeff Toler</td>
+          <td>Written confirmation obtained from Orlaith. $400k approved for Q2 FY27.</td>
+          <td><span class="rs closed"><div class="rs-dot"></div>✔ Closed</span><select class="status-select"><option value="open">Open</option><option value="inprog">In Progress</option><option value="closed" selected>✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="open">
+          <td class="raid-id">R-14</td>
+          <td>Change management resource gap — dedicated OCM resource not yet confirmed; hard pre-condition for go-live at every site</td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td><span class="pill high">High</span><select class="pill-select"><option value="high" selected>High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jerry Wu</td>
+          <td>Confirm the OCM contractor before Q2 site deployments begin.</td>
+          <td><span class="rs open"><div class="rs-dot"></div>Open</span><select class="status-select"><option value="open" selected>Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+        </tr>
+
+        <tr data-status="watching">
+          <td class="raid-id">R-15</td>
+          <td>Cobalt leadership departure (Alejandro Ramirez) — losing a key vendor leadership member could impact delivery continuity</td>
+          <td><span class="pill lowmed">Low/Med</span><select class="pill-select"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option><option value="lowmed" selected>Low/Med</option></select></td>
+          <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+          <td>Jeff Toler / Jerry Wu</td>
+          <td>Monitor vendor leadership transition. Confirm continuity plan and identify replacement POC from Cobalt. Assess impact on project timelines and commitments.</td>
+          <td><span class="rs watching"><div class="rs-dot"></div>Watching</span><select class="status-select"><option value="open">Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching" selected>Watching</option></select></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  Video AI – RAID Log · Cobalt Video Analytics Tier 1 Global Rollout · Last updated Jun 5, 2026 · 15 risks tracked
+</div>
+
+<script>
+  const STATUS_LABELS = {
+    open:     { text: 'Open',        cls: 'open' },
+    inprog:   { text: 'In Progress', cls: 'inprog' },
+    closed:   { text: '✔ Closed',    cls: 'closed' },
+    notstart: { text: 'Not Started', cls: 'notstart' },
+    watching: { text: 'Watching',    cls: 'watching' },
+  };
+  const PILL_LABELS = {
+    high:   { text: 'High',    cls: 'high' },
+    medium: { text: 'Medium',  cls: 'medium' },
+    low:    { text: 'Low',     cls: 'low' },
+    lowmed: { text: 'Low/Med', cls: 'lowmed' },
+  };
+
+  function recount() {
+    const counts = { open:0, inprog:0, closed:0, notstart:0, watching:0 };
+    document.querySelectorAll('#raid-table tbody tr').forEach(tr => {
+      const s = tr.dataset.status;
+      if (counts[s] !== undefined) counts[s]++;
+    });
+    document.getElementById('cnt-open').textContent     = counts.open;
+    document.getElementById('cnt-inprog').textContent   = counts.inprog;
+    document.getElementById('cnt-closed').textContent   = counts.closed;
+    document.getElementById('cnt-notstart').textContent = counts.notstart;
+    document.getElementById('cnt-watching').textContent = counts.watching;
+  }
+
+  function applyStatusSelect(sel) {
+    const val = sel.value;
+    const td = sel.closest('td');
+    const tr = sel.closest('tr');
+    const badge = td.querySelector('.rs');
+    const info = STATUS_LABELS[val];
+    badge.className = 'rs ' + info.cls;
+    badge.innerHTML = `<div class="rs-dot"></div>${info.text}`;
+    tr.dataset.status = val;
+    recount();
+  }
+
+  function applyPillSelect(sel) {
+    const val = sel.value;
+    const td = sel.closest('td');
+    const pill = td.querySelector('.pill');
+    const info = PILL_LABELS[val];
+    pill.className = 'pill ' + info.cls;
+    pill.textContent = info.text;
+  }
+
+  function enterEditMode() {
+    document.body.classList.add('edit-mode');
+    document.getElementById('btn-edit').style.display   = 'none';
+    document.getElementById('btn-save').style.display   = '';
+    document.getElementById('btn-cancel').style.display = '';
+    document.getElementById('btn-addrow').style.display = '';
+    setStatus('✏️ Editing — click any cell to change it', false);
+
+    // Make text cells editable
+    document.querySelectorAll('#raid-table tbody td').forEach((td, i) => {
+      const colIdx = td.cellIndex;
+      // Skip pill and status cols (2,3,6) — those use dropdowns
+      if (colIdx === 2 || colIdx === 3 || colIdx === 6) return;
+      td.contentEditable = 'true';
+      td.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); td.blur(); }
+      });
+    });
+
+    // Wire dropdowns
+    document.querySelectorAll('.status-select').forEach(sel => {
+      sel.onchange = () => applyStatusSelect(sel);
+    });
+    document.querySelectorAll('.pill-select').forEach(sel => {
+      sel.onchange = () => applyPillSelect(sel);
+    });
+
+    // Delete buttons
+    document.querySelectorAll('#raid-table tbody tr').forEach(tr => addDelBtn(tr));
+  }
+
+  function addDelBtn(tr) {
+    const firstTd = tr.querySelector('td:first-child');
+    if (!firstTd || firstTd.querySelector('.del-row-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'del-row-btn';
+    btn.textContent = '✕';
+    btn.title = 'Delete row';
+    btn.onclick = e => { e.stopPropagation(); tr.remove(); recount(); };
+    firstTd.appendChild(btn);
+  }
+
+  function nextRaidId() {
+    const ids = [...document.querySelectorAll('#raid-table tbody .raid-id')]
+      .map(td => parseInt(td.textContent.replace('R-', ''), 10))
+      .filter(n => !isNaN(n));
+    const max = ids.length ? Math.max(...ids) : 0;
+    return 'R-' + String(max + 1).padStart(2, '0');
+  }
+
+  function addRow() {
+    const newId = nextRaidId();
+    const tr = document.createElement('tr');
+    tr.dataset.status = 'open';
+    tr.innerHTML = `
+      <td class="raid-id" contenteditable="true">${newId}</td>
+      <td contenteditable="true">New risk description</td>
+      <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+      <td><span class="pill medium">Medium</span><select class="pill-select"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option><option value="lowmed">Low/Med</option></select></td>
+      <td contenteditable="true">Owner TBD</td>
+      <td contenteditable="true">Mitigation TBD</td>
+      <td><span class="rs open"><div class="rs-dot"></div>Open</span><select class="status-select"><option value="open" selected>Open</option><option value="inprog">In Progress</option><option value="closed">✔ Closed</option><option value="notstart">Not Started</option><option value="watching">Watching</option></select></td>
+    `;
+    document.querySelector('#raid-table tbody').appendChild(tr);
+    tr.querySelectorAll('.status-select').forEach(sel => sel.onchange = () => applyStatusSelect(sel));
+    tr.querySelectorAll('.pill-select').forEach(sel => sel.onchange = () => applyPillSelect(sel));
+    tr.querySelectorAll('td[contenteditable]').forEach(td => {
+      td.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); td.blur(); } });
+    });
+    addDelBtn(tr);
+    recount();
+    tr.querySelector('td:nth-child(2)').focus();
+  }
+
+  function saveChanges() {
+    document.body.classList.remove('edit-mode');
+    document.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    document.querySelectorAll('.del-row-btn').forEach(btn => btn.remove());
+
+    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'video-ai-raid-log.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    document.getElementById('btn-edit').style.display   = '';
+    document.getElementById('btn-save').style.display   = 'none';
+    document.getElementById('btn-cancel').style.display = 'none';
+    document.getElementById('btn-addrow').style.display = 'none';
+    setStatus('✅ Saved — replace your Desktop file with the download', true);
+  }
+
+  function cancelEdit() {
+    if (confirm('Discard all unsaved changes?')) location.reload();
+  }
+
+  function setStatus(msg, saved) {
+    const el = document.getElementById('edit-status');
+    el.textContent = msg;
+    el.className = 'edit-status' + (saved ? ' saved' : '');
+  }
+</script>
+
+</body>
+</html>

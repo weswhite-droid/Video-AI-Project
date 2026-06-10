@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – System Requirements</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117; color: #e2e8f0; min-height: 100vh; padding: 24px;
+    }
+
+    /* ── Back link ───────────────────────────────────────── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #63b3ed; text-decoration: none; font-size: 0.825rem;
+      margin-bottom: 20px; transition: color 0.15s;
+    }
+    .back-link:hover { color: #90cdf4; }
+
+    /* ── Toolbar ─────────────────────────────────────────── */
+    .edit-toolbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; gap: 10px;
+      background: #0f1117; border-bottom: 1px solid #2d3748;
+      padding: 10px 0; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .toolbar-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; margin-right: 4px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; border: 1px solid; transition: background 0.15s; white-space: nowrap;
+    }
+    .btn-edit   { background: rgba(99,179,237,0.12);  color: #63b3ed; border-color: rgba(99,179,237,0.35); }
+    .btn-edit:hover   { background: rgba(99,179,237,0.25); }
+    .btn-save   { background: rgba(104,211,145,0.12); color: #68d391; border-color: rgba(104,211,145,0.35); }
+    .btn-save:hover   { background: rgba(104,211,145,0.25); }
+    .btn-cancel { background: rgba(113,128,150,0.12); color: #a0aec0; border-color: rgba(113,128,150,0.3); }
+    .btn-cancel:hover { background: rgba(113,128,150,0.25); }
+    .edit-status { font-size: 0.75rem; color: #718096; margin-left: auto; }
+    .edit-status.saved { color: #68d391; }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748; border-radius: 12px;
+      padding: 28px 32px; margin-bottom: 24px;
+    }
+    .header h1 { font-size: 1.75rem; font-weight: 700; color: #f7fafc; line-height: 1.2; }
+    .header h1 span { color: #63b3ed; }
+    .header .subtitle { font-size: 0.875rem; color: #718096; margin-top: 4px; }
+
+    /* ── Sections ───────────────────────────────────────── */
+    .req-section {
+      background: #1a1f2e; border: 1px solid #2d3748;
+      border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+    }
+    .req-section details summary {
+      list-style: none; cursor: pointer;
+      padding: 14px 20px; background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex; align-items: center; gap: 10px;
+      user-select: none; transition: background 0.15s;
+    }
+    .req-section details summary::-webkit-details-marker { display: none; }
+    .req-section details summary:hover { background: rgba(255,255,255,0.07); }
+    .req-section details:not([open]) summary { border-bottom: none; }
+    .req-section details[open] summary { border-bottom: 1px solid #2d3748; }
+    .section-num { font-size: 0.72rem; color: #63b3ed; font-weight: 700; background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.25); border-radius: 4px; padding: 1px 7px; flex-shrink: 0; }
+    .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; }
+    .chevron { margin-left: auto; font-size: 0.7rem; color: #4a5568; transition: transform 0.2s ease; flex-shrink: 0; }
+    details[open] .chevron { transform: rotate(180deg); }
+
+    /* ── Body text (scope section) ──────────────────────── */
+    .section-body { padding: 16px 20px 20px; }
+    .section-body p { font-size: 0.85rem; color: #a0aec0; line-height: 1.65; margin-bottom: 10px; }
+    .section-body p:last-child { margin-bottom: 0; }
+
+    .sites-wrap { margin-top: 12px; }
+    .sites-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; margin-bottom: 8px; }
+    .sites-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .site-chip {
+      background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.25);
+      color: #63b3ed; border-radius: 20px; padding: 3px 11px;
+      font-size: 0.75rem; font-weight: 500;
+    }
+
+    /* ── Subsection header ──────────────────────────────── */
+    .sub-head {
+      padding: 9px 20px; font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em; color: #718096;
+      background: rgba(0,0,0,0.18); border-top: 1px solid #2d3748;
+      border-bottom: 1px solid #1e2538;
+    }
+
+    /* ── Tables (all sections) ──────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+    table.req-table {
+      width: 100%; border-collapse: collapse; font-size: 0.8rem;
+    }
+    table.req-table thead tr { background: rgba(255,255,255,0.04); }
+    table.req-table th {
+      padding: 9px 14px; text-align: left;
+      font-size: 0.67rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #718096;
+      border-bottom: 1px solid #2d3748; white-space: nowrap;
+    }
+    table.req-table td {
+      padding: 10px 14px; border-bottom: 1px solid #1e2538;
+      vertical-align: top; color: #cbd5e0; line-height: 1.5;
+    }
+    table.req-table tr:last-child td { border-bottom: none; }
+    table.req-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .td-req  { color: #e2e8f0; line-height: 1.55; }
+    .td-key  { font-weight: 600; color: #e2e8f0; white-space: nowrap; }
+    .td-note { color: #718096; font-size: 0.76rem; }
+    .td-target { color: #63b3ed; font-weight: 600; }
+
+    /* detail block inside a table cell */
+    .td-detail {
+      font-size: 0.76rem; color: #a0aec0; margin-top: 8px;
+      padding: 8px 12px; background: rgba(0,0,0,0.22);
+      border-radius: 6px; border-left: 2px solid #2d3748; line-height: 1.65;
+    }
+    .td-detail ul { padding-left: 16px; margin-top: 4px; }
+    .td-detail li { margin-top: 3px; }
+    .td-detail li ul { margin-top: 3px; }
+
+    /* ── Status badge ───────────────────────────────────── */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.64rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 3px 9px; border-radius: 4px;
+      white-space: nowrap;
+    }
+    .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .status-badge.completed  { background: rgba(99,179,237,0.15);  color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+    .status-badge.completed::before  { background: #63b3ed; }
+    .status-badge.inprogress { background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3); }
+    .status-badge.inprogress::before { background: #68d391; box-shadow: 0 0 4px rgba(104,211,145,0.5); }
+    .status-badge.atrisk     { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+    .status-badge.atrisk::before     { background: #fc8181; box-shadow: 0 0 4px rgba(252,129,129,0.5); }
+    .status-badge.notstarted { background: rgba(74,85,104,0.3);    color: #a0aec0; border: 1px solid #4a5568; }
+    .status-badge.notstarted::before { background: #4a5568; }
+
+    /* ── Status select ──────────────────────────────────── */
+    .status-select {
+      display: none; background: #1e2538; border: 1px solid #4a5568;
+      color: #e2e8f0; border-radius: 4px; padding: 4px 8px;
+      font-size: 0.75rem; cursor: pointer;
+    }
+    body.edit-mode .status-select { display: inline-block; }
+    body.edit-mode .status-badge  { display: none; }
+
+    /* status cell keeps things tidy */
+    .td-status { white-space: nowrap; vertical-align: middle; }
+
+    /* ── Add-row button (edit mode only) ────────────────── */
+    .add-row-btn {
+      display: none; margin: 10px 20px 14px;
+      background: rgba(183,148,244,0.08); border: 1px dashed rgba(183,148,244,0.3);
+      color: #b794f4; border-radius: 6px; padding: 8px;
+      font-size: 0.78rem; cursor: pointer; width: calc(100% - 40px);
+      text-align: center; transition: background 0.15s;
+    }
+    body.edit-mode .add-row-btn { display: block; }
+    .add-row-btn:hover { background: rgba(183,148,244,0.18); }
+
+    /* ── Delete button ──────────────────────────────────── */
+    .del-btn {
+      display: none; background: rgba(252,129,129,0.12);
+      border: 1px solid rgba(252,129,129,0.3); color: #fc8181;
+      border-radius: 4px; padding: 1px 7px; font-size: 0.65rem;
+      font-weight: 700; cursor: pointer; margin-left: 8px;
+    }
+    body.edit-mode .del-btn { display: inline; }
+    .del-btn:hover { background: rgba(252,129,129,0.28); }
+
+    /* ── Workflow collapse (violation table) ────────────── */
+    .wf-toggle summary {
+      list-style: none; font-size: 0.72rem; color: #63b3ed;
+      cursor: pointer; display: inline;
+    }
+    .wf-toggle summary::-webkit-details-marker { display: none; }
+    .wf-body {
+      font-size: 0.76rem; color: #a0aec0; margin-top: 8px;
+      padding: 10px 12px; background: rgba(0,0,0,0.2);
+      border-radius: 6px; line-height: 1.6;
+    }
+    .wf-body ul { padding-left: 16px; }
+    .wf-body li { margin-top: 3px; }
+    .wf-body ul ul { margin-top: 3px; }
+
+    /* Phase table colours */
+    .phase-live    { color: #68d391; font-weight: 700; }
+    .phase-target  { color: #63b3ed; font-weight: 600; }
+    .phase-tbd     { color: #718096; font-style: italic; }
+
+    /* Edit mode contenteditable focus */
+    body.edit-mode [contenteditable] { outline: none; }
+    body.edit-mode [contenteditable]:focus {
+      background: rgba(99,179,237,0.08);
+      box-shadow: 0 0 0 2px rgba(99,179,237,0.3);
+      border-radius: 3px;
+    }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .footer { margin-top: 24px; text-align: center; font-size: 0.7rem; color: #4a5568; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ TOOLBAR -->
+<div class="edit-toolbar">
+  <span class="toolbar-label">Page:</span>
+  <button class="btn btn-edit"   id="btn-edit"   onclick="enterEditMode()">✏️ Edit</button>
+  <button class="btn btn-save"   id="btn-save"   onclick="saveChanges()"  style="display:none">💾 Save to File</button>
+  <button class="btn btn-cancel" id="btn-cancel" onclick="cancelEdit()"   style="display:none">✕ Cancel</button>
+  <span class="edit-status" id="edit-status">View mode</span>
+</div>
+
+<a class="back-link" href="video-ai-dashboard.html">&#8592; Back to Master Project Dashboard</a>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<div class="header">
+  <h1>Video AI – <span>System Requirements</span></h1>
+  <div class="subtitle">Cobalt Video Analytics · End-to-End Technical &amp; Operational Requirements · Tier 1 Global Office Rollout</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 1: Purpose & Scope -->
+<div class="req-section">
+  <details open>
+  <summary>
+    <span class="section-num">1</span>
+    <span class="section-title">Purpose &amp; Scope</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="section-body">
+    <p class="editable-text">Define end-to-end technical and operational requirements for deploying Cobalt Video Analytics integrated with Salesforce's physical security stack across T1 office locations globally. Year 1 expansion scope entails the following 15 sites:</p>
+    <div class="sites-wrap">
+      <div class="sites-label">Year 1 Sites (15)</div>
+      <div class="sites-list">
+        <span class="site-chip">Atlanta</span>
+        <span class="site-chip">Bangalore</span>
+        <span class="site-chip">Bellevue</span>
+        <span class="site-chip">Chicago</span>
+        <span class="site-chip">Dublin</span>
+        <span class="site-chip">Hyderabad</span>
+        <span class="site-chip">Indianapolis</span>
+        <span class="site-chip">London</span>
+        <span class="site-chip">New York</span>
+        <span class="site-chip">Paris</span>
+        <span class="site-chip">San Francisco</span>
+        <span class="site-chip">Seattle</span>
+        <span class="site-chip">Sydney</span>
+        <span class="site-chip">Tokyo</span>
+        <span class="site-chip">Toronto</span>
+      </div>
+    </div>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 2: Business Objectives -->
+<div class="req-section">
+  <details open>
+  <summary>
+    <span class="section-num">2</span>
+    <span class="section-title">Business Objectives</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-objectives">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Objective</th>
+          <th>Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">BO-01</td>
+          <td class="td-req">Transform security operations from reactive surveillance to proactive, AI-enabled threat detection</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">BO-02</td>
+          <td class="td-req">Achieve 98%+ automated alarm resolution rate</td>
+          <td class="td-note">Pilot result: 98% achieved at SF Tower</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">BO-03</td>
+          <td class="td-req">80%+ reduction in guard dispatches to non-genuine alarms so that security teams can respond to real incidents with better intelligence</td>
+          <td class="td-note">Pilot result: 80% reduction achieved</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">BO-04</td>
+          <td class="td-req">Eliminate 780,000+ nuisance alarms annually across 5,177 cameras at full scale</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">BO-05</td>
+          <td class="td-req">Support Salesforce's commitment to employee safety at global scale</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="add-row-btn" onclick="addRow('tbl-objectives', ['BO','Objective','Notes'])">+ Add Objective</button>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 3: Integration Architecture -->
+<div class="req-section">
+  <details open>
+  <summary>
+    <span class="section-num">3</span>
+    <span class="section-title">Integration Architecture Requirements</span>
+    <span class="chevron">▼</span>
+  </summary>
+
+  <div class="sub-head">Integration Points</div>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-integrations">
+      <thead>
+        <tr>
+          <th>Integration</th>
+          <th>Description</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Cobalt → Lenel OnGuard</td>
+          <td>Alarm monitoring integration — Cobalt ingests and analyzes OnGuard alarm signals</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Cobalt → Milestone VMS</td>
+          <td>Video management via Milestone Open Network Bridge</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Cobalt → ADA Door Systems</td>
+          <td>Door system integration for access control event correlation</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Cobalt → Service Cloud</td>
+          <td>Case creation and incident tracking for policy violations</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Cobalt → Agentforce</td>
+          <td>AI-powered automated response and case routing</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Cobalt → Slack</td>
+          <td>Real-time notifications to GOC / SecOps channels</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub-head">Network &amp; Security Requirements</div>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-network">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Requirement</th>
+          <th>Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">NW-01</td>
+          <td class="td-req">AWS private link encryption for cloud-to-on-prem connectivity</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">NW-02</td>
+          <td class="td-req">Firewall configuration completed per site prior to go-live</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">NW-03</td>
+          <td class="td-req">Regional Lenel license servers — OpenAccess License ($3k–$5k/year per server)</td>
+          <td class="td-note">Currently only deployed at SF West</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">NW-04</td>
+          <td class="td-req">AWS hosting: ~$500k/year for global deployment (~1 g5.4xlarge EC2 instance per 30 cameras)</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="add-row-btn" onclick="addRow('tbl-network', ['NW','Requirement','Notes'])">+ Add Network Requirement</button>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 4: Functional Requirements -->
+<div class="req-section">
+  <details open>
+  <summary>
+    <span class="section-num">4</span>
+    <span class="section-title">Functional Requirements</span>
+    <span class="chevron">▼</span>
+  </summary>
+
+  <!-- 4a -->
+  <div class="sub-head">4a · Alarm Monitoring &amp; Web Application Portal</div>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-4a">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Requirement</th>
+          <th>Detail</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">AM-01</td>
+          <td class="td-req">Automated root cause analysis for all security events</td>
+          <td class="td-note">Upon receiving a signal from the Lenel OnGuard Alarm Monitoring system, the Cobalt Video Analytics platform shall automatically ingest, analyze, and categorize the underlying cause of the event while notating analysis within the alarm notes.</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">AM-02</td>
+          <td class="td-req">AI-based nuisance alarm filtering before escalation</td>
+          <td class="td-note">All alarms must be analyzed to filter out false alarms prior to escalation to GO Center.</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">AM-03</td>
+          <td class="td-req">Real-time escalation to GO Center within 30–60 seconds of genuine threat detection</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">AM-04</td>
+          <td class="td-req">Human review required for all legitimate violation detections (tailgate, unauthorized entry)</td>
+          <td class="td-note">Cases generated must NOT auto-close without human disposition. Currently only 3–5% of detected violations receive human investigation — this gap must be closed before Phase 2.</td>
+          <td class="td-status"><span class="status-badge atrisk">⚠ At Risk</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk" selected>⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">AM-05</td>
+          <td class="td-req">Web application portal dashboard must be kept "clean"</td>
+          <td class="td-note">Dashboard must contain only alarms escalated to GO Center. All alarms not being escalated to GOC must be acknowledged/archived.</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="add-row-btn" onclick="addRow('tbl-4a', ['AM','Requirement','Detail'])">+ Add Alarm Monitoring Requirement</button>
+
+  <!-- 4b -->
+  <div class="sub-head">4b · Violation / Incident Detection &amp; Response</div>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-violations">
+      <thead>
+        <tr>
+          <th>Violation Type</th>
+          <th>Workflow</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Tailgating / Piggybacking</td>
+          <td>
+            <details class="wf-toggle">
+              <summary>Defined — view workflow ▾</summary>
+              <div class="wf-body">
+                <ul>
+                  <li>Tailgating event → Office Agent → local Slack channel; Office Agent creates Service Cloud Case (Non-Compliance Tracking)</li>
+                  <li>Vendor identifies tailgator &amp; tailgatee using ACS → pings Office Agent → updates case and Slack</li>
+                  <li>Office Agent sends Slack message to tailgatee (1st through door): <em>Do you know the tailgator? (Yes / No)</em>
+                    <ul>
+                      <li><strong>YES:</strong> tailgatee enters name → reminders sent to both parties → case auto-closed in Service Cloud</li>
+                      <li><strong>NO:</strong> Office Agent notifies SecOps + GOC via Slack → guard dispatched → human handles final resolution and case closure</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </details>
+          </td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Weapons Detection</td>
+          <td>
+            <details class="wf-toggle">
+              <summary>Defined — view workflow ▾</summary>
+              <div class="wf-body">
+                <ul>
+                  <li>Weapon identified by video analytics → Office Agent → local Slack channel; Office Agent creates Service Cloud Case</li>
+                  <li>Office Agent notifies SecOps + GOC via Slack → guard dispatched → human handles final resolution and case closure</li>
+                </ul>
+              </div>
+            </details>
+          </td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Unauthorized Access Attempts</td>
+          <td><span style="color:#718096;font-style:italic;">Workflow TBD</span></td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Medical Emergency (Fall / Trip)</td>
+          <td><span style="color:#718096;font-style:italic;">Workflow TBD</span></td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Doors Forced / Propped Open</td>
+          <td><span style="color:#718096;font-style:italic;">Workflow TBD</span></td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">After-Hours Access Anomalies</td>
+          <td><span style="color:#718096;font-style:italic;">Workflow TBD</span></td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Loitering in Restricted Areas</td>
+          <td><span style="color:#718096;font-style:italic;">Workflow TBD</span></td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Object Left Behind / Removed</td>
+          <td><span style="color:#718096;font-style:italic;">Workflow TBD</span></td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Crowd Detection &amp; Density Anomalies</td>
+          <td><span style="color:#718096;font-style:italic;">Workflow TBD</span></td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4c -->
+  <div class="sub-head">4c · Case Management (Salesforce Service Cloud)</div>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-4c">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Requirement</th>
+          <th>Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">CM-01</td>
+          <td class="td-req">Auto-create Salesforce cases with video/image evidence attached for policy violations</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">CM-02</td>
+          <td class="td-req">Cases must NOT auto-close without human disposition for genuine violations</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge atrisk">⚠ At Risk</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk" selected>⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">CM-03</td>
+          <td class="td-req">Priority tiering: High / Medium / Low based on violation type and location</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">CM-04</td>
+          <td class="td-req">Response time SLAs defined per priority level</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">CM-05</td>
+          <td class="td-req">Escalation procedures for repeat offenders — 3rd offense notification must include reporting manager</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">CM-06</td>
+          <td class="td-req">Case data retained per Salesforce data retention policy</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="add-row-btn" onclick="addRow('tbl-4c', ['CM','Requirement','Notes'])">+ Add Case Management Requirement</button>
+
+  <!-- 4d -->
+  <div class="sub-head">4d · Agentforce Integration</div>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-4d">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Requirement</th>
+          <th>Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">AF-01</td>
+          <td class="td-req">Live integration required at all active deployments (SF Tower + Seattle Data 1 as baseline)</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">AF-02</td>
+          <td class="td-req">Automated case routing and dispatch workflows</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">AF-03</td>
+          <td class="td-req">Agentforce actions must support: case triage, investigator assignment, and status updates</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="add-row-btn" onclick="addRow('tbl-4d', ['AF','Requirement','Notes'])">+ Add Agentforce Requirement</button>
+
+  <!-- 4e -->
+  <div class="sub-head">4e · Slack Notifications</div>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-4e">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Requirement</th>
+          <th>Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">SL-01</td>
+          <td class="td-req">Real-time alerts to GOC and SecOps channels upon genuine threat detection</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">SL-02</td>
+          <td class="td-req">Notification format must include: violation type, location, timestamp, image/video evidence link</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">SL-03</td>
+          <td class="td-req">Escalation alerts for SLA breaches — automatic Slack notification to team lead when SLA is not met, based on priority/severity level</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="add-row-btn" onclick="addRow('tbl-4e', ['SL','Requirement','Notes'])">+ Add Slack Requirement</button>
+
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 5: Non-Functional -->
+<div class="req-section">
+  <details open>
+  <summary>
+    <span class="section-num">5</span>
+    <span class="section-title">Non-Functional Requirements</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-nfr">
+      <thead>
+        <tr>
+          <th>Requirement</th>
+          <th>Target</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Availability</td>
+          <td class="td-target">24/7, no shift limitations</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Scalability</td>
+          <td class="td-target">Must support full 5,177-camera global footprint</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Alert Performance</td>
+          <td class="td-target">Detection-to-alert within seconds of event</td>
+          <td class="td-status"><span class="status-badge completed">Completed</span><select class="status-select"><option value="completed" selected>✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Case Assignment</td>
+          <td class="td-target">Within defined SLA per priority tier</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Audit / Logging</td>
+          <td class="td-target">All detections logged with full audit trail</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Compliance</td>
+          <td class="td-target">Pattern analysis and reporting for repeat offenders</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Data Privacy</td>
+          <td class="td-target">Must comply with regional data privacy laws (GDPR, CCPA, etc.)</td>
+          <td class="td-status"><span class="status-badge atrisk">⚠ At Risk</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk" selected>⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 6: Operational -->
+<div class="req-section">
+  <details open>
+  <summary>
+    <span class="section-num">6</span>
+    <span class="section-title">Operational Requirements</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-operational">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Requirement</th>
+          <th>Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">OP-01</td>
+          <td class="td-req">GOC staffing assessment: validate current team capacity to handle incoming daily legitimate violations requiring human review</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge atrisk">⚠ At Risk</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk" selected>⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">OP-02</td>
+          <td class="td-req">Change management plan for GOC, SecOps, and GuardForce required before go-live</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">OP-03</td>
+          <td class="td-req">Training for 100% of affected security personnel prior to each site activation</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">OP-04</td>
+          <td class="td-req">Global SOP documentation required, including per violation type</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">OP-05</td>
+          <td class="td-req">Ongoing Cobalt Video Analytics model tuning process defined — feedback loop for false positives/negatives</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">OP-06</td>
+          <td class="td-req">SecOps to own Employee Success escalation &amp; process for excessive tailgating</td>
+          <td class="td-note">—</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="add-row-btn" onclick="addRow('tbl-operational', ['OP','Requirement','Notes'])">+ Add Operational Requirement</button>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 7: Rollout Phasing -->
+<div class="req-section">
+  <details open>
+  <summary>
+    <span class="section-num">7</span>
+    <span class="section-title">Rollout Phasing</span>
+    <span class="chevron">▼</span>
+  </summary>
+  <div class="table-wrap">
+    <table class="req-table" id="tbl-phases">
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Sites</th>
+          <th>Target</th>
+          <th>Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-key">Phase 1 — Q2 FY27</td>
+          <td>Hyderabad, Bangalore, Tokyo, Sydney, San Francisco, Seattle / Bellevue</td>
+          <td class="phase-live">Live (SF, Seattle)</td>
+          <td>Priority: HYD (remove &amp; replace phase)</td>
+          <td class="td-status"><span class="status-badge inprogress">In Progress</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress" selected>In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted">Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Phase 2 — Q3 FY27</td>
+          <td>Chicago, Indianapolis, New York, Toronto, Atlanta</td>
+          <td class="phase-target">FY27 Target (min. 5 sites active)</td>
+          <td>—</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Phase 3 — Q4 FY27</td>
+          <td>Dublin, London, Paris, Bangalore Tower</td>
+          <td class="phase-tbd">TBD</td>
+          <td>GDPR/privacy sign-off required before EU/CA sites</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+        <tr>
+          <td class="td-key">Phase 4 — FY28</td>
+          <td>Full global rollout to remaining sites</td>
+          <td class="phase-tbd">Not Started</td>
+          <td>Budget: $1,612,800 TCV</td>
+          <td class="td-status"><span class="status-badge notstarted">Not Started</span><select class="status-select"><option value="completed">✔ Completed</option><option value="inprogress">In Progress</option><option value="atrisk">⚠ At Risk</option><option value="notstarted" selected>Not Started</option></select></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </details>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  Video AI – System Requirements · Cobalt Video Analytics Tier 1 Global Rollout · Last updated Jun 5, 2026
+</div>
+
+<script>
+  const STATUS_MAP = {
+    completed:  { text: '✔ Completed', cls: 'completed' },
+    inprogress: { text: 'In Progress',  cls: 'inprogress' },
+    atrisk:     { text: '⚠ At Risk',    cls: 'atrisk' },
+    notstarted: { text: 'Not Started',  cls: 'notstarted' },
+  };
+
+  function applyStatusSelect(sel) {
+    const val = sel.value;
+    const badge = sel.previousElementSibling;
+    if (badge && badge.classList.contains('status-badge')) {
+      badge.className = 'status-badge ' + STATUS_MAP[val].cls;
+      badge.textContent = STATUS_MAP[val].text;
+    }
+  }
+
+  function enterEditMode() {
+    document.body.classList.add('edit-mode');
+    document.getElementById('btn-edit').style.display   = 'none';
+    document.getElementById('btn-save').style.display   = '';
+    document.getElementById('btn-cancel').style.display = '';
+    setStatus('✏️ Editing — click any cell text or use dropdowns to change status', false);
+
+    document.querySelectorAll('.td-req, .td-key, .td-note, .td-target, .phase-live, .phase-target, .phase-tbd, .editable-text').forEach(el => {
+      el.contentEditable = 'true';
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+    });
+
+    document.querySelectorAll('.status-select').forEach(sel => {
+      sel.onchange = () => applyStatusSelect(sel);
+    });
+
+    document.querySelectorAll('table.req-table tbody tr').forEach(tr => addDelBtnTd(tr));
+  }
+
+  function addDelBtnTd(tr) {
+    const lastTd = tr.querySelector('td:last-child');
+    if (!lastTd || lastTd.querySelector('.del-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'del-btn';
+    btn.textContent = '✕';
+    btn.title = 'Delete row';
+    btn.style.marginLeft = '8px';
+    btn.onclick = e => { e.stopPropagation(); tr.remove(); };
+    lastTd.appendChild(btn);
+  }
+
+  function addRow(tableId, colHints) {
+    const tbody = document.querySelector('#' + tableId + ' tbody');
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr');
+    const prefix = colHints[0];
+    const nextNum = (rows.length + 1).toString().padStart(2, '0');
+    const id = prefix + '-' + nextNum;
+
+    const tr = document.createElement('tr');
+    const cols = tbody.closest('table').querySelectorAll('thead th').length;
+
+    if (cols === 4) {
+      tr.innerHTML = `
+        <td class="td-key" contenteditable="true">${id}</td>
+        <td class="td-req" contenteditable="true">New ${colHints[1].toLowerCase()}</td>
+        <td class="td-note" contenteditable="true">—</td>
+        <td class="td-status">
+          <span class="status-badge notstarted">Not Started</span>
+          <select class="status-select">
+            <option value="completed">✔ Completed</option>
+            <option value="inprogress">In Progress</option>
+            <option value="atrisk">⚠ At Risk</option>
+            <option value="notstarted" selected>Not Started</option>
+          </select>
+          <button class="del-btn" style="margin-left:8px;">✕</button>
+        </td>`;
+    } else if (cols === 3) {
+      tr.innerHTML = `
+        <td class="td-key" contenteditable="true">New item</td>
+        <td class="td-note" contenteditable="true">—</td>
+        <td class="td-status">
+          <span class="status-badge notstarted">Not Started</span>
+          <select class="status-select">
+            <option value="completed">✔ Completed</option>
+            <option value="inprogress">In Progress</option>
+            <option value="atrisk">⚠ At Risk</option>
+            <option value="notstarted" selected>Not Started</option>
+          </select>
+          <button class="del-btn" style="margin-left:8px;">✕</button>
+        </td>`;
+    } else {
+      tr.innerHTML = `
+        <td class="td-key" contenteditable="true">New item</td>
+        <td contenteditable="true">—</td>
+        <td contenteditable="true">—</td>
+        <td contenteditable="true">—</td>
+        <td class="td-status">
+          <span class="status-badge notstarted">Not Started</span>
+          <select class="status-select">
+            <option value="completed">✔ Completed</option>
+            <option value="inprogress">In Progress</option>
+            <option value="atrisk">⚠ At Risk</option>
+            <option value="notstarted" selected>Not Started</option>
+          </select>
+          <button class="del-btn" style="margin-left:8px;">✕</button>
+        </td>`;
+    }
+
+    tr.querySelector('.status-select').onchange = function() { applyStatusSelect(this); };
+    tr.querySelector('.del-btn').onclick = e => { e.stopPropagation(); tr.remove(); };
+    tbody.appendChild(tr);
+    tr.querySelector('[contenteditable]').focus();
+  }
+
+  function saveChanges() {
+    document.body.classList.remove('edit-mode');
+    document.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    document.querySelectorAll('.del-btn').forEach(btn => btn.remove());
+
+    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'video-ai-requirements.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    document.getElementById('btn-edit').style.display   = '';
+    document.getElementById('btn-save').style.display   = 'none';
+    document.getElementById('btn-cancel').style.display = 'none';
+    setStatus('✅ Saved — replace your Desktop file with the download', true);
+  }
+
+  function cancelEdit() {
+    if (confirm('Discard all unsaved changes?')) location.reload();
+  }
+
+  function setStatus(msg, saved) {
+    const el = document.getElementById('edit-status');
+    el.textContent = msg;
+    el.className = 'edit-status' + (saved ? ' saved' : '');
+  }
+</script>
+
+</body>
+</html>

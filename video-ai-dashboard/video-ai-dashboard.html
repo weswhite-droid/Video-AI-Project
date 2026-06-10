@@ -442,16 +442,49 @@
 
 <!-- ══════════════════════════════════════════════════════ RISK CHART -->
 <div class="risk-chart-block">
-  <div class="risk-chart-title" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-    <span>⚠️ RAID Risk Summary — <span id="raidTotalLabel">15 Total Risks</span></span>
-    <button class="sync-btn" onclick="openSyncModal()" style="margin-left: auto;">⟳ Sync from Canvas</button>
-    <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4" target="_blank" class="canvas-link" style="font-size: 0.72rem; color: #63b3ed; text-decoration: none; border: 1px solid rgba(99,179,237,0.35); padding: 5px 12px; border-radius: 6px; background: rgba(99,179,237,0.1); white-space: nowrap; transition: background 0.15s, border-color 0.15s;" onmouseover="this.style.background='rgba(99,179,237,0.2)'; this.style.borderColor='#63b3ed';" onmouseout="this.style.background='rgba(99,179,237,0.1)'; this.style.borderColor='rgba(99,179,237,0.35)';">📋 Open Canvas</a>
-    <span class="sync-last" id="syncLastLabel" style="font-size: 0.65rem; color: #4a5568; margin-left: 0;"></span>
-  </div>
-  <div style="display: flex; justify-content: center; padding: 20px 0;">
+  <div class="risk-chart-title">⚠️ RAID Risk Summary — 15 Total Risks</div>
+  <div class="chart-grid">
+
+    <!-- Bar chart -->
+    <div>
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:10px;">Count by Status</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">Open</div>
+          <div class="bar-track">
+            <div class="bar-fill open" style="width:40%">6</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">In Progress</div>
+          <div class="bar-track">
+            <div class="bar-fill inprog" style="width:20%">3</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Closed</div>
+          <div class="bar-track">
+            <div class="bar-fill closed" style="width:20%">3</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Not Started</div>
+          <div class="bar-track">
+            <div class="bar-fill notstart" style="width:13.3%">2</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Watching</div>
+          <div class="bar-track">
+            <div class="bar-fill watching" style="width:6.7%">1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Donut chart -->
     <div>
-      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:10px;text-align:center;">Distribution</div>
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#718096;margin-bottom:10px;">Distribution</div>
       <div class="donut-wrap">
         <div class="donut"></div>
         <div class="donut-legend">
@@ -463,37 +496,7 @@
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ══════════════════════════════════════════════════════ MASTER PROJECT PLAN -->
-<div class="milestones-block" id="milestonesBlock" style="background: #1a1f2e; border: 1px solid #2d3748; border-radius: 10px; margin-bottom: 24px; overflow: hidden;">
-  <div class="milestones-header" style="padding: 14px 20px; background: rgba(255,255,255,0.04); border-bottom: 1px solid #2d3748; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-    <span style="font-size: 1rem;">📅</span>
-    <span class="mh-title" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0;">Video AI Plan &amp; Milestones</span>
-    <span class="mh-sub" id="milestonesCountLabel" style="font-size: 0.7rem; color: #4a5568; margin-left: 6px;"></span>
-    <button class="milestones-sync-btn" onclick="openMilestonesModal()" style="margin-left: auto; background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.35); color: #63b3ed; border-radius: 6px; padding: 5px 12px; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s; white-space: nowrap; flex-shrink: 0;">⟳ Sync from Canvas</button>
-    <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q" target="_blank" style="background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.35); color: #63b3ed; border-radius: 6px; padding: 5px 12px; font-size: 0.72rem; font-weight: 600; text-decoration: none; white-space: nowrap; flex-shrink: 0; transition: background 0.15s, border-color 0.15s;" onmouseover="this.style.background='rgba(99,179,237,0.2)'; this.style.borderColor='#63b3ed';" onmouseout="this.style.background='rgba(99,179,237,0.1)'; this.style.borderColor='rgba(99,179,237,0.35)';">📋 Open Canvas</a>
-    <span class="milestones-last" id="milestonesLastLabel" style="font-size: 0.65rem; color: #4a5568; white-space: nowrap;"></span>
-  </div>
-  <div id="milestonesBody">
-    <div class="milestones-empty" id="milestonesEmpty" style="padding: 28px; text-align: center; color: #4a5568; font-size: 0.8rem;">
-      No milestones loaded yet — click <strong>⟳ Sync from Canvas</strong> to import from the Video AI Plan & Milestones canvas.
-    </div>
-    <div class="milestones-table-wrap" id="milestonesTableWrap" style="display: none; overflow-x: auto;">
-      <table class="milestones" id="milestonesTable" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
-        <thead>
-          <tr style="background: rgba(255,255,255,0.04);">
-            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Phase</th>
-            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Task / Milestone</th>
-            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Owner</th>
-            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Due</th>
-            <th style="padding: 9px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; border-bottom: 1px solid #2d3748; white-space: nowrap;">Status</th>
-          </tr>
-        </thead>
-        <tbody id="milestonesTableBody"></tbody>
-      </table>
-    </div>
   </div>
 </div>
 
@@ -969,440 +972,6 @@
 <!-- ══════════════════════════════════════════════════════ FOOTER -->
 <div class="footer">
   Generated from #proj-gss-video-ai-working-group Master Project Plan · Last updated Jun 5, 2026 · Statuses inferred from project context — update as needed
-</div>
-
-<!-- ══════════════════════════════════════════════════════ SYNC MODAL -->
-<div class="sync-overlay" id="syncOverlay" onclick="closeSyncOnBackdrop(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-  <div class="sync-modal" style="background: #1a1f2e; border: 1px solid #3d4f6e; border-radius: 12px; padding: 28px 32px; width: min(680px, 95vw); max-height: 90vh; overflow-y: auto;">
-    <h2 style="font-size: 1rem; font-weight: 700; color: #f7fafc; margin-bottom: 6px;">⟳ Sync RAID Log from Slack Canvas</h2>
-    <div class="sync-instructions" style="font-size: 0.78rem; color: #718096; margin-bottom: 16px; line-height: 1.6;">
-      <strong>Step 1:</strong> Open the <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4" target="_blank" style="color: #63b3ed; text-decoration: none;">Slack Canvas</a> in <strong>#proj-gss-video-ai-working-group</strong><br>
-      <strong>Step 2:</strong> Select all rows of the RAID log table (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+A</code> inside table)<br>
-      <strong>Step 3:</strong> Copy (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+C</code>) and paste below<br>
-      <strong>Expected columns:</strong> ID · Description · Likelihood · Impact · Status · Owner
-    </div>
-    <textarea id="syncInput" placeholder="Paste canvas RAID table content here…" oninput="previewSync()" style="width: 100%; height: 220px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; color: #e2e8f0; font-size: 0.78rem; font-family: 'Courier New', monospace; padding: 12px; resize: vertical; outline: none;"></textarea>
-    <div class="sync-error" id="syncError" style="color: #fc8181; font-size: 0.75rem; margin-top: 8px; display: none;"></div>
-    <div class="sync-preview" id="syncPreview" style="margin-top: 14px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 16px; font-size: 0.75rem; color: #a0aec0; display: none;"></div>
-    <div class="sync-modal-actions" style="display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end;">
-      <button class="btn-cancel" onclick="closeSyncModal()" style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #2d3748; background: rgba(255,255,255,0.07); color: #a0aec0;">Cancel</button>
-      <button class="btn-apply" id="applyBtn" onclick="applySync()" disabled style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; background: #2b6cb0; color: #fff;">Apply to Dashboard</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── Sync functionality ──────────────────────────────────────────
-var STATUS_MAP = {
-  'open': 'open', 'in progress': 'inprog', 'in-progress': 'inprog', 'inprogress': 'inprog',
-  'closed': 'closed', 'complete': 'closed', 'completed': 'closed', 'done': 'closed',
-  'not started': 'notstart', 'not-started': 'notstart', 'notstarted': 'notstart',
-  'watching': 'watching', 'watch': 'watching', 'monitor': 'watching'
-};
-
-var parsedRisks = null;
-
-// Helper function to safely escape HTML
-function escapeHtml(text) {
-  var div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function openSyncModal() {
-  document.getElementById('syncInput').value = '';
-  document.getElementById('syncError').style.display = 'none';
-  document.getElementById('syncPreview').style.display = 'none';
-  document.getElementById('applyBtn').disabled = true;
-  parsedRisks = null;
-  var overlay = document.getElementById('syncOverlay');
-  overlay.style.display = 'flex';
-}
-
-function closeSyncModal() {
-  document.getElementById('syncOverlay').style.display = 'none';
-}
-
-function closeSyncOnBackdrop(e) {
-  if (e.target === document.getElementById('syncOverlay')) closeSyncModal();
-}
-
-function parseCanvasText(raw) {
-  var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
-  if (lines.length < 2) return null;
-
-  var delim = (lines[0].indexOf('|') !== -1) ? '|' : '\t';
-  var rows = lines.map(function(l) {
-    return l.split(delim).map(function(c){ return c.trim().replace(/^\||\|$/g,'').trim(); });
-  });
-
-  var headerIdx = 0;
-  for (var i = 0; i < Math.min(rows.length, 4); i++) {
-    var lower = rows[i].map(function(c){ return c.toLowerCase(); });
-    if (lower.indexOf('status') !== -1 || lower.indexOf('id') !== -1) { headerIdx = i; break; }
-  }
-
-  var headers = rows[headerIdx].map(function(c){ return c.toLowerCase(); });
-  var statusCol = headers.indexOf('status');
-  if (statusCol === -1) {
-    for (var j = 0; j < headers.length; j++) {
-      if (headers[j].indexOf('status') !== -1) { statusCol = j; break; }
-    }
-  }
-  if (statusCol === -1) return null;
-
-  var idCol = headers.indexOf('id');
-  var descCol = -1;
-  ['description','risk','issue','item','title','name'].forEach(function(k){
-    if (descCol === -1 && headers.indexOf(k) !== -1) descCol = headers.indexOf(k);
-  });
-  var ownerCol = headers.indexOf('owner');
-
-  var risks = [];
-  for (var r = headerIdx + 1; r < rows.length; r++) {
-    var row = rows[r];
-    if (row.length <= statusCol) continue;
-    var rawStatus = (row[statusCol] || '').toLowerCase().trim();
-    var normStatus = STATUS_MAP[rawStatus] || null;
-    if (!normStatus) continue;
-    risks.push({
-      id: idCol !== -1 ? row[idCol] || '' : '',
-      desc: descCol !== -1 ? row[descCol] || '' : '',
-      owner: ownerCol !== -1 ? row[ownerCol] || '' : '',
-      status: normStatus,
-      rawStatus: row[statusCol]
-    });
-  }
-  return risks.length > 0 ? risks : null;
-}
-
-function countByStatus(risks) {
-  var c = { open:0, inprog:0, closed:0, notstart:0, watching:0 };
-  risks.forEach(function(r){ if (c[r.status] !== undefined) c[r.status]++; });
-  return c;
-}
-
-function previewSync() {
-  var raw = document.getElementById('syncInput').value;
-  var errEl = document.getElementById('syncError');
-  var prevEl = document.getElementById('syncPreview');
-  var applyBtn = document.getElementById('applyBtn');
-  errEl.style.display = 'none';
-  prevEl.style.display = 'none';
-  applyBtn.disabled = true;
-  parsedRisks = null;
-
-  if (!raw.trim()) return;
-
-  var risks = parseCanvasText(raw);
-  if (!risks) {
-    errEl.textContent = 'Could not parse the pasted content. Make sure you copied the table rows from the canvas (including the header row). Accepts tab-separated or pipe-delimited format.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  parsedRisks = risks;
-  var c = countByStatus(risks);
-  var total = risks.length;
-
-  // Build preview table using DOM methods (secure)
-  var previewHtml = '<strong style="color:#e2e8f0;">Preview — ' + total + ' risk' + (total !== 1 ? 's' : '') + ' parsed</strong>';
-  previewHtml += '<table style="margin-top:10px; width: 100%; border-collapse: collapse;"><tr style="border-bottom: 1px solid #2d3748;"><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">ID</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Description</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Status</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Owner</th></tr>';
-
-  risks.forEach(function(r) {
-    var sc = r.status === 'open' ? '#fc8181' : r.status === 'inprog' ? '#ecc94b' : r.status === 'closed' ? '#68d391' : r.status === 'watching' ? '#f6ad55' : '#b794f4';
-    var safeId = escapeHtml(r.id || '—');
-    var safeDesc = escapeHtml((r.desc || '—').substring(0,55)) + (r.desc.length>55?'…':'');
-    var safeStatus = escapeHtml(r.rawStatus);
-    var safeOwner = escapeHtml(r.owner || '—');
-    previewHtml += '<tr style="border-bottom: 1px solid #1e2538;"><td style="padding: 5px 8px; color: #cbd5e0;">' + safeId + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeDesc + '</td><td style="color:' + sc + ';font-weight:600; padding: 5px 8px;">' + safeStatus + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeOwner + '</td></tr>';
-  });
-
-  previewHtml += '</table>';
-  previewHtml += '<div style="margin-top:10px;color:#718096;">Open: <b style="color:#fc8181;">' + c.open + '</b> · In Progress: <b style="color:#ecc94b;">' + c.inprog + '</b> · Closed: <b style="color:#68d391;">' + c.closed + '</b> · Not Started: <b style="color:#b794f4;">' + c.notstart + '</b> · Watching: <b style="color:#f6ad55;">' + c.watching + '</b></div>';
-
-  prevEl.innerHTML = previewHtml;
-  prevEl.style.display = 'block';
-  applyBtn.disabled = false;
-}
-
-function applySync() {
-  if (!parsedRisks) return;
-  var c = countByStatus(parsedRisks);
-  var total = parsedRisks.length;
-
-  // Update donut chart
-  var pOpen = c.open / total * 100;
-  var pInp = c.inprog / total * 100;
-  var pClo = c.closed / total * 100;
-  var pNot = c.notstart / total * 100;
-  var s1 = pOpen, s2 = s1 + pInp, s3 = s2 + pClo, s4 = s3 + pNot;
-
-  var donut = document.querySelector('.donut');
-  if (donut) {
-    donut.style.background = 'conic-gradient(#fc8181 0% ' + s1.toFixed(1) + '%, #ecc94b ' + s1.toFixed(1) + '% ' + s2.toFixed(1) + '%, #68d391 ' + s2.toFixed(1) + '% ' + s3.toFixed(1) + '%, #b794f4 ' + s3.toFixed(1) + '% ' + s4.toFixed(1) + '%, #f6ad55 ' + s4.toFixed(1) + '% 100%)';
-
-    // Update donut center number
-    var styleId = 'donutStyle';
-    var existing = document.getElementById(styleId);
-    if (existing) existing.remove();
-    var st = document.createElement('style');
-    st.id = styleId;
-    st.textContent = '.donut::after { content: "' + total + '"; position: absolute; inset: 22px; background: #1a1f2e; border-radius: 50%; display: block; font-size: 1.4rem; font-weight: 700; color: #e2e8f0; text-align: center; line-height: 86px; }';
-    document.head.appendChild(st);
-  }
-
-  // Update legend counts
-  var counts = document.querySelectorAll('.dl-count');
-  if (counts[0]) counts[0].textContent = c.open;
-  if (counts[1]) counts[1].textContent = c.inprog;
-  if (counts[2]) counts[2].textContent = c.closed;
-  if (counts[3]) counts[3].textContent = c.notstart;
-  if (counts[4]) counts[4].textContent = c.watching;
-
-  // Update title
-  var titleEl = document.getElementById('raidTotalLabel');
-  if (titleEl) titleEl.textContent = total + ' Total Risks';
-
-  // Update timestamp
-  var now = new Date();
-  var ts = now.toLocaleDateString('en-US', {month:'short',day:'numeric'}) + ' ' + now.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
-  var lastEl = document.getElementById('syncLastLabel');
-  if (lastEl) lastEl.textContent = 'Last synced ' + ts;
-
-  closeSyncModal();
-
-  // Show success message
-  alert('✅ Dashboard updated successfully!\n\n' + total + ' risks synced from Slack Canvas.\n\n⚠️ Remember: These changes are local only. To persist them, you need to update the HTML file and push to GitHub.');
-}
-
-// ── Milestones Sync functionality ──────────────────────────────
-var MS_STATUS_MAP = {
-  'not started': { key: 'notstarted', label: 'Not Started', cls: 'grey' },
-  'not-started': { key: 'notstarted', label: 'Not Started', cls: 'grey' },
-  'notstarted': { key: 'notstarted', label: 'Not Started', cls: 'grey' },
-  'in progress': { key: 'inprog', label: 'In Progress', cls: 'green' },
-  'in-progress': { key: 'inprog', label: 'In Progress', cls: 'green' },
-  'inprogress': { key: 'inprog', label: 'In Progress', cls: 'green' },
-  'active': { key: 'inprog', label: 'In Progress', cls: 'green' },
-  'complete': { key: 'done', label: 'Completed', cls: 'blue' },
-  'completed': { key: 'done', label: 'Completed', cls: 'blue' },
-  'done': { key: 'done', label: 'Completed', cls: 'blue' },
-  'closed': { key: 'done', label: 'Completed', cls: 'blue' },
-  'at risk': { key: 'atrisk', label: 'At Risk', cls: 'red' },
-  'at-risk': { key: 'atrisk', label: 'At Risk', cls: 'red' },
-  'atrisk': { key: 'atrisk', label: 'At Risk', cls: 'red' },
-  'blocked': { key: 'atrisk', label: 'Blocked', cls: 'red' },
-  'on hold': { key: 'onhold', label: 'On Hold', cls: 'orange' },
-  'on-hold': { key: 'onhold', label: 'On Hold', cls: 'orange' },
-  'onhold': { key: 'onhold', label: 'On Hold', cls: 'orange' },
-  'pending': { key: 'onhold', label: 'Pending', cls: 'yellow' },
-  'planned': { key: 'notstarted', label: 'Planned', cls: 'grey' }
-};
-
-var parsedMilestones = null;
-
-function openMilestonesModal() {
-  document.getElementById('milestonesInput').value = '';
-  document.getElementById('milestonesError').style.display = 'none';
-  document.getElementById('milestonesPreview').style.display = 'none';
-  document.getElementById('milestonesApplyBtn').disabled = true;
-  parsedMilestones = null;
-  document.getElementById('milestonesOverlay').style.display = 'flex';
-}
-
-function closeMilestonesModal() {
-  document.getElementById('milestonesOverlay').style.display = 'none';
-}
-
-function closeMilestonesOnBackdrop(e) {
-  if (e.target === document.getElementById('milestonesOverlay')) closeMilestonesModal();
-}
-
-function parseMilestonesText(raw) {
-  var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
-  if (lines.length < 2) return null;
-
-  var delim = (lines[0].indexOf('|') !== -1) ? '|' : '\t';
-  var rows = lines.map(function(l) {
-    return l.split(delim).map(function(c){ return c.trim().replace(/^\||\|$/g,'').trim(); });
-  });
-
-  var headerIdx = 0;
-  for (var i = 0; i < Math.min(rows.length, 4); i++) {
-    var lower = rows[i].map(function(c){ return c.toLowerCase(); });
-    if (lower.some(function(c){ return c === 'status' || c === 'task' || c === 'milestone' || c === 'phase'; })) {
-      headerIdx = i; break;
-    }
-  }
-
-  var headers = rows[headerIdx].map(function(c){ return c.toLowerCase(); });
-
-  function findCol(candidates) {
-    for (var i = 0; i < candidates.length; i++) {
-      var idx = headers.indexOf(candidates[i]);
-      if (idx !== -1) return idx;
-    }
-    for (var j = 0; j < headers.length; j++) {
-      for (var k = 0; k < candidates.length; k++) {
-        if (headers[j].indexOf(candidates[k]) !== -1) return j;
-      }
-    }
-    return -1;
-  }
-
-  var phaseCol = findCol(['phase', 'workstream', 'area', 'category']);
-  var taskCol = findCol(['task', 'milestone', 'item', 'deliverable', 'name', 'title', 'description']);
-  var ownerCol = findCol(['owner', 'assigned', 'responsible', 'dri']);
-  var dueCol = findCol(['due', 'date', 'target', 'deadline', 'eta']);
-  var statusCol = findCol(['status', 'state']);
-
-  if (statusCol === -1 && taskCol === -1) return null;
-
-  var items = [];
-  for (var r = headerIdx + 1; r < rows.length; r++) {
-    var row = rows[r];
-    var taskName = taskCol !== -1 && row[taskCol] ? row[taskCol].trim() : '';
-    if (!taskName || taskName === '—' || taskName === '-') continue;
-
-    var rawStatus = statusCol !== -1 && row[statusCol] ? row[statusCol].toLowerCase().trim() : '';
-    var statusObj = MS_STATUS_MAP[rawStatus] || { key: 'notstarted', label: row[statusCol] || 'Not Started', cls: 'grey' };
-
-    items.push({
-      phase: phaseCol !== -1 && row[phaseCol] ? row[phaseCol].trim() : '',
-      task: taskName,
-      owner: ownerCol !== -1 && row[ownerCol] ? row[ownerCol].trim() : '',
-      due: dueCol !== -1 && row[dueCol] ? row[dueCol].trim() : '',
-      statusKey: statusObj.key,
-      statusLbl: statusObj.label,
-      statusCls: statusObj.cls
-    });
-  }
-  return items.length > 0 ? items : null;
-}
-
-function previewMilestones() {
-  var raw = document.getElementById('milestonesInput').value;
-  var errEl = document.getElementById('milestonesError');
-  var prevEl = document.getElementById('milestonesPreview');
-  var btn = document.getElementById('milestonesApplyBtn');
-  errEl.style.display = 'none';
-  prevEl.style.display = 'none';
-  btn.disabled = true;
-  parsedMilestones = null;
-  if (!raw.trim()) return;
-
-  var items = parseMilestonesText(raw);
-  if (!items) {
-    errEl.textContent = 'Could not parse the pasted content. Make sure you copied the table rows including the header row. Accepts tab-separated or pipe-delimited format.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  parsedMilestones = items;
-  var html = '<strong style="color:#e2e8f0;">Preview — ' + items.length + ' milestone' + (items.length !== 1 ? 's' : '') + ' parsed</strong>';
-  html += '<table style="margin-top:10px; width: 100%; border-collapse: collapse;"><tr style="border-bottom: 1px solid #2d3748;"><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Phase</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Task</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Owner</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Due</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Status</th></tr>';
-
-  items.forEach(function(m) {
-    var sc = m.statusCls === 'blue' ? '#63b3ed' : m.statusCls === 'green' ? '#68d391' : m.statusCls === 'red' ? '#fc8181' : m.statusCls === 'yellow' ? '#ecc94b' : m.statusCls === 'orange' ? '#f6ad55' : '#a0aec0';
-    var safePhase = escapeHtml(m.phase || '—');
-    var safeTask = escapeHtml(m.task.substring(0,50)) + (m.task.length>50?'…':'');
-    var safeOwner = escapeHtml(m.owner || '—');
-    var safeDue = escapeHtml(m.due || '—');
-    var safeStatus = escapeHtml(m.statusLbl);
-    html += '<tr style="border-bottom: 1px solid #1e2538;"><td style="padding: 5px 8px; color: #cbd5e0;">' + safePhase + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeTask + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeOwner + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeDue + '</td><td style="color:' + sc + ';font-weight:600; padding: 5px 8px;">' + safeStatus + '</td></tr>';
-  });
-
-  html += '</table>';
-  prevEl.innerHTML = html;
-  prevEl.style.display = 'block';
-  btn.disabled = false;
-}
-
-function applyMilestones() {
-  if (!parsedMilestones) return;
-  var items = parsedMilestones;
-  var tbody = document.getElementById('milestonesTableBody');
-  tbody.innerHTML = '';
-
-  items.forEach(function(m) {
-    var tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid #1e2538';
-    tr.addEventListener('mouseover', function() { this.style.background = 'rgba(255,255,255,0.02)'; });
-    tr.addEventListener('mouseout', function() { this.style.background = ''; });
-
-    var tdPhase = document.createElement('td');
-    tdPhase.style.cssText = 'padding: 10px 14px; font-size: 0.68rem; font-weight: 600; color: #718096; white-space: nowrap;';
-    tdPhase.textContent = m.phase || '—';
-
-    var tdTask = document.createElement('td');
-    tdTask.style.cssText = 'padding: 10px 14px; font-weight: 500; color: #e2e8f0;';
-    tdTask.textContent = m.task;
-
-    var tdOwner = document.createElement('td');
-    tdOwner.style.cssText = 'padding: 10px 14px; font-size: 0.75rem; color: #718096;';
-    tdOwner.textContent = m.owner || '—';
-
-    var tdDue = document.createElement('td');
-    tdDue.style.cssText = 'padding: 10px 14px; font-size: 0.75rem; color: #a0aec0; white-space: nowrap;';
-    tdDue.textContent = m.due || '—';
-
-    var tdStatus = document.createElement('td');
-    var statusBadge = document.createElement('span');
-    statusBadge.style.cssText = 'font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 4px; white-space: nowrap;';
-
-    var badgeColors = {
-      'red': 'background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3);',
-      'green': 'background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3);',
-      'blue': 'background: rgba(99,179,237,0.15); color: #63b3ed; border: 1px solid rgba(99,179,237,0.3);',
-      'grey': 'background: rgba(74,85,104,0.3); color: #a0aec0; border: 1px solid #4a5568;',
-      'yellow': 'background: rgba(236,201,75,0.15); color: #ecc94b; border: 1px solid rgba(236,201,75,0.3);',
-      'orange': 'background: rgba(246,173,85,0.15); color: #f6ad55; border: 1px solid rgba(246,173,85,0.3);'
-    };
-    statusBadge.style.cssText += badgeColors[m.statusCls] || badgeColors['grey'];
-    statusBadge.textContent = m.statusLbl;
-    tdStatus.appendChild(statusBadge);
-
-    tr.appendChild(tdPhase);
-    tr.appendChild(tdTask);
-    tr.appendChild(tdOwner);
-    tr.appendChild(tdDue);
-    tr.appendChild(tdStatus);
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById('milestonesEmpty').style.display = 'none';
-  document.getElementById('milestonesTableWrap').style.display = 'block';
-  document.getElementById('milestonesCountLabel').textContent = items.length + ' items';
-
-  var now = new Date();
-  var ts = now.toLocaleDateString('en-US', {month:'short',day:'numeric'}) + ' ' + now.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
-  document.getElementById('milestonesLastLabel').textContent = 'Last synced ' + ts;
-
-  closeMilestonesModal();
-
-  alert('✅ Video AI Plan & Milestones updated successfully!\n\n' + items.length + ' milestones synced from Slack Canvas.\n\n⚠️ Remember: These changes are local only. To persist them, you need to update the HTML file and push to GitHub.');
-}
-</script>
-
-<!-- ══════════════════════════════════════════════════════ MILESTONES SYNC MODAL -->
-<div class="sync-overlay" id="milestonesOverlay" onclick="closeMilestonesOnBackdrop(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-  <div class="sync-modal" style="background: #1a1f2e; border: 1px solid #3d4f6e; border-radius: 12px; padding: 28px 32px; width: min(680px, 95vw); max-height: 90vh; overflow-y: auto;">
-    <h2 style="font-size: 1rem; font-weight: 700; color: #f7fafc; margin-bottom: 6px;">📅 Sync Video AI Plan & Milestones from Canvas</h2>
-    <div class="sync-instructions" style="font-size: 0.78rem; color: #718096; margin-bottom: 16px; line-height: 1.6;">
-      <strong>Step 1:</strong> Open the <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q" target="_blank" style="color: #63b3ed; text-decoration: none;">Video AI Plan & Milestones Canvas</a> in <strong>#proj-gss-video-ai-working-group</strong><br>
-      <strong>Step 2:</strong> Find the Project Plan / Milestones table<br>
-      <strong>Step 3:</strong> Select all rows (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+A</code> inside table), copy (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+C</code>), and paste below<br>
-      <strong>Expected columns:</strong> Phase · Task/Milestone · Owner · Due Date · Status
-    </div>
-    <textarea id="milestonesInput" placeholder="Paste Video AI Plan & Milestones table content here…" oninput="previewMilestones()" style="width: 100%; height: 220px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; color: #e2e8f0; font-size: 0.78rem; font-family: 'Courier New', monospace; padding: 12px; resize: vertical; outline: none;"></textarea>
-    <div class="sync-error" id="milestonesError" style="color: #fc8181; font-size: 0.75rem; margin-top: 8px; display: none;"></div>
-    <div class="sync-preview" id="milestonesPreview" style="margin-top: 14px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 16px; font-size: 0.75rem; color: #a0aec0; display: none;"></div>
-    <div class="sync-modal-actions" style="display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end;">
-      <button class="btn-cancel" onclick="closeMilestonesModal()" style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #2d3748; background: rgba(255,255,255,0.07); color: #a0aec0;">Cancel</button>
-      <button class="btn-apply" id="milestonesApplyBtn" onclick="applyMilestones()" disabled style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; background: #2b6cb0; color: #fff;">Apply to Dashboard</button>
-    </div>
-  </div>
 </div>
 
 </body>

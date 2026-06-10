@@ -1,0 +1,22 @@
+🎯 **Video AI Project Dashboard is now live!**
+
+📊 **Main Dashboard:** https://weswhite-droid.github.io/Video-AI-Project/
+
+**Quick Access:**
+• ⚠️ RAID Log: https://weswhite-droid.github.io/Video-AI-Project/video-ai-raid-log.html
+• 👥 RACI Matrix: https://weswhite-droid.github.io/Video-AI-Project/video-ai-raci.html
+• 📐 Requirements: https://weswhite-droid.github.io/Video-AI-Project/video-ai-requirements.html
+
+**Dashboard Features:**
+✅ Real-time project status tracking (1 At Risk, 9 In Progress, 13 Completed, 5 Not Started)
+✅ RAID management with visual charts (15 Risks, 10 Assumptions, 6 Issues, 11 Dependencies)
+✅ Interactive expandable sections
+✅ Sync from Canvas functionality for live updates
+
+**Project Highlights:**
+• Budget: $400,140 FY27 / $1,612,800 FY28
+• Pilot Success: 98% alarm resolution, 80% guard dispatch reduction
+• Phase 1 Sites: San Francisco · Bellevue · Chicago · New York (Q2 FY27)
+
+_Last updated: June 9, 2026_
+_GitHub Repo: https://github.com/weswhite-droid/Video-AI-Project_

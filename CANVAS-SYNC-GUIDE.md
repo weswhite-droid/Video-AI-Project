@@ -62,9 +62,9 @@ Click the **"📋 Open Canvas"** button (opens in new tab), or manually go to:
 
 ---
 
-## 📅 Sync Option 2: Master Project Plan from Canvas
+## 📅 Sync Option 2: Video AI Plan & Milestones from Canvas
 
-### **Canvas URL:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ANV1YNC4E
+### **Canvas URL:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q
 
 ### **Step 1: Open the Dashboard**
 
@@ -72,13 +72,13 @@ Same as RAID Log sync (see above)
 
 ### **Step 2: Click "⟳ Sync from Canvas" Button**
 
-Located in the **Master Project Plan & Milestones** section.
+Located in the **Video AI Plan & Milestones** section.
 
-### **Step 3: Open Master Project Plan Canvas**
+### **Step 3: Open Video AI Plan & Milestones Canvas**
 
 Click the **"📋 Open Canvas"** button, or manually go to:
 - Channel: **#proj-gss-video-ai-working-group**
-- Canvas URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ANV1YNC4E
+- Canvas URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q
 
 ### **Step 4: Copy the Project Plan Table**
 
@@ -111,9 +111,9 @@ Click the **"📋 Open Canvas"** button, or manually go to:
 - Legend counts (Open, In Progress, Closed, Not Started, Watching)
 - "Last synced" timestamp
 
-### **When you sync Master Project Plan:**
+### **When you sync Video AI Plan & Milestones:**
 
-✅ **Master Project Plan & Milestones:**
+✅ **Video AI Plan & Milestones:**
 - Full milestone/task table with all rows
 - Phase groupings
 - Task names and descriptions
@@ -212,7 +212,7 @@ The sync tool auto-maps these status values:
 
 ---
 
-### **Master Project Plan Table Format:**
+### **Video AI Plan & Milestones Table Format:**
 
 Expected columns (in any order):
 
@@ -224,7 +224,7 @@ Expected columns (in any order):
 | **Due Date** | due, date, target, deadline, eta | Jun 15, Q2 FY27, 2026-06-15 |
 | **Status** | status, state | Not Started, In Progress, Completed, At Risk |
 
-### **Supported Status Values (Master Project Plan):**
+### **Supported Status Values (Video AI Plan):**
 
 - **Not Started:** not started, not-started, notstarted, planned
 - **In Progress:** in progress, in-progress, inprogress, active
@@ -286,7 +286,7 @@ This is **expected behavior**! The sync updates the page dynamically but doesn't
 
 ### **Canvas URLs:**
 - **RAID Log:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4
-- **Master Project Plan:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ANV1YNC4E
+- **Video AI Plan & Milestones:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q
 
 ### **Dashboard:**
 - **Local:** `C:\Users\wes.white\Documents\Video AI Project\video-ai-dashboard.html`
@@ -302,8 +302,8 @@ This is **expected behavior**! The sync updates the page dynamically but doesn't
 2. 🔄 Dashboard RAID section → Sync button → Paste (Ctrl+V)
 3. ✅ Apply → Done!
 
-**Master Project Plan:**
-1. 📋 Open Project Plan Canvas → Copy table (Ctrl+A, Ctrl+C)
+**Video AI Plan & Milestones:**
+1. 📋 Open Video AI Plan Canvas → Copy table (Ctrl+A, Ctrl+C)
 2. 🔄 Dashboard Milestones section → Sync button → Paste (Ctrl+V)
 3. ✅ Apply → Done!
 

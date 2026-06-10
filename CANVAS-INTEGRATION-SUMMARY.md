@@ -21,8 +21,8 @@ Your Video AI Dashboard now has **live sync functionality** with two Slack Canva
 
 ---
 
-### **2. Master Project Plan Canvas** 📅
-**URL:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ANV1YNC4E
+### **2. Video AI Plan & Milestones Canvas** 📅
+**URL:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q
 
 **Syncs:**
 - Complete milestone/task table
@@ -32,7 +32,7 @@ Your Video AI Dashboard now has **live sync functionality** with two Slack Canva
 - Due dates
 - Status badges (color-coded by status)
 
-**Location in Dashboard:** Master Project Plan & Milestones section (after RAID summary)
+**Location in Dashboard:** Video AI Plan & Milestones section (after RAID summary)
 
 ---
 
@@ -49,11 +49,11 @@ Your Video AI Dashboard now has **live sync functionality** with two Slack Canva
 
 ---
 
-### **For Master Project Plan:**
+### **For Video AI Plan & Milestones:**
 
-1. **In Dashboard:** Click "⟳ Sync from Canvas" in Master Project Plan section
+1. **In Dashboard:** Click "⟳ Sync from Canvas" in Video AI Plan & Milestones section
 2. **Or click:** "📋 Open Canvas" to go directly to the Slack canvas
-3. **In Canvas:** Select Project Plan table → Ctrl+A → Ctrl+C
+3. **In Canvas:** Select Video AI Plan table → Ctrl+A → Ctrl+C
 4. **Back to Dashboard:** Paste in modal (Ctrl+V) → Preview appears
 5. **Click:** "Apply to Dashboard"
 6. ✅ **Done!** Milestone table populates with all tasks
@@ -79,7 +79,7 @@ Your Video AI Dashboard now has **live sync functionality** with two Slack Canva
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│ 📅 Master Project Plan & Milestones                     │
+│ 📅 Video AI Plan & Milestones                           │
 │    [⟳ Sync from Canvas] [📋 Open Canvas]               │
 │                                                         │
 │  ┌───────────────────────────────────────────────────┐ │
@@ -115,6 +115,22 @@ Your Video AI Dashboard now has **live sync functionality** with two Slack Canva
 - Color-coded status badges
 - Timestamp shows last sync time
 - Success confirmation alerts
+
+---
+
+## 📋 Canvas Links Summary
+
+Your dashboard now connects to **two separate canvases**:
+
+1. **RAID Log Canvas**
+   - URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4
+   - Content: Risks, Assumptions, Issues, Dependencies
+   - Updates: Donut chart and risk distribution
+
+2. **Video AI Plan & Milestones Canvas**
+   - URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q
+   - Content: Project plan, milestones, tasks, deliverables
+   - Updates: Full milestone table with phases, owners, due dates, statuses
 
 ---
 

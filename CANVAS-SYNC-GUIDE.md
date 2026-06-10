@@ -2,7 +2,18 @@
 
 ## Overview
 
-Your Video AI Dashboard now has **automatic sync** from the Slack Canvas RAID Log! Any time you update the RAID log in the canvas, you can sync it to the dashboard with just a few clicks.
+Your Video AI Dashboard now has **automatic sync** from two Slack Canvases:
+
+1. **RAID Log** - Risks, Assumptions, Issues, Dependencies
+2. **Master Project Plan** - Milestones, tasks, phases, and deliverables
+
+Any time you update either canvas, you can sync to the dashboard with just a few clicks!
+
+---
+
+## 🎯 Sync Option 1: RAID Log from Canvas
+
+### **Canvas URL:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4
 
 ---
 
@@ -51,15 +62,64 @@ Click the **"📋 Open Canvas"** button (opens in new tab), or manually go to:
 
 ---
 
+## 📅 Sync Option 2: Master Project Plan from Canvas
+
+### **Canvas URL:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ANV1YNC4E
+
+### **Step 1: Open the Dashboard**
+
+Same as RAID Log sync (see above)
+
+### **Step 2: Click "⟳ Sync from Canvas" Button**
+
+Located in the **Master Project Plan & Milestones** section.
+
+### **Step 3: Open Master Project Plan Canvas**
+
+Click the **"📋 Open Canvas"** button, or manually go to:
+- Channel: **#proj-gss-video-ai-working-group**
+- Canvas URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ANV1YNC4E
+
+### **Step 4: Copy the Project Plan Table**
+
+1. In the Canvas, find the **Project Plan / Milestones table**
+2. Click inside the table
+3. Select all rows: **Ctrl+A** (or Cmd+A on Mac)
+4. Copy: **Ctrl+C** (or Cmd+C on Mac)
+
+### **Step 5: Paste in the Dashboard Sync Modal**
+
+1. Return to the dashboard sync modal
+2. Paste into the text area: **Ctrl+V**
+3. Watch the preview appear showing parsed milestones
+
+### **Step 6: Apply Changes**
+
+1. Review the preview (Phase, Task, Owner, Due Date, Status)
+2. Click **"Apply to Dashboard"**
+3. ✅ Your milestone table updates instantly!
+
+---
+
 ## 📊 What Gets Updated
 
-When you sync from the canvas:
+### **When you sync RAID Log:**
 
 ✅ **RAID Risk Summary:**
 - Total risk count
 - Donut chart distribution
 - Legend counts (Open, In Progress, Closed, Not Started, Watching)
 - "Last synced" timestamp
+
+### **When you sync Master Project Plan:**
+
+✅ **Master Project Plan & Milestones:**
+- Full milestone/task table with all rows
+- Phase groupings
+- Task names and descriptions
+- Owner assignments
+- Due dates
+- Status badges (color-coded)
 
 ---
 
@@ -122,7 +182,9 @@ To make this fully automatic, you could:
 
 ---
 
-## 📋 Expected Canvas Format
+## 📋 Expected Canvas Formats
+
+### **RAID Log Table Format:**
 
 The sync tool expects these columns (in any order):
 
@@ -147,6 +209,36 @@ The sync tool auto-maps these status values:
 
 ✅ Tab-separated (default Slack canvas copy)
 ✅ Pipe-delimited (`|` separated)
+
+---
+
+### **Master Project Plan Table Format:**
+
+Expected columns (in any order):
+
+| Required Column | Alternative Names | Example Values |
+|----------------|-------------------|----------------|
+| **Phase** | phase, workstream, area, category | Planning, Procurement, Deployment |
+| **Task/Milestone** | task, milestone, item, deliverable, name, title | "VP Sign-off", "Budget Approval" |
+| **Owner** | owner, assigned, responsible, DRI | Jeff Toler, Jerry Wu |
+| **Due Date** | due, date, target, deadline, eta | Jun 15, Q2 FY27, 2026-06-15 |
+| **Status** | status, state | Not Started, In Progress, Completed, At Risk |
+
+### **Supported Status Values (Master Project Plan):**
+
+- **Not Started:** not started, not-started, notstarted, planned
+- **In Progress:** in progress, in-progress, inprogress, active
+- **Completed:** complete, completed, done, closed
+- **At Risk:** at risk, at-risk, atrisk, blocked
+- **On Hold:** on hold, on-hold, onhold, pending
+
+**Status Colors:**
+- 🔴 Red: At Risk, Blocked
+- 🟢 Green: In Progress, Active
+- 🔵 Blue: Completed, Done
+- ⚪ Grey: Not Started, Planned
+- 🟠 Orange: On Hold
+- 🟡 Yellow: Pending
 
 ---
 
@@ -192,14 +284,27 @@ This is **expected behavior**! The sync updates the page dynamically but doesn't
 
 ## 📌 Quick Reference
 
-**Slack Canvas:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4  
-**Channel:** #proj-gss-video-ai-working-group  
-**Dashboard (local):** `C:\Users\wes.white\Documents\Video AI Project\video-ai-dashboard.html`  
-**Dashboard (live):** https://weswhite-droid.github.io/Video-AI-Project/video-ai-dashboard.html
+### **Canvas URLs:**
+- **RAID Log:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4
+- **Master Project Plan:** https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ANV1YNC4E
 
-**Sync Shortcut:**
-1. 📋 Open Canvas → Copy table (Ctrl+A, Ctrl+C)
-2. 🔄 Dashboard → Sync button → Paste (Ctrl+V)
+### **Dashboard:**
+- **Local:** `C:\Users\wes.white\Documents\Video AI Project\video-ai-dashboard.html`
+- **Live:** https://weswhite-droid.github.io/Video-AI-Project/video-ai-dashboard.html
+
+### **Channel:**
+**#proj-gss-video-ai-working-group**
+
+### **Sync Shortcuts:**
+
+**RAID Log:**
+1. 📋 Open RAID Canvas → Copy table (Ctrl+A, Ctrl+C)
+2. 🔄 Dashboard RAID section → Sync button → Paste (Ctrl+V)
+3. ✅ Apply → Done!
+
+**Master Project Plan:**
+1. 📋 Open Project Plan Canvas → Copy table (Ctrl+A, Ctrl+C)
+2. 🔄 Dashboard Milestones section → Sync button → Paste (Ctrl+V)
 3. ✅ Apply → Done!
 
 ---

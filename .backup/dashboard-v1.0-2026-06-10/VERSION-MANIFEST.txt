@@ -1,0 +1,239 @@
+================================================================================
+VIDEO AI MASTER PROJECT DASHBOARD - VERSION 1.0 BACKUP
+================================================================================
+
+Backup Date: June 10, 2026
+Backup Location: .backup/dashboard-v1.0-2026-06-10/
+Status: Production-Ready ✅
+
+================================================================================
+FILE INVENTORY
+================================================================================
+
+Core Dashboard Files:
+---------------------
+[68 KB]  video-ai-dashboard.html      - Main dashboard with dual Canvas sync
+[38 KB]  video-ai-raid-log.html       - RAID log detail page
+[36 KB]  video-ai-raci.html           - RACI matrix page
+[59 KB]  video-ai-requirements.html   - System requirements page
+[2.5 KB] index.html                   - Landing page with auto-redirect
+
+Documentation:
+--------------
+[10 KB]  CANVAS-INTEGRATION-SUMMARY.md  - Canvas integration overview
+[9 KB]   CANVAS-SYNC-GUIDE.md           - Sync instructions for users
+[5 KB]   DEPLOYMENT-GUIDE.md            - GitHub Pages deployment
+[6 KB]   DEPLOYMENT-SUCCESS.md          - Post-deployment checklist
+[5 KB]   ENABLE-PAGES-GUIDE.md          - GitHub Pages setup
+[3 KB]   README-SLACK-SHARING.md        - Slack sharing workflows
+[9 KB]   Video AI Project Summary.md    - Project overview
+[15 KB]  MODIFICATION-GUIDE.md          - How to modify dashboard (NEW)
+[12 KB]  CODE-REFERENCE.md              - Quick code reference (NEW)
+[1 KB]   VERSION-MANIFEST.txt           - This file
+
+Total Files: 19
+Total Size: ~276 KB
+
+================================================================================
+FEATURES
+================================================================================
+
+✅ RAID Log Canvas Sync
+   - Canvas URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4
+   - Donut chart visualization
+   - Real-time sync with preview
+   - Status: Open, In Progress, Closed, Not Started, Watching
+
+✅ Video AI Plan & Milestones Canvas Sync
+   - Canvas URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q
+   - Full milestone table
+   - Phase, Task, Owner, Due Date, Status columns
+   - Color-coded status badges
+
+✅ Security
+   - HTML escaping for all user input
+   - No external API calls
+   - Local browser processing only
+
+✅ Visual Design
+   - Dark theme (#0f1117)
+   - Responsive layout
+   - Collapsible sections
+   - Interactive sync modals
+   - Color-coded status indicators
+
+================================================================================
+CANVAS INTEGRATION
+================================================================================
+
+RAID Log Canvas:
+   ID: F0ARY14AVK4
+   URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4
+   Channel: #proj-gss-video-ai-working-group
+   Content: Risks, Assumptions, Issues, Dependencies
+   Sync Location: Lines 444-467 (HTML), 982-1177 (JS)
+
+Video AI Plan & Milestones Canvas:
+   ID: F0ARW0XCV3Q
+   URL: https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARW0XCV3Q
+   Channel: #proj-gss-video-ai-working-group
+   Content: Project milestones, tasks, phases, deliverables
+   Sync Location: Lines 469-502 (HTML), 1179-1354 (JS)
+
+================================================================================
+KEY CODE SECTIONS
+================================================================================
+
+video-ai-dashboard.html Structure:
+   Lines 6-423     : CSS Styles
+   Lines 426-443   : Header (project info)
+   Lines 444-467   : RAID Risk Summary (donut chart)
+   Lines 469-502   : Video AI Plan & Milestones (table)
+   Lines 504-521   : Stats Bar (4 cards)
+   Lines 523-900   : Task Sections (8 categories)
+   Lines 902-932   : Requirements & RAID Log links
+   Lines 934-936   : Footer
+   Lines 938-980   : RAID Sync Modal
+   Lines 982-1177  : RAID Sync JavaScript
+   Lines 1179-1354 : Milestones Sync JavaScript
+   Lines 1356-1390 : Milestones Sync Modal
+
+================================================================================
+DEPLOYMENT
+================================================================================
+
+Repository:
+   URL: https://github.com/weswhite-droid/Video-AI-Project
+   Branch: main
+   Last Commit: Latest at time of backup
+
+GitHub Pages:
+   Enable at: https://github.com/weswhite-droid/Video-AI-Project/settings/pages
+   Live URL: https://weswhite-droid.github.io/Video-AI-Project/
+   Status: Pending enablement
+
+Local:
+   Location: C:\Users\wes.white\Documents\Video AI Project\
+   Test: Open video-ai-dashboard.html in browser
+
+================================================================================
+VERSION HISTORY
+================================================================================
+
+v1.0 (June 10, 2026) - CURRENT
+   ✅ Initial production release
+   ✅ Dual Canvas sync (RAID + Video AI Plan)
+   ✅ RAID donut chart (bar chart removed)
+   ✅ Milestones table with full sync
+   ✅ Secure HTML escaping
+   ✅ Complete documentation
+
+Changes from Initial Development:
+   - Removed RAID bar chart (kept donut only)
+   - Changed from generic "Master Project Plan" to "Video AI Plan & Milestones"
+   - Updated canvas URL to F0ARW0XCV3Q
+   - Added comprehensive modification guides
+
+================================================================================
+MODIFICATION GUIDE
+================================================================================
+
+For detailed instructions on modifying the dashboard:
+   → See: MODIFICATION-GUIDE.md
+
+For quick code lookups:
+   → See: CODE-REFERENCE.md
+
+Common modifications:
+   - Update risk counts: Lines 458-462
+   - Change stats: Lines 470-481
+   - Add new tasks: After line 582
+   - Change colors: Lines 6-423 (CSS)
+   - Update Canvas URLs: Lines 448, 476
+
+================================================================================
+RESTORATION
+================================================================================
+
+To restore this version:
+
+Option 1 - Copy Single File:
+   cp .backup/dashboard-v1.0-2026-06-10/video-ai-dashboard.html ./
+
+Option 2 - Restore All Files:
+   cp .backup/dashboard-v1.0-2026-06-10/*.html ./
+   cp .backup/dashboard-v1.0-2026-06-10/*.md ./
+
+Option 3 - Git Checkout:
+   git log --oneline
+   git checkout <commit-hash> -- video-ai-dashboard.html
+
+================================================================================
+TESTING CHECKLIST
+================================================================================
+
+After any modifications, verify:
+   □ File opens in browser without errors
+   □ Console (F12) shows no JavaScript errors
+   □ RAID sync button works
+   □ Milestones sync button works
+   □ Preview appears when pasting Canvas data
+   □ Apply updates the dashboard correctly
+   □ All links work (Canvas links, internal links)
+   □ Visual styling intact
+   □ Responsive design (resize browser)
+
+================================================================================
+SUPPORT
+================================================================================
+
+Contact: wes.white@salesforce.com
+Channel: #proj-gss-video-ai-working-group
+Repository: https://github.com/weswhite-droid/Video-AI-Project
+
+Documentation Files:
+   - MODIFICATION-GUIDE.md    : How to modify dashboard
+   - CODE-REFERENCE.md        : Quick code lookup
+   - CANVAS-SYNC-GUIDE.md     : User sync instructions
+   - DEPLOYMENT-GUIDE.md      : How to deploy
+
+================================================================================
+BACKUP INTEGRITY
+================================================================================
+
+Checksum: (Not calculated)
+File Count: 19 files
+Total Size: ~276 KB
+Compression: None (plain files)
+Encrypted: No
+
+All files are:
+   ✅ Functional and tested
+   ✅ Documented
+   ✅ Ready for restoration
+   ✅ Safe to use in production
+
+================================================================================
+NOTES
+================================================================================
+
+This backup represents the complete, working Video AI Master Project Dashboard
+with dual Canvas sync functionality. All features have been tested and are
+production-ready.
+
+The dashboard successfully syncs with two separate Slack Canvases:
+1. RAID Log (Risks, Assumptions, Issues, Dependencies)
+2. Video AI Plan & Milestones (Project tasks and deliverables)
+
+No known issues at time of backup.
+
+For future modifications, always:
+1. Test locally before deploying
+2. Check browser console for errors
+3. Verify sync functionality with both canvases
+4. Commit changes to git
+5. Update version notes
+
+================================================================================
+END OF MANIFEST
+================================================================================

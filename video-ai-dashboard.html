@@ -442,7 +442,12 @@
 
 <!-- ══════════════════════════════════════════════════════ RISK CHART -->
 <div class="risk-chart-block">
-  <div class="risk-chart-title">⚠️ RAID Risk Summary — 15 Total Risks</div>
+  <div class="risk-chart-title" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <span>⚠️ RAID Risk Summary — <span id="raidTotalLabel">15 Total Risks</span></span>
+    <button class="sync-btn" onclick="openSyncModal()" style="margin-left: auto;">⟳ Sync from Canvas</button>
+    <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4" target="_blank" class="canvas-link" style="font-size: 0.72rem; color: #63b3ed; text-decoration: none; border: 1px solid rgba(99,179,237,0.35); padding: 5px 12px; border-radius: 6px; background: rgba(99,179,237,0.1); white-space: nowrap; transition: background 0.15s, border-color 0.15s;" onmouseover="this.style.background='rgba(99,179,237,0.2)'; this.style.borderColor='#63b3ed';" onmouseout="this.style.background='rgba(99,179,237,0.1)'; this.style.borderColor='rgba(99,179,237,0.35)';">📋 Open Canvas</a>
+    <span class="sync-last" id="syncLastLabel" style="font-size: 0.65rem; color: #4a5568; margin-left: 0;"></span>
+  </div>
   <div style="display: flex; justify-content: center; padding: 20px 0;">
     <!-- Donut chart -->
     <div>
@@ -934,6 +939,212 @@
 <div class="footer">
   Generated from #proj-gss-video-ai-working-group Master Project Plan · Last updated Jun 5, 2026 · Statuses inferred from project context — update as needed
 </div>
+
+<!-- ══════════════════════════════════════════════════════ SYNC MODAL -->
+<div class="sync-overlay" id="syncOverlay" onclick="closeSyncOnBackdrop(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+  <div class="sync-modal" style="background: #1a1f2e; border: 1px solid #3d4f6e; border-radius: 12px; padding: 28px 32px; width: min(680px, 95vw); max-height: 90vh; overflow-y: auto;">
+    <h2 style="font-size: 1rem; font-weight: 700; color: #f7fafc; margin-bottom: 6px;">⟳ Sync RAID Log from Slack Canvas</h2>
+    <div class="sync-instructions" style="font-size: 0.78rem; color: #718096; margin-bottom: 16px; line-height: 1.6;">
+      <strong>Step 1:</strong> Open the <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARY14AVK4" target="_blank" style="color: #63b3ed; text-decoration: none;">Slack Canvas</a> in <strong>#proj-gss-video-ai-working-group</strong><br>
+      <strong>Step 2:</strong> Select all rows of the RAID log table (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+A</code> inside table)<br>
+      <strong>Step 3:</strong> Copy (<code style="background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #a0aec0;">Ctrl+C</code>) and paste below<br>
+      <strong>Expected columns:</strong> ID · Description · Likelihood · Impact · Status · Owner
+    </div>
+    <textarea id="syncInput" placeholder="Paste canvas RAID table content here…" oninput="previewSync()" style="width: 100%; height: 220px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; color: #e2e8f0; font-size: 0.78rem; font-family: 'Courier New', monospace; padding: 12px; resize: vertical; outline: none;"></textarea>
+    <div class="sync-error" id="syncError" style="color: #fc8181; font-size: 0.75rem; margin-top: 8px; display: none;"></div>
+    <div class="sync-preview" id="syncPreview" style="margin-top: 14px; background: #0f1117; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 16px; font-size: 0.75rem; color: #a0aec0; display: none;"></div>
+    <div class="sync-modal-actions" style="display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end;">
+      <button class="btn-cancel" onclick="closeSyncModal()" style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #2d3748; background: rgba(255,255,255,0.07); color: #a0aec0;">Cancel</button>
+      <button class="btn-apply" id="applyBtn" onclick="applySync()" disabled style="padding: 8px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; background: #2b6cb0; color: #fff;">Apply to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Sync functionality ──────────────────────────────────────────
+var STATUS_MAP = {
+  'open': 'open', 'in progress': 'inprog', 'in-progress': 'inprog', 'inprogress': 'inprog',
+  'closed': 'closed', 'complete': 'closed', 'completed': 'closed', 'done': 'closed',
+  'not started': 'notstart', 'not-started': 'notstart', 'notstarted': 'notstart',
+  'watching': 'watching', 'watch': 'watching', 'monitor': 'watching'
+};
+
+var parsedRisks = null;
+
+// Helper function to safely escape HTML
+function escapeHtml(text) {
+  var div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function openSyncModal() {
+  document.getElementById('syncInput').value = '';
+  document.getElementById('syncError').style.display = 'none';
+  document.getElementById('syncPreview').style.display = 'none';
+  document.getElementById('applyBtn').disabled = true;
+  parsedRisks = null;
+  var overlay = document.getElementById('syncOverlay');
+  overlay.style.display = 'flex';
+}
+
+function closeSyncModal() {
+  document.getElementById('syncOverlay').style.display = 'none';
+}
+
+function closeSyncOnBackdrop(e) {
+  if (e.target === document.getElementById('syncOverlay')) closeSyncModal();
+}
+
+function parseCanvasText(raw) {
+  var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
+  if (lines.length < 2) return null;
+
+  var delim = (lines[0].indexOf('|') !== -1) ? '|' : '\t';
+  var rows = lines.map(function(l) {
+    return l.split(delim).map(function(c){ return c.trim().replace(/^\||\|$/g,'').trim(); });
+  });
+
+  var headerIdx = 0;
+  for (var i = 0; i < Math.min(rows.length, 4); i++) {
+    var lower = rows[i].map(function(c){ return c.toLowerCase(); });
+    if (lower.indexOf('status') !== -1 || lower.indexOf('id') !== -1) { headerIdx = i; break; }
+  }
+
+  var headers = rows[headerIdx].map(function(c){ return c.toLowerCase(); });
+  var statusCol = headers.indexOf('status');
+  if (statusCol === -1) {
+    for (var j = 0; j < headers.length; j++) {
+      if (headers[j].indexOf('status') !== -1) { statusCol = j; break; }
+    }
+  }
+  if (statusCol === -1) return null;
+
+  var idCol = headers.indexOf('id');
+  var descCol = -1;
+  ['description','risk','issue','item','title','name'].forEach(function(k){
+    if (descCol === -1 && headers.indexOf(k) !== -1) descCol = headers.indexOf(k);
+  });
+  var ownerCol = headers.indexOf('owner');
+
+  var risks = [];
+  for (var r = headerIdx + 1; r < rows.length; r++) {
+    var row = rows[r];
+    if (row.length <= statusCol) continue;
+    var rawStatus = (row[statusCol] || '').toLowerCase().trim();
+    var normStatus = STATUS_MAP[rawStatus] || null;
+    if (!normStatus) continue;
+    risks.push({
+      id: idCol !== -1 ? row[idCol] || '' : '',
+      desc: descCol !== -1 ? row[descCol] || '' : '',
+      owner: ownerCol !== -1 ? row[ownerCol] || '' : '',
+      status: normStatus,
+      rawStatus: row[statusCol]
+    });
+  }
+  return risks.length > 0 ? risks : null;
+}
+
+function countByStatus(risks) {
+  var c = { open:0, inprog:0, closed:0, notstart:0, watching:0 };
+  risks.forEach(function(r){ if (c[r.status] !== undefined) c[r.status]++; });
+  return c;
+}
+
+function previewSync() {
+  var raw = document.getElementById('syncInput').value;
+  var errEl = document.getElementById('syncError');
+  var prevEl = document.getElementById('syncPreview');
+  var applyBtn = document.getElementById('applyBtn');
+  errEl.style.display = 'none';
+  prevEl.style.display = 'none';
+  applyBtn.disabled = true;
+  parsedRisks = null;
+
+  if (!raw.trim()) return;
+
+  var risks = parseCanvasText(raw);
+  if (!risks) {
+    errEl.textContent = 'Could not parse the pasted content. Make sure you copied the table rows from the canvas (including the header row). Accepts tab-separated or pipe-delimited format.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  parsedRisks = risks;
+  var c = countByStatus(risks);
+  var total = risks.length;
+
+  // Build preview table using DOM methods (secure)
+  var previewHtml = '<strong style="color:#e2e8f0;">Preview — ' + total + ' risk' + (total !== 1 ? 's' : '') + ' parsed</strong>';
+  previewHtml += '<table style="margin-top:10px; width: 100%; border-collapse: collapse;"><tr style="border-bottom: 1px solid #2d3748;"><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">ID</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Description</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Status</th><th style="padding: 4px 8px; text-align: left; font-size: 0.68rem; text-transform: uppercase; color: #718096;">Owner</th></tr>';
+
+  risks.forEach(function(r) {
+    var sc = r.status === 'open' ? '#fc8181' : r.status === 'inprog' ? '#ecc94b' : r.status === 'closed' ? '#68d391' : r.status === 'watching' ? '#f6ad55' : '#b794f4';
+    var safeId = escapeHtml(r.id || '—');
+    var safeDesc = escapeHtml((r.desc || '—').substring(0,55)) + (r.desc.length>55?'…':'');
+    var safeStatus = escapeHtml(r.rawStatus);
+    var safeOwner = escapeHtml(r.owner || '—');
+    previewHtml += '<tr style="border-bottom: 1px solid #1e2538;"><td style="padding: 5px 8px; color: #cbd5e0;">' + safeId + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeDesc + '</td><td style="color:' + sc + ';font-weight:600; padding: 5px 8px;">' + safeStatus + '</td><td style="padding: 5px 8px; color: #cbd5e0;">' + safeOwner + '</td></tr>';
+  });
+
+  previewHtml += '</table>';
+  previewHtml += '<div style="margin-top:10px;color:#718096;">Open: <b style="color:#fc8181;">' + c.open + '</b> · In Progress: <b style="color:#ecc94b;">' + c.inprog + '</b> · Closed: <b style="color:#68d391;">' + c.closed + '</b> · Not Started: <b style="color:#b794f4;">' + c.notstart + '</b> · Watching: <b style="color:#f6ad55;">' + c.watching + '</b></div>';
+
+  prevEl.innerHTML = previewHtml;
+  prevEl.style.display = 'block';
+  applyBtn.disabled = false;
+}
+
+function applySync() {
+  if (!parsedRisks) return;
+  var c = countByStatus(parsedRisks);
+  var total = parsedRisks.length;
+
+  // Update donut chart
+  var pOpen = c.open / total * 100;
+  var pInp = c.inprog / total * 100;
+  var pClo = c.closed / total * 100;
+  var pNot = c.notstart / total * 100;
+  var s1 = pOpen, s2 = s1 + pInp, s3 = s2 + pClo, s4 = s3 + pNot;
+
+  var donut = document.querySelector('.donut');
+  if (donut) {
+    donut.style.background = 'conic-gradient(#fc8181 0% ' + s1.toFixed(1) + '%, #ecc94b ' + s1.toFixed(1) + '% ' + s2.toFixed(1) + '%, #68d391 ' + s2.toFixed(1) + '% ' + s3.toFixed(1) + '%, #b794f4 ' + s3.toFixed(1) + '% ' + s4.toFixed(1) + '%, #f6ad55 ' + s4.toFixed(1) + '% 100%)';
+
+    // Update donut center number
+    var styleId = 'donutStyle';
+    var existing = document.getElementById(styleId);
+    if (existing) existing.remove();
+    var st = document.createElement('style');
+    st.id = styleId;
+    st.textContent = '.donut::after { content: "' + total + '"; position: absolute; inset: 22px; background: #1a1f2e; border-radius: 50%; display: block; font-size: 1.4rem; font-weight: 700; color: #e2e8f0; text-align: center; line-height: 86px; }';
+    document.head.appendChild(st);
+  }
+
+  // Update legend counts
+  var counts = document.querySelectorAll('.dl-count');
+  if (counts[0]) counts[0].textContent = c.open;
+  if (counts[1]) counts[1].textContent = c.inprog;
+  if (counts[2]) counts[2].textContent = c.closed;
+  if (counts[3]) counts[3].textContent = c.notstart;
+  if (counts[4]) counts[4].textContent = c.watching;
+
+  // Update title
+  var titleEl = document.getElementById('raidTotalLabel');
+  if (titleEl) titleEl.textContent = total + ' Total Risks';
+
+  // Update timestamp
+  var now = new Date();
+  var ts = now.toLocaleDateString('en-US', {month:'short',day:'numeric'}) + ' ' + now.toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'});
+  var lastEl = document.getElementById('syncLastLabel');
+  if (lastEl) lastEl.textContent = 'Last synced ' + ts;
+
+  closeSyncModal();
+
+  // Show success message
+  alert('✅ Dashboard updated successfully!\n\n' + total + ' risks synced from Slack Canvas.\n\n⚠️ Remember: These changes are local only. To persist them, you need to update the HTML file and push to GitHub.');
+}
+</script>
 
 </body>
 </html>

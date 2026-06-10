@@ -2242,12 +2242,208 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+// Auto-sync notification system
+var autoSyncInterval = null;
+var autoSyncEnabled = true;
+var SYNC_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+
+function showSyncReminder() {
+  // Check if auto-sync is enabled
+  var enabled = localStorage.getItem('autoSyncEnabled');
+  if (enabled === 'false') return;
+
+  // Create reminder notification
+  var reminder = document.createElement('div');
+  reminder.className = 'sync-reminder';
+  reminder.style.cssText = 'position: fixed; top: 80px; right: 24px; z-index: 999; background: linear-gradient(135deg, #2b6cb0 0%, #3182ce 100%); border: 1px solid #3182ce; border-radius: 12px; padding: 20px 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); animation: slideInRight 0.3s ease; max-width: 400px;';
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;';
+  title.innerHTML = '<span style="font-size: 1.2rem;">⟳</span> Time to Sync from Canvas';
+
+  var message = document.createElement('div');
+  message.style.cssText = 'font-size: 0.8rem; color: #bee3f8; margin-bottom: 16px; line-height: 1.5;';
+  message.textContent = "It's been 30 minutes since the last update. Sync your dashboard with the latest Canvas data to stay current.";
+
+  var buttons = document.createElement('div');
+  buttons.style.cssText = 'display: flex; gap: 10px;';
+
+  var syncBtn = document.createElement('button');
+  syncBtn.textContent = 'Sync Now';
+  syncBtn.style.cssText = 'flex: 1; padding: 10px 16px; background: #fff; color: #2b6cb0; border: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.15s;';
+  syncBtn.onmouseover = function() { this.style.background = '#f7fafc'; this.style.transform = 'translateY(-1px)'; };
+  syncBtn.onmouseout = function() { this.style.background = '#fff'; this.style.transform = 'translateY(0)'; };
+  syncBtn.onclick = function() {
+    document.body.removeChild(reminder);
+    openSyncModal();
+    resetSyncTimer();
+  };
+
+  var dismissBtn = document.createElement('button');
+  dismissBtn.textContent = 'Dismiss';
+  dismissBtn.style.cssText = 'padding: 10px 16px; background: rgba(255,255,255,0.1); color: #bee3f8; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.15s;';
+  dismissBtn.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.15)'; };
+  dismissBtn.onmouseout = function() { this.style.background = 'rgba(255,255,255,0.1)'; };
+  dismissBtn.onclick = function() {
+    document.body.removeChild(reminder);
+    resetSyncTimer();
+  };
+
+  var disableLink = document.createElement('div');
+  disableLink.style.cssText = 'margin-top: 12px; text-align: center;';
+  var link = document.createElement('a');
+  link.href = '#';
+  link.textContent = 'Disable auto-sync reminders';
+  link.style.cssText = 'font-size: 0.7rem; color: #bee3f8; text-decoration: none; opacity: 0.7; transition: opacity 0.15s;';
+  link.onmouseover = function() { this.style.opacity = '1'; };
+  link.onmouseout = function() { this.style.opacity = '0.7'; };
+  link.onclick = function(e) {
+    e.preventDefault();
+    disableAutoSync();
+    document.body.removeChild(reminder);
+  };
+  disableLink.appendChild(link);
+
+  buttons.appendChild(syncBtn);
+  buttons.appendChild(dismissBtn);
+
+  reminder.appendChild(title);
+  reminder.appendChild(message);
+  reminder.appendChild(buttons);
+  reminder.appendChild(disableLink);
+
+  // Add animation
+  var style = document.createElement('style');
+  style.textContent = '@keyframes slideInRight { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }';
+  document.head.appendChild(style);
+
+  document.body.appendChild(reminder);
+
+  // Auto-dismiss after 60 seconds
+  setTimeout(function() {
+    if (document.body.contains(reminder)) {
+      document.body.removeChild(reminder);
+      resetSyncTimer();
+    }
+  }, 60000);
+}
+
+function startSyncTimer() {
+  // Clear existing timer
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval);
+  }
+
+  // Start new timer
+  autoSyncInterval = setInterval(function() {
+    showSyncReminder();
+  }, SYNC_INTERVAL_MS);
+
+  // Store last sync time
+  localStorage.setItem('lastSyncTime', Date.now());
+}
+
+function resetSyncTimer() {
+  localStorage.setItem('lastSyncTime', Date.now());
+  startSyncTimer();
+}
+
+function disableAutoSync() {
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval);
+    autoSyncInterval = null;
+  }
+  localStorage.setItem('autoSyncEnabled', 'false');
+
+  // Show confirmation
+  var confirm = document.createElement('div');
+  confirm.style.cssText = 'position: fixed; top: 80px; right: 24px; z-index: 999; background: #2d3748; border: 1px solid #4a5568; border-radius: 10px; padding: 16px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideInRight 0.3s ease;';
+  confirm.innerHTML = '<div style="font-size: 0.85rem; color: #e2e8f0; margin-bottom: 8px;">✓ Auto-sync reminders disabled</div><div style="font-size: 0.75rem; color: #a0aec0;">You can re-enable in settings</div>';
+  document.body.appendChild(confirm);
+
+  setTimeout(function() {
+    if (document.body.contains(confirm)) {
+      document.body.removeChild(confirm);
+    }
+  }, 4000);
+}
+
+function enableAutoSync() {
+  localStorage.setItem('autoSyncEnabled', 'true');
+  startSyncTimer();
+
+  // Show confirmation
+  var confirm = document.createElement('div');
+  confirm.style.cssText = 'position: fixed; top: 80px; right: 24px; z-index: 999; background: #2b6cb0; border: 1px solid #3182ce; border-radius: 10px; padding: 16px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideInRight 0.3s ease;';
+  confirm.innerHTML = '<div style="font-size: 0.85rem; color: #fff; margin-bottom: 8px;">✓ Auto-sync reminders enabled</div><div style="font-size: 0.75rem; color: #bee3f8;">You\'ll be reminded every 30 minutes</div>';
+  document.body.appendChild(confirm);
+
+  setTimeout(function() {
+    if (document.body.contains(confirm)) {
+      document.body.removeChild(confirm);
+    }
+  }, 4000);
+}
+
+function checkInitialSyncTimer() {
+  var enabled = localStorage.getItem('autoSyncEnabled');
+  var lastSyncTime = localStorage.getItem('lastSyncTime');
+
+  // Enable by default
+  if (enabled === null) {
+    localStorage.setItem('autoSyncEnabled', 'true');
+  }
+
+  if (enabled !== 'false') {
+    // Check if it's been more than 30 minutes since last sync
+    if (lastSyncTime) {
+      var timeSinceSync = Date.now() - parseInt(lastSyncTime);
+      if (timeSinceSync >= SYNC_INTERVAL_MS) {
+        // Show reminder after 5 seconds on page load
+        setTimeout(showSyncReminder, 5000);
+      }
+    }
+
+    // Start the timer
+    startSyncTimer();
+  }
+}
+
+// Add settings button to header for auto-sync control
+function addAutoSyncSettings() {
+  // Find the header and add settings icon
+  var header = document.querySelector('.header-top');
+  if (header) {
+    var settingsBtn = document.createElement('button');
+    settingsBtn.innerHTML = '⚙️';
+    settingsBtn.title = 'Auto-sync settings';
+    settingsBtn.style.cssText = 'background: rgba(255,255,255,0.05); border: 1px solid #2d3748; border-radius: 8px; padding: 8px 12px; font-size: 1rem; cursor: pointer; transition: all 0.15s; margin-left: 12px;';
+    settingsBtn.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.1)'; };
+    settingsBtn.onmouseout = function() { this.style.background = 'rgba(255,255,255,0.05)'; };
+    settingsBtn.onclick = function() {
+      var enabled = localStorage.getItem('autoSyncEnabled') !== 'false';
+      if (confirm(enabled ? 'Disable auto-sync reminders?' : 'Enable auto-sync reminders every 30 minutes?')) {
+        if (enabled) {
+          disableAutoSync();
+        } else {
+          enableAutoSync();
+        }
+      }
+    };
+
+    var phaseBadgeParent = header.querySelector('.phase-badge').parentNode;
+    phaseBadgeParent.appendChild(settingsBtn);
+  }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   updateLastUpdated();
   calculateProjectHealth();
   calculateQuickStats();
   restoreCollapsedState();
+  checkInitialSyncTimer();
+  addAutoSyncSettings();
 });
 
 </script>

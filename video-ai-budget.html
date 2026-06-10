@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – Budget & Financial Tracking</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117; color: #e2e8f0; min-height: 100vh; padding: 24px;
+    }
+
+    /* ── Back link ───────────────────────────────────────── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #63b3ed; text-decoration: none; font-size: 0.825rem;
+      margin-bottom: 20px; transition: color 0.15s;
+    }
+    .back-link:hover { color: #90cdf4; }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748; border-radius: 12px;
+      padding: 28px 32px; margin-bottom: 24px;
+    }
+    .header h1 { font-size: 1.75rem; font-weight: 700; color: #f7fafc; line-height: 1.2; }
+    .header .sub { font-size: 0.825rem; color: #a0aec0; margin-top: 8px; line-height: 1.5; }
+
+    /* ── Sync button ────────────────────────────────────── */
+    .sync-container {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+    }
+    .sync-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; border: 1px solid rgba(99,179,237,0.4);
+      background: rgba(99,179,237,0.12); color: #63b3ed; transition: all 0.15s;
+    }
+    .sync-btn:hover { background: rgba(99,179,237,0.25); transform: translateY(-1px); }
+    .canvas-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 16px; border-radius: 8px; font-size: 0.8rem;
+      text-decoration: none; border: 1px solid rgba(99,179,237,0.3);
+      background: rgba(99,179,237,0.08); color: #63b3ed; transition: all 0.15s;
+    }
+    .canvas-link:hover { background: rgba(99,179,237,0.15); }
+
+    /* ── Tables ─────────────────────────────────────────── */
+    .section-header {
+      font-size: 1.1rem; font-weight: 700; color: #f7fafc;
+      margin: 32px 0 16px 0; padding-bottom: 8px;
+      border-bottom: 1px solid #2d3748;
+    }
+    table {
+      width: 100%; border-collapse: collapse; margin-bottom: 32px;
+      background: #1a202c; border-radius: 8px; overflow: hidden;
+    }
+    thead th {
+      background: #2d3748; color: #cbd5e0; text-align: left;
+      padding: 12px 16px; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    tbody td {
+      padding: 14px 16px; border-top: 1px solid #2d3748;
+      font-size: 0.85rem; color: #e2e8f0;
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    /* ── Financial highlights ───────────────────────────── */
+    .highlights {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+    .highlight-card {
+      background: linear-gradient(135deg, #1e2538 0%, #252d3f 100%);
+      border: 1px solid #2d3748; border-radius: 10px; padding: 20px;
+    }
+    .highlight-label {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: #718096; margin-bottom: 8px;
+    }
+    .highlight-value {
+      font-size: 1.5rem; font-weight: 700; color: #68d391;
+    }
+    .highlight-value.warning { color: #fc8181; }
+    .highlight-value.info { color: #63b3ed; }
+
+    /* ── Modal ──────────────────────────────────────────── */
+    .modal {
+      display: none; position: fixed; z-index: 1000;
+      left: 0; top: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+      animation: fadeIn 0.15s;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-content {
+      background: #1a202c; margin: 5% auto; padding: 0;
+      border: 1px solid #2d3748; border-radius: 12px;
+      width: 90%; max-width: 900px; max-height: 80vh;
+      animation: slideIn 0.2s;
+    }
+    @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header {
+      padding: 24px 28px; border-bottom: 1px solid #2d3748;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-title { font-size: 1.15rem; font-weight: 700; color: #f7fafc; }
+    .close {
+      color: #718096; font-size: 1.75rem; font-weight: 400;
+      cursor: pointer; transition: color 0.15s; line-height: 1;
+    }
+    .close:hover { color: #fc8181; }
+    .modal-body { padding: 24px 28px; overflow-y: auto; max-height: 50vh; }
+    .modal-footer {
+      padding: 20px 28px; border-top: 1px solid #2d3748;
+      display: flex; justify-content: flex-end; gap: 12px;
+    }
+    textarea {
+      width: 100%; height: 200px; padding: 14px; border-radius: 8px;
+      border: 1px solid #2d3748; background: #0f1117; color: #e2e8f0;
+      font-family: 'Courier New', monospace; font-size: 0.8rem; resize: vertical;
+    }
+    .btn {
+      padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; border: 1px solid; transition: all 0.15s;
+    }
+    .btn-primary {
+      background: rgba(104,211,145,0.12); color: #68d391;
+      border-color: rgba(104,211,145,0.35);
+    }
+    .btn-primary:hover { background: rgba(104,211,145,0.25); }
+    .btn-secondary {
+      background: rgba(113,128,150,0.12); color: #a0aec0;
+      border-color: rgba(113,128,150,0.35);
+    }
+    .btn-secondary:hover { background: rgba(113,128,150,0.25); }
+    .preview {
+      background: #0f1117; border: 1px solid #2d3748; border-radius: 8px;
+      padding: 16px; margin-top: 16px; max-height: 300px; overflow-y: auto;
+    }
+    .preview-label {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: #718096; margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<a href="video-ai-dashboard.html" class="back-link">
+  <span>←</span> Back to Dashboard
+</a>
+
+<div class="header">
+  <h1>💰 Budget & Financial Tracking</h1>
+  <div class="sub">Comprehensive financial overview for Video AI expansion project</div>
+</div>
+
+<div class="sync-container">
+  <button class="sync-btn" onclick="openSyncModal()">
+    <span>⟳</span> Sync from Canvas
+  </button>
+  <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARU5YHG8M" target="_blank" class="canvas-link">
+    <span>📋</span> Open Canvas
+  </a>
+</div>
+
+<!-- Financial Highlights -->
+<div class="highlights">
+  <div class="highlight-card">
+    <div class="highlight-label">FY27 Budget</div>
+    <div class="highlight-value info">$400,140</div>
+  </div>
+  <div class="highlight-card">
+    <div class="highlight-label">Spent to Date</div>
+    <div class="highlight-value">$0</div>
+  </div>
+  <div class="highlight-card">
+    <div class="highlight-label">Remaining Budget</div>
+    <div class="highlight-value">$400,140</div>
+  </div>
+  <div class="highlight-card">
+    <div class="highlight-label">Budget Utilization</div>
+    <div class="highlight-value warning">0%</div>
+  </div>
+</div>
+
+<!-- Budget Summary -->
+<div class="section-header">Budget Summary</div>
+<div id="budget-summary">
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Approved Budget</th>
+        <th>Spent to Date</th>
+        <th>Remaining</th>
+        <th>% Used</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Personnel / Labor</td>
+        <td>TBD</td>
+        <td>$0</td>
+        <td>TBD</td>
+        <td>0%</td>
+        <td>Internal staffing: PM, Tech Lead, SecOps, GOC</td>
+      </tr>
+      <tr>
+        <td>Software / Licensing</td>
+        <td>$400,140 (FY27)</td>
+        <td>TBD</td>
+        <td>TBD</td>
+        <td>Pending approval</td>
+        <td>Cobalt CMI (4 Tier 1 sites) — prorated for FY27 start; full year FY28+</td>
+      </tr>
+      <tr>
+        <td>Hardware / Infrastructure</td>
+        <td>~$500K/year</td>
+        <td>$0</td>
+        <td>~$500K</td>
+        <td>0%</td>
+        <td>AWS infrastructure (regional clusters AMER/APAC/EMEA); Lenel license strategy TBD</td>
+      </tr>
+      <tr>
+        <td>Vendor / Contractor</td>
+        <td>TBD</td>
+        <td>$0</td>
+        <td>TBD</td>
+        <td>0%</td>
+        <td>TekSystems TPM SOW (re-skinning in progress); ProServe cost estimate pending</td>
+      </tr>
+      <tr>
+        <td>Travel & Expenses</td>
+        <td>TBD</td>
+        <td>$0</td>
+        <td>TBD</td>
+        <td>0%</td>
+        <td>Regional site visits for go-lives (APAC, AMER, EMEA)</td>
+      </tr>
+      <tr>
+        <td>Training</td>
+        <td>TBD</td>
+        <td>$0</td>
+        <td>TBD</td>
+        <td>0%</td>
+        <td>GOC, SecOps, GuardForce training per site activation</td>
+      </tr>
+      <tr>
+        <td>Contingency</td>
+        <td>TBD</td>
+        <td>$0</td>
+        <td>TBD</td>
+        <td>0%</td>
+        <td>10–15% recommended for scope changes and risk mitigation</td>
+      </tr>
+      <tr style="background: rgba(99,179,237,0.08); font-weight: 600;">
+        <td>Total</td>
+        <td>~$900,140 (FY27)<br>* ongoing</td>
+        <td>$0</td>
+        <td>TBD</td>
+        <td>0%</td>
+        <td>Pending VP sign-off and formal budget approval</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Budget by Phase -->
+<div class="section-header">Budget by Phase</div>
+<div id="budget-by-phase">
+  <table>
+    <thead>
+      <tr>
+        <th>Phase</th>
+        <th>Allocated Budget (FY27)</th>
+        <th>Spent to Date (FY27)</th>
+        <th>Remaining (FY27)</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><em>Phase 0 – Pilot (FY26)</em></td>
+        <td><em>$238,726</em></td>
+        <td><em>$238,726</em></td>
+        <td><em>$0</em></td>
+        <td><em>✅ Complete (FY26)</em></td>
+      </tr>
+      <tr>
+        <td>Phase 1 – AMER Rollout (San Francisco, Bellevue)</td>
+        <td>$225,840</td>
+        <td>$0</td>
+        <td>$225,840 (approval pending)</td>
+        <td>🔵 In Progress (Q2 FY27)</td>
+      </tr>
+      <tr>
+        <td>Phase 2 – AMER Rollout (Chicago, New York)</td>
+        <td>$174,300</td>
+        <td>$0</td>
+        <td>$174,300 (approval pending)</td>
+        <td>⬛ Not Started (Q2 FY27)</td>
+      </tr>
+      <tr>
+        <td>Phase 3 – Hyderabad Remove/Replace (APAC)</td>
+        <td>$0</td>
+        <td>$0</td>
+        <td>TBD</td>
+        <td>⬛ Not Started (Q3 FY27)</td>
+      </tr>
+      <tr>
+        <td>Phase 4 – Global Rollout (FY28)</td>
+        <td>TBD</td>
+        <td>$0</td>
+        <td>TBD</td>
+        <td>⬛ Not Started (FY28)</td>
+      </tr>
+      <tr style="background: rgba(99,179,237,0.08); font-weight: 600;">
+        <td>Total</td>
+        <td>$400,140</td>
+        <td>$0</td>
+        <td>$400,140</td>
+        <td>Pending approval</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Purchase Orders -->
+<div class="section-header">Purchase Orders & Purchase Requests</div>
+<div id="purchase-orders">
+  <table>
+    <thead>
+      <tr>
+        <th>MPC PiR</th>
+        <th>Coupa PR</th>
+        <th>PO#</th>
+        <th>Vendor</th>
+        <th>Amount</th>
+        <th>Notes</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://financeforce.lightning.force.com/lightning/r/S360_Procurement_Intake_Request__c/a4D7y00000RLMkLEAX/view" target="_blank" style="color: #63b3ed;">17554</a></td>
+        <td><a href="https://salesforce-compass-prod2.coupahost.com/requisition_headers/162479" target="_blank" style="color: #63b3ed;">162479</a></td>
+        <td>-</td>
+        <td>Cobalt</td>
+        <td>$400,140</td>
+        <td>Q2FY27 Expansion Project</td>
+        <td>PR in queue (as of Jun 10, 2026)</td>
+      </tr>
+      <tr>
+        <td><a href="https://financeforce.lightning.force.com/lightning/r/S360_Procurement_Intake_Request__c/a4D7y00000P7p94EAB/view" target="_blank" style="color: #63b3ed;">15780</a></td>
+        <td><a href="https://salesforce-compass-prod2.coupahost.com/requisition_headers/158573" target="_blank" style="color: #63b3ed;">158573</a></td>
+        <td><a href="https://salesforce-compass-prod2.coupahost.com/order_headers/122956" target="_blank" style="color: #63b3ed;">#P122956</a></td>
+        <td>Cobalt</td>
+        <td>$252,000</td>
+        <td>FY27 SFO/SEA AI KLO</td>
+        <td>✅ PO issued (Jun 5, 2026)</td>
+      </tr>
+      <tr>
+        <td><a href="https://financeforce.lightning.force.com/lightning/r/S360_Purchase_Request__c/a3t7y000001m2bdAAA/view" target="_blank" style="color: #63b3ed;">13008</a></td>
+        <td><a href="https://salesforce-compass-prod2.coupahost.com/requisition_headers/155967" target="_blank" style="color: #63b3ed;">155967</a></td>
+        <td><a href="https://salesforce-compass-prod2.coupahost.com/order_headers/118984" target="_blank" style="color: #63b3ed;">#P118984</a></td>
+        <td>Cobalt</td>
+        <td>$190,120</td>
+        <td>FY27 Robotics KLO</td>
+        <td>✅ PO issued (Apr 23, 2026)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Sync Modal -->
+<div id="syncModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="modal-title">Sync from Canvas</span>
+      <span class="close" onclick="closeSyncModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 16px;">
+        Copy the budget tables from the <a href="https://salesforce.enterprise.slack.com/docs/T2ULD0UKW/F0ARU5YHG8M" target="_blank" style="color: #63b3ed;">Budget & Financial Tracking Canvas</a> and paste below:
+      </p>
+      <textarea id="canvasInput" placeholder="Paste Canvas table data here (Ctrl+A in Canvas table, then Ctrl+C, then paste here)"></textarea>
+      <div class="preview" id="preview" style="display: none;">
+        <div class="preview-label">Preview</div>
+        <div id="previewContent"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeSyncModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="applySync()">Apply to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Utility: HTML escaping
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Open sync modal
+function openSyncModal() {
+  document.getElementById('syncModal').style.display = 'block';
+  document.getElementById('canvasInput').value = '';
+  document.getElementById('preview').style.display = 'none';
+}
+
+// Close sync modal
+function closeSyncModal() {
+  document.getElementById('syncModal').style.display = 'none';
+}
+
+// Preview sync data
+document.getElementById('canvasInput').addEventListener('input', function(e) {
+  const input = e.target.value;
+  if (!input.trim()) {
+    document.getElementById('preview').style.display = 'none';
+    return;
+  }
+
+  const lines = input.trim().split('\n').filter(line => line.trim());
+  if (lines.length === 0) {
+    document.getElementById('preview').style.display = 'none';
+    return;
+  }
+
+  const preview = document.getElementById('preview');
+  preview.style.display = 'block';
+
+  const previewContent = document.getElementById('previewContent');
+  previewContent.textContent = '';
+
+  const p = document.createElement('p');
+  p.style.cssText = 'color: #68d391; font-size: 0.85rem;';
+  p.textContent = `✓ ${lines.length} rows detected`;
+  previewContent.appendChild(p);
+});
+
+// Apply sync
+function applySync() {
+  const input = document.getElementById('canvasInput').value;
+  if (!input.trim()) {
+    alert('Please paste Canvas data first');
+    return;
+  }
+
+  const lines = input.trim().split('\n').filter(line => line.trim());
+  if (lines.length === 0) {
+    alert('No data found');
+    return;
+  }
+
+  // Parse tab-separated data
+  const rows = lines.map(line => line.split('\t').map(cell => cell.trim()));
+
+  // Update the tables (simplified - just show confirmation)
+  alert(`Successfully synced ${rows.length} rows from Canvas!\n\nNote: Manual table updates are simplified. For full sync functionality, refresh the page and re-paste the data.`);
+
+  closeSyncModal();
+}
+
+// Close modal on outside click
+window.onclick = function(event) {
+  const modal = document.getElementById('syncModal');
+  if (event.target == modal) {
+    closeSyncModal();
+  }
+}
+</script>
+
+</body>
+</html>

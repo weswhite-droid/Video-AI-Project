@@ -1,0 +1,14 @@
+{
+  "name": "video-ai-dashboard",
+  "version": "1.0.0",
+  "description": "Video AI Master Project Dashboard with Slack Canvas sync",
+  "scripts": {
+    "sync": "node scripts/sync-slack-canvas.js",
+    "test-sync": "node scripts/sync-slack-canvas.js"
+  },
+  "dependencies": {
+    "@slack/web-api": "^6.12.0"
+  },
+  "author": "Wes White",
+  "license": "ISC"
+}

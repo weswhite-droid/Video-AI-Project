@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – Task Details</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f7fafc;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .header h1 span {
+      color: #63b3ed;
+      background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: #718096;
+      margin-top: 8px;
+    }
+
+    .nav-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .legend-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+      margin-right: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.825rem;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-red { background: #fc8181; box-shadow: 0 0 6px rgba(252,129,129,0.5); }
+    .dot-green { background: #68d391; box-shadow: 0 0 6px rgba(104,211,145,0.5); }
+    .dot-blue { background: #63b3ed; box-shadow: 0 0 6px rgba(99,179,237,0.5); }
+    .dot-grey { background: #718096; }
+    .dot-orange { background: #f6ad55; box-shadow: 0 0 6px rgba(246,173,85,0.5); }
+
+    /* Sections */
+    .sections {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .section {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .section:hover {
+      transform: translateY(-2px);
+    }
+
+    .section details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid #2d3748;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .section details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .section details summary:hover {
+      background: rgba(255,255,255,0.07);
+    }
+
+    .section details[open] summary {
+      border-bottom: 1px solid #2d3748;
+    }
+
+    .section details:not([open]) summary {
+      border-bottom: none;
+    }
+
+    .chevron {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #4a5568;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    details[open] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .section-icon {
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+    }
+
+    .section-count {
+      font-size: 0.75rem;
+      color: #718096;
+    }
+
+    .task-list {
+      padding: 8px 0;
+    }
+
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 18px;
+      border-left: 3px solid transparent;
+      transition: background 0.15s;
+    }
+
+    .task:hover {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .task.red { border-left-color: #fc8181; }
+    .task.green { border-left-color: #68d391; }
+    .task.blue { border-left-color: #63b3ed; }
+    .task.grey { border-left-color: #4a5568; }
+    .task.orange { border-left-color: #f6ad55; }
+
+    .task-status {
+      flex-shrink: 0;
+      margin-top: 2px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .task.red .task-status { background: #fc8181; box-shadow: 0 0 5px rgba(252,129,129,0.6); }
+    .task.green .task-status { background: #68d391; box-shadow: 0 0 5px rgba(104,211,145,0.6); }
+    .task.blue .task-status { background: #63b3ed; box-shadow: 0 0 5px rgba(99,179,237,0.6); }
+    .task.grey .task-status { background: #4a5568; }
+    .task.orange .task-status { background: #f6ad55; box-shadow: 0 0 5px rgba(246,173,85,0.6); }
+
+    .task-body {
+      flex: 1;
+    }
+
+    .task-name {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #e2e8f0;
+      line-height: 1.4;
+    }
+
+    .task-sub {
+      font-size: 0.75rem;
+      color: #718096;
+      margin-top: 2px;
+    }
+
+    .badge {
+      flex-shrink: 0;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    .badge.red { background: rgba(252,129,129,0.15); color: #fc8181; border: 1px solid rgba(252,129,129,0.3); }
+    .badge.green { background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3); }
+    .badge.blue { background: rgba(99,179,237,0.15); color: #63b3ed; border: 1px solid rgba(99,179,237,0.3); }
+    .badge.grey { background: rgba(74,85,104,0.3); color: #a0aec0; border: 1px solid #4a5568; }
+    .badge.orange { background: rgba(246,173,85,0.15); color: #f6ad55; border: 1px solid rgba(246,173,85,0.3); }
+
+    .divider {
+      height: 1px;
+      background: #2d3748;
+      margin: 0 18px;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #4a5568;
+      padding: 20px;
+    }
+
+    /* Back to top button */
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>Video AI – <span>Task Details</span></h1>
+  <div class="subtitle">Detailed Task Breakdown by Category</div>
+  <a href="video-ai-dashboard.html" class="nav-button">← Back to Dashboard</a>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <span class="legend-title">Status Key</span>
+  <div class="legend-item"><div class="legend-dot dot-red"></div> At Risk / Show Stopper</div>
+  <div class="legend-item"><div class="legend-dot dot-orange"></div> At Risk</div>
+  <div class="legend-item"><div class="legend-dot dot-green"></div> In Progress</div>
+  <div class="legend-item"><div class="legend-dot dot-blue"></div> Completed</div>
+  <div class="legend-item"><div class="legend-dot dot-grey"></div> Not Started</div>
+</div>
+
+<!-- Task Sections -->
+<div class="sections">
+
+  <!-- Planning & Governance -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📋</span>
+      <span class="section-title">Planning &amp; Governance</span>
+      <span class="section-count">5 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Charter &amp; Overview</div>
+          <div class="task-sub">Purpose, objectives, scope, stakeholders, timeline &amp; approvals</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-raid-log.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">RAID Log ↗</a></div>
+          <div class="task-sub">Risks, Assumptions, Issues &amp; Dependencies tracking — ongoing</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Plan &amp; Milestones</div>
+          <div class="task-sub">Phased rollout plan by region with milestones &amp; deliverables</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-raci.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">RACI Matrix ↗</a></div>
+          <div class="task-sub">RACI assignments and communication plan</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Stakeholders (Restricted)</div>
+          <div class="task-sub">Core working group identified and access restricted</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- Requirements & Change Management -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📐</span>
+      <span class="section-title">Requirements &amp; Change Management</span>
+      <span class="section-count">3 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name"><a href="video-ai-requirements.html" style="color:#e2e8f0;text-decoration:none;" onmouseover="this.style.color='#63b3ed'" onmouseout="this.style.color='#e2e8f0'">System Requirements ↗</a></div>
+          <div class="task-sub">Business, functional, non-functional requirements &amp; out-of-scope</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Change Management Plan</div>
+          <div class="task-sub">Change management strategy and execution plan</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Pre-Read: Video AI Program</div>
+          <div class="task-sub">VP-level briefing — pilot results, vendor rec, budget, Phase 2 sign-off</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- Financial & Quality -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">💰</span>
+      <span class="section-title">Financial &amp; Quality</span>
+      <span class="section-count">2 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Budget &amp; Financial Tracking</div>
+          <div class="task-sub">PRs submitted May 26 · Awaiting PO/budget confirmation from Rob &amp; Gary</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Quality &amp; Acceptance Criteria</div>
+          <div class="task-sub">Quality standards and phase-specific acceptance criteria</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- Purchase Orders & Purchase Requests -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📄</span>
+      <span class="section-title">Purchase Orders &amp; Purchase Requests</span>
+      <span class="section-count">3 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div style="overflow-x: auto; padding: 12px 16px;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; background: #1a202c; border-radius: 8px; overflow: hidden;">
+        <thead>
+          <tr style="background: #2d3748;">
+            <th style="padding: 10px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #cbd5e0; font-weight: 700; white-space: nowrap;">MPC PiR</th>
+            <th style="padding: 10px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #cbd5e0; font-weight: 700; white-space: nowrap;">Coupa PR</th>
+            <th style="padding: 10px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #cbd5e0; font-weight: 700; white-space: nowrap;">PO#</th>
+            <th style="padding: 10px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #cbd5e0; font-weight: 700; white-space: nowrap;">Vendor</th>
+            <th style="padding: 10px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #cbd5e0; font-weight: 700; white-space: nowrap;">Amount</th>
+            <th style="padding: 10px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #cbd5e0; font-weight: 700; white-space: nowrap;">Notes</th>
+            <th style="padding: 10px 14px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: #cbd5e0; font-weight: 700; white-space: nowrap;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-top: 1px solid #2d3748;">
+            <td style="padding: 12px 14px; color: #e2e8f0;"><a href="https://financeforce.lightning.force.com/lightning/r/S360_Procurement_Intake_Request__c/a4D7y00000RLMkLEAX/view" target="_blank" style="color: #63b3ed; text-decoration: none;" onmouseover="this.style.color='#90cdf4'" onmouseout="this.style.color='#63b3ed'">17554</a></td>
+            <td style="padding: 12px 14px; color: #e2e8f0;"><a href="https://salesforce-compass-prod2.coupahost.com/requisition_headers/162479" target="_blank" style="color: #63b3ed; text-decoration: none;" onmouseover="this.style.color='#90cdf4'" onmouseout="this.style.color='#63b3ed'">162479</a></td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">-</td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">Cobalt</td>
+            <td style="padding: 12px 14px; color: #e2e8f0; font-weight: 600;">$400,140</td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">Q2FY27 Expansion Project</td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">PR in queue (as of Jun 10, 2026)</td>
+          </tr>
+          <tr style="border-top: 1px solid #2d3748;">
+            <td style="padding: 12px 14px; color: #e2e8f0;"><a href="https://financeforce.lightning.force.com/lightning/r/S360_Procurement_Intake_Request__c/a4D7y00000P7p94EAB/view" target="_blank" style="color: #63b3ed; text-decoration: none;" onmouseover="this.style.color='#90cdf4'" onmouseout="this.style.color='#63b3ed'">15780</a></td>
+            <td style="padding: 12px 14px; color: #e2e8f0;"><a href="https://salesforce-compass-prod2.coupahost.com/requisition_headers/158573" target="_blank" style="color: #63b3ed; text-decoration: none;" onmouseover="this.style.color='#90cdf4'" onmouseout="this.style.color='#63b3ed'">158573</a></td>
+            <td style="padding: 12px 14px; color: #e2e8f0;"><a href="https://salesforce-compass-prod2.coupahost.com/order_headers/122956" target="_blank" style="color: #63b3ed; text-decoration: none;" onmouseover="this.style.color='#90cdf4'" onmouseout="this.style.color='#63b3ed'">#P122956</a></td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">Cobalt</td>
+            <td style="padding: 12px 14px; color: #e2e8f0; font-weight: 600;">$252,000</td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">FY27 SFO/SEA AI KLO</td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">✅ PO issued (Jun 5, 2026)</td>
+          </tr>
+          <tr style="border-top: 1px solid #2d3748;">
+            <td style="padding: 12px 14px; color: #e2e8f0;"><a href="https://financeforce.lightning.force.com/lightning/r/S360_Purchase_Request__c/a3t7y000001m2bdAAA/view" target="_blank" style="color: #63b3ed; text-decoration: none;" onmouseover="this.style.color='#90cdf4'" onmouseout="this.style.color='#63b3ed'">13008</a></td>
+            <td style="padding: 12px 14px; color: #e2e8f0;"><a href="https://salesforce-compass-prod2.coupahost.com/requisition_headers/155967" target="_blank" style="color: #63b3ed; text-decoration: none;" onmouseover="this.style.color='#90cdf4'" onmouseout="this.style.color='#63b3ed'">155967</a></td>
+            <td style="padding: 12px 14px; color: #e2e8f0;"><a href="https://salesforce-compass-prod2.coupahost.com/order_headers/118984" target="_blank" style="color: #63b3ed; text-decoration: none;" onmouseover="this.style.color='#90cdf4'" onmouseout="this.style.color='#63b3ed'">#P118984</a></td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">Cobalt</td>
+            <td style="padding: 12px 14px; color: #e2e8f0; font-weight: 600;">$190,120</td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">FY27 Robotics KLO</td>
+            <td style="padding: 12px 14px; color: #e2e8f0;">✅ PO issued (Apr 23, 2026)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </details>
+  </div>
+
+  <!-- Knowledge & Closure -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">📦</span>
+      <span class="section-title">Knowledge &amp; Closure</span>
+      <span class="section-count">2 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Lessons Learned</div>
+          <div class="task-sub">Pilot lessons and ongoing log for continuous improvement</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Closure &amp; Handoff Checklist + Package</div>
+          <div class="task-sub">Closure checklist, handoff package &amp; final sign-off</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- High-Level Deliverables -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🎯</span>
+      <span class="section-title">High-Level Deliverables</span>
+      <span class="section-count">1 item</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Video AI Project Slide Deck</div>
+          <div class="task-sub">High-level overview presentation for stakeholders</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- Procurement & Financials -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🧾</span>
+      <span class="section-title">Procurement Milestones</span>
+      <span class="section-count">6 items</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Budget ($1.6M) Tentative Approval</div>
+          <div class="task-sub">Apr 10 · Pending VP sign-off at time of update</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">VP Sign-off – Orlaith Murphy</div>
+          <div class="task-sub">Apr 16 · Formal VP approval obtained</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Cobalt FY27 Quote Received</div>
+          <div class="task-sub">May 5 · Revised ~$754,620 FY27 (Q2–Q4) quote from Cobalt</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PO / Budget Confirmation</div>
+          <div class="task-sub">May 6 · Quote shared with Rob Mirakaj &amp; Gary Lunetta — awaiting confirmation</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PIR Submission – "Cobalt Video AI Continuation"</div>
+          <div class="task-sub">May 19 · Submitted in procurement system</div>
+        </div>
+        <div class="badge blue">Completed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Purchase Request (PR) Approvals</div>
+          <div class="task-sub">May 26 · All PRs submitted — awaiting approval routing</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- Staffing / Resources -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">👥</span>
+      <span class="section-title">Staffing &amp; Resources</span>
+      <span class="section-count">13 roles</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Sponsor</div>
+          <div class="task-sub">Bill Inzeo</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Program Manager</div>
+          <div class="task-sub">Jeff Toler</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Program Lead</div>
+          <div class="task-sub">Jerry Wu / Wes White</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Project Manager / Coordinator</div>
+          <div class="task-sub">Wes White (PMP, FTE) · ~20 hrs/wk · Greenlit by Bill &amp; Orlaith</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecOps Director</div>
+          <div class="task-sub">Robert Mirakaj</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">GOC Director</div>
+          <div class="task-sub">Suzanne Paleologos</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">H&amp;S Senior Manager</div>
+          <div class="task-sub">Aaron Patkin</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">VP Resilience</div>
+          <div class="task-sub">Stasha Wyskiel</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">PhySec Lead</div>
+          <div class="task-sub">Kory Turnbow</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Security Technology Director</div>
+          <div class="task-sub">Gary Lunetta</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">GS&amp;S Financial Ops</div>
+          <div class="task-sub">James Herrera</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task blue">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecTech SOW Worker 1</div>
+          <div class="task-sub">Steven Hord</div>
+        </div>
+        <div class="badge blue">Confirmed</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task orange">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">SecTech SOW Worker 2</div>
+          <div class="task-sub">TBD · Resource not yet identified</div>
+        </div>
+        <div class="badge orange">At Risk</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+  <!-- Phase Rollout -->
+  <div class="section">
+    <details open>
+    <summary>
+      <span class="section-icon">🗺️</span>
+      <span class="section-title">Phase Rollout</span>
+      <span class="section-count">2 phases</span>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="task-list">
+      <div class="task green">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Phase 1 – AMER (4 Sites)</div>
+          <div class="task-sub">San Francisco · Bellevue · Chicago · New York · Q2 FY27</div>
+        </div>
+        <div class="badge green">In Progress</div>
+      </div>
+      <div class="divider"></div>
+      <div class="task grey">
+        <div class="task-status"></div>
+        <div class="task-body">
+          <div class="task-name">Phase 2 – Full Scale (15 Tier 1 Sites)</div>
+          <div class="task-sub">Global rollout · FY28 · Budget: $1,612,800 TCV</div>
+        </div>
+        <div class="badge grey">Not Started</div>
+      </div>
+    </div>
+    </details>
+  </div>
+
+</div>
+
+<!-- Back to Top Button -->
+<div class="back-to-top" id="backToTop" onclick="scrollToTop()">
+  ↑
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  Video AI Project Task Details | Generated from Master Project Plan | Last updated Jun 5, 2026<br>
+  <a href="video-ai-dashboard.html" style="color: #63b3ed; text-decoration: none;">Back to Dashboard</a>
+</div>
+
+<script>
+// Back to top button
+window.addEventListener('scroll', function() {
+  const backToTop = document.getElementById('backToTop');
+  if (window.pageYOffset > 300) {
+    backToTop.classList.add('visible');
+  } else {
+    backToTop.classList.remove('visible');
+  }
+});
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>

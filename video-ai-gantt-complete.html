@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – Complete Gantt Chart by Phase</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f7fafc;
+    }
+
+    .header h1 span { color: #63b3ed; }
+
+    .phase-section {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .phase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #2d3748;
+    }
+
+    .phase-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #63b3ed;
+    }
+
+    .phase-stats {
+      font-size: 0.875rem;
+      color: #718096;
+    }
+
+    .timeline {
+      background: #161b22;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .timeline-header {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      color: #718096;
+      white-space: pre;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    .task-row {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #1a1f2e;
+    }
+
+    .task-row:hover {
+      background: rgba(99,179,237,0.05);
+    }
+
+    .task-label {
+      width: 300px;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+      padding-right: 12px;
+    }
+
+    .task-id {
+      font-weight: 700;
+      color: #63b3ed;
+    }
+
+    .task-name {
+      color: #cbd5e0;
+      font-size: 0.75rem;
+      margin-top: 2px;
+    }
+
+    .task-timeline {
+      flex: 1;
+      height: 24px;
+      position: relative;
+      background: #0d1117;
+      border-radius: 4px;
+    }
+
+    .task-bar {
+      position: absolute;
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .bar-completed {
+      background: linear-gradient(90deg, #276749, #68d391);
+      color: white;
+    }
+
+    .bar-in-progress {
+      background: linear-gradient(90deg, #b7791f, #ecc94b);
+      color: #1a1208;
+    }
+
+    .bar-not-started {
+      background: linear-gradient(90deg, #2d3748, #4a5568);
+      color: #cbd5e0;
+    }
+
+    .bar-at-risk {
+      background: linear-gradient(90deg, #c53030, #fc8181);
+      color: white;
+    }
+
+    .bar-blocked {
+      background: repeating-linear-gradient(
+        45deg,
+        #f6ad55,
+        #f6ad55 10px,
+        #c05621 10px,
+        #c05621 20px
+      );
+      color: #1a0e00;
+    }
+
+    .task-dates {
+      width: 200px;
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      color: #718096;
+      padding-left: 12px;
+      text-align: right;
+    }
+
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: #161b22;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+
+    .legend-box {
+      width: 32px;
+      height: 16px;
+      border-radius: 3px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+    }
+
+    .nav-links {
+      padding: 16px;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      margin-top: 24px;
+    }
+
+    .nav-links a {
+      color: #63b3ed;
+      text-decoration: none;
+      margin-right: 20px;
+      font-size: 0.875rem;
+    }
+
+    .nav-links a:hover { text-decoration: underline; }
+
+    .print-button {
+      background: #3182ce;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .print-button:hover { background: #2c5aa0; }
+
+    @media print {
+      body { background: white; color: black; }
+      .nav-links, .print-button { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Video AI – <span>Complete Gantt Chart</span></h1>
+    <div style="font-size: 0.875rem; color: #718096; margin-top: 8px;">
+      Cobalt Video Analytics · Tier 1 Global Office Rollout · All Phases & Tasks
+    </div>
+    <div style="margin-top: 16px;">
+      <button class="print-button" onclick="window.print()">🖨️ Print / PDF</button>
+      <button class="print-button" onclick="window.location.href='video-ai-gantt.html'">🔄 Sync Version</button>
+      <button class="print-button" onclick="window.location.href='video-ai-dashboard.html'">📊 Main Dashboard</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num" style="color: #63b3ed;">69</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #68d391;">12</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #ecc94b;">18</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #4a5568;">31</div>
+      <div class="stat-label">Not Started</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #fc8181;">7</div>
+      <div class="stat-label">At Risk</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #f6ad55;">1</div>
+      <div class="stat-label">Blocked</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-box bar-completed"></div>
+      <span>Completed</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box bar-in-progress"></div>
+      <span>In Progress</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box bar-not-started"></div>
+      <span>Not Started</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box bar-at-risk"></div>
+      <span>At Risk</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box bar-blocked"></div>
+      <span>Blocked</span>
+    </div>
+  </div>
+
+  <!-- Pre-Deployment Tasks -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">📋 Pre-Deployment Tasks</div>
+      <div class="phase-stats">9 tasks | Jun 2026 - Aug 2026</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: April 2026 ─────────────────────────────────────────────────────────────── August 2026</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-01</div>
+          <div class="task-name">Budget Approval ($400K)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 0%; width: 15%;">Apr-May 2026</div>
+        </div>
+        <div class="task-dates">2026-04-01 → 2026-05-15</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-02</div>
+          <div class="task-name">SF Tower & Seattle Pilot</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 0%; width: 85%;">Jun 2025 - Jul 2026</div>
+        </div>
+        <div class="task-dates">2025-06-15 → 2026-07-03</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-03</div>
+          <div class="task-name">Model Tuning Process ⚠️ BLOCKER</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 50%; width: 15%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-01 → 2026-07-15</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-04</div>
+          <div class="task-name">GOC Capacity Assessment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 50%; width: 20%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-01 → 2026-07-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-05</div>
+          <div class="task-name">Define SLA Chain</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 50%; width: 15%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-01 → 2026-07-15</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-06</div>
+          <div class="task-name">GOC Training (1hr)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 58%; width: 1%;">Jun 29</div>
+        </div>
+        <div class="task-dates">2026-06-29 → 2026-06-29</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-07</div>
+          <div class="task-name">Develop Global SOPs</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 50%; width: 40%;">Jun-Aug 2026</div>
+        </div>
+        <div class="task-dates">2026-06-15 → 2026-08-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-08</div>
+          <div class="task-name">SecOps Escalation Process</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 50%; width: 20%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-15 → 2026-07-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">PRE-09</div>
+          <div class="task-name">Hire SecTech Worker 2 ⚠️</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 50%; width: 20%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-01 → 2026-07-31</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 1: APAC Deployment -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🌏 Phase 1: APAC Deployment (Q2 FY27)</div>
+      <div class="phase-stats">12 tasks | Nov 2025 - Sep 2026</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: November 2025 ────────────────────────────────────────────────────── September 2026</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-01</div>
+          <div class="task-name">San Francisco Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 0%; width: 40%;">Nov 2025 - Apr 2026 ✓ Live</div>
+        </div>
+        <div class="task-dates">2025-11-01 → 2026-04-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-02</div>
+          <div class="task-name">Seattle/Bellevue Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 0%; width: 40%;">Nov 2025 - Apr 2026 ✓ Live</div>
+        </div>
+        <div class="task-dates">2025-11-01 → 2026-04-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-03</div>
+          <div class="task-name">Hyderabad Re-Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 55%; width: 45%;">Jul-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-07-01 → 2026-12-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-04</div>
+          <div class="task-name">Hyderabad DPIA Approval</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 52%; width: 15%;">Jun-Aug 2026</div>
+        </div>
+        <div class="task-dates">2026-06-26 → 2026-08-15</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-05</div>
+          <div class="task-name">Bangalore Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 60%; width: 25%;">Jul-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-07-01 → 2026-09-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-06</div>
+          <div class="task-name">Tokyo Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 60%; width: 25%;">Jul-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-07-01 → 2026-09-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-07</div>
+          <div class="task-name">Sydney Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 60%; width: 25%;">Jul-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-07-01 → 2026-09-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-08</div>
+          <div class="task-name">AWS Infrastructure (580 cams)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 55%; width: 22%;">Jun-Aug 2026</div>
+        </div>
+        <div class="task-dates">2026-06-15 → 2026-08-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-09</div>
+          <div class="task-name">Open Network Bridge VM</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 55%; width: 12%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-15 → 2026-07-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-10</div>
+          <div class="task-name">Lenel License (AMER East)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 62%; width: 8%;">Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-07-01 → 2026-07-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-11</div>
+          <div class="task-name">Agentforce Go-Live</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 65%; width: 20%;">Jul-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-07-15 → 2026-09-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P1-12</div>
+          <div class="task-name">Auto-Close Threshold 🔴</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 72%; width: 13%;">Aug-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-08-01 → 2026-09-15</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2: AMER Deployment -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🌎 Phase 2: AMER Deployment (Q3 FY27)</div>
+      <div class="phase-stats">7 tasks | Sep 2026 - Dec 2026</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: September 2026 ─────────────────────────────────────────────────── December 2026</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P2-01</div>
+          <div class="task-name">Chicago Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 25%; width: 75%;">Oct-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-10-01 → 2026-12-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P2-03</div>
+          <div class="task-name">New York Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 25%; width: 75%;">Oct-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-10-01 → 2026-12-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P2-04</div>
+          <div class="task-name">Toronto Deployment (CCPA)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 25%; width: 75%;">Oct-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-10-01 → 2026-12-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P2-05</div>
+          <div class="task-name">Atlanta Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 25%; width: 75%;">Oct-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-10-01 → 2026-12-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P2-06</div>
+          <div class="task-name">AWS Infrastructure (333 cams)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 0%; width: 50%;">Sep-Oct 2026</div>
+        </div>
+        <div class="task-dates">2026-09-01 → 2026-10-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P2-07</div>
+          <div class="task-name">Change Mgmt Plan Execution</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 12%; width: 88%;">Sep-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-09-15 → 2026-12-15</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P2-08</div>
+          <div class="task-name">Training 100% Personnel</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 12%; width: 88%;">Sep-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-09-15 → 2026-12-31</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3: EMEA Deployment -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🌍 Phase 3: EMEA Deployment (Q4 FY27)</div>
+      <div class="phase-stats">7 tasks | Oct 2026 - Mar 2028</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: October 2026 ───────────────────────────────────────────────────── March 2028</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P3-01</div>
+          <div class="task-name">Dublin Deployment (GDPR)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 75%; width: 15%;">Jan-Mar 2028</div>
+        </div>
+        <div class="task-dates">2028-01-01 → 2028-03-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P3-02</div>
+          <div class="task-name">London Deployment (GDPR)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 75%; width: 15%;">Jan-Mar 2028</div>
+        </div>
+        <div class="task-dates">2028-01-01 → 2028-03-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P3-03</div>
+          <div class="task-name">Paris Deployment (GDPR)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 75%; width: 15%;">Jan-Mar 2028</div>
+        </div>
+        <div class="task-dates">2028-01-01 → 2028-03-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P3-04</div>
+          <div class="task-name">Bangalore Tower</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 50%; width: 15%;">Jan-Mar 2027</div>
+        </div>
+        <div class="task-dates">2027-01-01 → 2027-03-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P3-05</div>
+          <div class="task-name">GDPR Sign-Off (EU Sites)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 0%; width: 18%;">Oct-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-10-01 → 2026-12-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P3-06</div>
+          <div class="task-name">CCPA Sign-Off (Toronto)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 0%; width: 18%;">Oct-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-10-01 → 2026-12-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P3-07</div>
+          <div class="task-name">InfoSec/Privacy Approvals 🔴</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 0%; width: 22%;">Oct 2026-Jan 2027</div>
+        </div>
+        <div class="task-dates">2026-10-01 → 2027-01-15</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 4: Global Rollout -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🌐 Phase 4: Global Rollout (FY28)</div>
+      <div class="phase-stats">5 tasks | Jan 2027 - Mar 2028</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: January 2027 ───────────────────────────────────────────────────── March 2028</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P4-01</div>
+          <div class="task-name">Global Rollout Planning (5,177 cams)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 20%; width: 18%;">Apr-Jun 2027</div>
+        </div>
+        <div class="task-dates">2027-04-01 → 2027-06-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P4-02</div>
+          <div class="task-name">Secure FY28 Budget ($1.6M TCV)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 0%; width: 15%;">Jan-Mar 2027</div>
+        </div>
+        <div class="task-dates">2027-01-01 → 2027-03-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P4-03</div>
+          <div class="task-name">AWS Full Scale (~$500k/yr)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 20%; width: 18%;">Apr-Jun 2027</div>
+        </div>
+        <div class="task-dates">2027-04-01 → 2027-06-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P4-04</div>
+          <div class="task-name">Global Lenel Licenses</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 20%; width: 18%;">Apr-Jun 2027</div>
+        </div>
+        <div class="task-dates">2027-04-01 → 2027-06-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">P4-05</div>
+          <div class="task-name">Full 5,177-Camera Deployment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 40%; width: 60%;">Jul 2027 - Mar 2028</div>
+        </div>
+        <div class="task-dates">2027-07-01 → 2028-03-31</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ongoing Operational Tasks -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🔄 Ongoing Operational Tasks</div>
+      <div class="phase-stats">8 tasks | Apr 2026 - Ongoing</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: April 2026 ──────────────────────────────────────────────────────────── Ongoing</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">OPS-01</div>
+          <div class="task-name">Ambient AI Hyderabad Extension</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 15%; width: 40%;">Jun-Nov 2026</div>
+        </div>
+        <div class="task-dates">2026-06-01 → 2026-11-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">OPS-02</div>
+          <div class="task-name">Bi-Weekly Vendor Syncs</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 0%; width: 100%;">Apr 2026 - Ongoing →</div>
+        </div>
+        <div class="task-dates">2026-04-01 → Ongoing</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">OPS-03</div>
+          <div class="task-name">Model Tuning Loop ⚠️ BLOCKED</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-blocked" style="left: 20%; width: 80%;">TBD - Ongoing</div>
+        </div>
+        <div class="task-dates">TBD → Ongoing</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">OPS-04</div>
+          <div class="task-name">Agentforce Automation Dev</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 40%; width: 60%;">Oct 2026 - Ongoing →</div>
+        </div>
+        <div class="task-dates">2026-10-01 → Ongoing</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">OPS-05</div>
+          <div class="task-name">SIEM Integration Monitoring</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 17%; width: 83%;">Jun 2026 - Ongoing →</div>
+        </div>
+        <div class="task-dates">2026-06-15 → Ongoing</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">OPS-06</div>
+          <div class="task-name">H&S Integration Coordination</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 50%; width: 50%;">TBD</div>
+        </div>
+        <div class="task-dates">TBD → TBD</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">OPS-07</div>
+          <div class="task-name">OCM Resource Support 🔴</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 15%; width: 85%;">Jun 2026 - Ongoing →</div>
+        </div>
+        <div class="task-dates">2026-06-01 → Ongoing</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">OPS-08</div>
+          <div class="task-name">Monitor Cobalt Leadership</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 15%; width: 85%;">Jun 2026 - Ongoing →</div>
+        </div>
+        <div class="task-dates">2026-06-01 → Ongoing</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Integration Milestones -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🔗 Integration Milestones</div>
+      <div class="phase-stats">8 tasks | Nov 2025 - Aug 2026</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: November 2025 ────────────────────────────────────────────────────── August 2026</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">INT-01</div>
+          <div class="task-name">Lenel OnGuard Integration</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 0%; width: 35%;">Nov 2025 - Mar 2026 ✓</div>
+        </div>
+        <div class="task-dates">2025-11-01 → 2026-03-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">INT-02</div>
+          <div class="task-name">Milestone VMS Integration</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 40%; width: 45%;">Apr-Aug 2026</div>
+        </div>
+        <div class="task-dates">2026-04-01 → 2026-08-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">INT-03</div>
+          <div class="task-name">Service Cloud Integration</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 10%; width: 40%;">Dec 2025 - Apr 2026 ✓</div>
+        </div>
+        <div class="task-dates">2025-12-01 → 2026-04-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">INT-04</div>
+          <div class="task-name">Agentforce Integration</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 50%; width: 40%;">May-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-05-01 → 2026-09-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">INT-05</div>
+          <div class="task-name">Slack Integration</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 17%; width: 33%;">Jan-Apr 2026 ✓</div>
+        </div>
+        <div class="task-dates">2026-01-01 → 2026-04-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">INT-06</div>
+          <div class="task-name">ADA Door Systems Integration</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 70%; width: 30%;">TBD</div>
+        </div>
+        <div class="task-dates">TBD → TBD</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">INT-07</div>
+          <div class="task-name">Logical Device Structure Fix</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 65%; width: 25%;">Jun-Aug 2026</div>
+        </div>
+        <div class="task-dates">2026-06-15 → 2026-08-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">INT-08</div>
+          <div class="task-name">OnGuard Connectivity Validation</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 65%; width: 25%;">Jun-Aug 2026</div>
+        </div>
+        <div class="task-dates">2026-06-15 → 2026-08-31</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Violation Workflow Development -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">⚠️ Violation Workflow Development</div>
+      <div class="phase-stats">9 tasks | Feb 2026 - Nov 2026</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: February 2026 ────────────────────────────────────────────────────── November 2026</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-01</div>
+          <div class="task-name">Tailgating/Piggybacking</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 0%; width: 25%;">Feb-Apr 2026 ✓</div>
+        </div>
+        <div class="task-dates">2026-02-01 → 2026-04-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-02</div>
+          <div class="task-name">Weapons Detection</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 0%; width: 25%;">Feb-Apr 2026 ✓</div>
+        </div>
+        <div class="task-dates">2026-02-01 → 2026-04-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-03</div>
+          <div class="task-name">Doors Forced/Propped Open</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-completed" style="left: 8%; width: 30%;">Mar-May 2026 ✓</div>
+        </div>
+        <div class="task-dates">2026-03-01 → 2026-05-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-04</div>
+          <div class="task-name">Unauthorized Access Attempts</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 42%; width: 25%;">Jul-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-07-01 → 2026-09-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-05</div>
+          <div class="task-name">Medical Emergency (Fall/Trip)</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 42%; width: 25%;">Jul-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-07-01 → 2026-09-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-06</div>
+          <div class="task-name">After-Hours Access Anomalies</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 50%; width: 25%;">Aug-Oct 2026</div>
+        </div>
+        <div class="task-dates">2026-08-01 → 2026-10-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-07</div>
+          <div class="task-name">Loitering in Restricted Areas</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 50%; width: 25%;">Aug-Oct 2026</div>
+        </div>
+        <div class="task-dates">2026-08-01 → 2026-10-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-08</div>
+          <div class="task-name">Object Left Behind/Removed</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 58%; width: 25%;">Sep-Nov 2026</div>
+        </div>
+        <div class="task-dates">2026-09-01 → 2026-11-30</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">VW-09</div>
+          <div class="task-name">Crowd Detection & Density</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 58%; width: 25%;">Sep-Nov 2026</div>
+        </div>
+        <div class="task-dates">2026-09-01 → 2026-11-30</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Dependencies & Risks -->
+  <div class="phase-section">
+    <div class="phase-header">
+      <div class="phase-title">🚨 Key Dependencies & Risks</div>
+      <div class="phase-stats">5 critical items | Jun 2026 - Dec 2026</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-header">Timeline: June 2026 ────────────────────────────────────────────────────── December 2026</div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">DEP-01</div>
+          <div class="task-name">Model Tuning Loop ⚠️ BLOCKER</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-not-started" style="left: 0%; width: 15%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-01 → 2026-07-15</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">DEP-02</div>
+          <div class="task-name">GOC Capacity Assessment</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 0%; width: 20%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-01 → 2026-07-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">DEP-03</div>
+          <div class="task-name">GDPR/CCPA Approvals</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-in-progress" style="left: 45%; width: 32%;">Oct-Dec 2026</div>
+        </div>
+        <div class="task-dates">2026-10-01 → 2026-12-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">DEP-04</div>
+          <div class="task-name">SecTech Hire ⚠️ SHOW STOPPER</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 0%; width: 20%;">Jun-Jul 2026</div>
+        </div>
+        <div class="task-dates">2026-06-01 → 2026-07-31</div>
+      </div>
+
+      <div class="task-row">
+        <div class="task-label">
+          <div class="task-id">DEP-05</div>
+          <div class="task-name">Auto-Close Threshold</div>
+        </div>
+        <div class="task-timeline">
+          <div class="task-bar bar-at-risk" style="left: 22%; width: 16%;">Aug-Sep 2026</div>
+        </div>
+        <div class="task-dates">2026-08-01 → 2026-09-15</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <strong>📊 Dashboard Navigation:</strong><br><br>
+    <a href="video-ai-dashboard.html">Main Dashboard</a>
+    <a href="video-ai-gantt.html">Sync-Enabled Gantt</a>
+    <a href="video-ai-raid-log.html">RAID Log</a>
+    <a href="video-ai-raci.html">RACI Matrix</a>
+    <a href="video-ai-requirements.html">Requirements</a>
+    <a href="video-ai-budget.html">Budget</a>
+  </div>
+
+  <div style="text-align: center; padding: 24px; color: #718096; font-size: 0.8rem;">
+    <strong>Video AI Project Gantt Chart</strong> | Last Updated: June 29, 2026 | Generated by Wes White (PMP)
+  </div>
+
+</body>
+</html>

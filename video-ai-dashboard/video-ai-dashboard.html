@@ -431,6 +431,466 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════ PROJECT HEALTH SCORE -->
+<div class="health-score-block">
+  <div class="health-score-content">
+    <div class="health-score-main">
+      <div class="health-score-gauge">
+        <svg viewBox="0 0 200 120" style="width:100%;height:100%;">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#fc8181;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#ecc94b;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#68d391;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#2d3748" stroke-width="20" stroke-linecap="round"/>
+          <path d="M 20 100 A 80 80 0 0 1 140 100" fill="none" stroke="url(#gaugeGrad)" stroke-width="20" stroke-linecap="round"/>
+          <circle cx="100" cy="100" r="3" fill="#ecc94b"/>
+          <line x1="100" y1="100" x2="140" y2="55" stroke="#ecc94b" stroke-width="3" stroke-linecap="round"/>
+          <text x="100" y="95" text-anchor="middle" fill="#e2e8f0" font-size="32" font-weight="700">68</text>
+          <text x="100" y="110" text-anchor="middle" fill="#718096" font-size="10">PROJECT HEALTH</text>
+        </svg>
+      </div>
+      <div class="health-score-details">
+        <div class="health-title">Overall Project Health</div>
+        <div class="health-rating">68/100 — <span style="color:#ecc94b;">⚠️ Caution</span></div>
+        <div class="health-breakdown">
+          <div class="health-item">
+            <span class="health-label">Schedule:</span>
+            <div class="health-bar-mini"><div class="health-fill" style="width:65%;background:#f6ad55;"></div></div>
+            <span class="health-val">65%</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">Budget:</span>
+            <div class="health-bar-mini"><div class="health-fill" style="width:85%;background:#68d391;"></div></div>
+            <span class="health-val">85%</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">Resources:</span>
+            <div class="health-bar-mini"><div class="health-fill" style="width:50%;background:#fc8181;"></div></div>
+            <span class="health-val">50%</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">Risk Mgmt:</span>
+            <div class="health-bar-mini"><div class="health-fill" style="width:70%;background:#63b3ed;"></div></div>
+            <span class="health-val">70%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="health-score-export">
+      <button class="export-btn" onclick="window.print()">📄 Export PDF</button>
+      <button class="export-btn" onclick="exportToCSV()">📊 Export CSV</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .health-score-block {
+    background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+    border: 1px solid #2d3748;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .health-score-content { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .health-score-main { display: flex; gap: 28px; align-items: center; flex: 1; }
+  .health-score-gauge { width: 200px; height: 120px; flex-shrink: 0; }
+  .health-score-details { flex: 1; min-width: 300px; }
+  .health-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; margin-bottom: 6px; }
+  .health-rating { font-size: 1.1rem; font-weight: 600; color: #e2e8f0; margin-bottom: 16px; }
+  .health-breakdown { display: flex; flex-direction: column; gap: 10px; }
+  .health-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; }
+  .health-label { width: 80px; color: #cbd5e0; }
+  .health-bar-mini { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; border: 1px solid #2d3748; }
+  .health-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .health-val { width: 40px; text-align: right; color: #a0aec0; font-weight: 600; }
+  .health-score-export { display: flex; flex-direction: column; gap: 10px; }
+  .export-btn {
+    background: rgba(99,179,237,0.15);
+    color: #63b3ed;
+    border: 1px solid rgba(99,179,237,0.3);
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .export-btn:hover {
+    background: rgba(99,179,237,0.25);
+    border-color: #63b3ed;
+    transform: translateY(-1px);
+  }
+  @media print {
+    .export-btn, .filter-controls { display: none; }
+    body { background: white; color: black; }
+  }
+</style>
+
+<!-- ══════════════════════════════════════════════════════ ACTION REQUIRED THIS WEEK -->
+<div class="action-required-block">
+  <div class="action-header">
+    <span class="action-icon">⚡</span>
+    <span class="action-title">Action Required This Week</span>
+    <span class="action-count">5 Items</span>
+  </div>
+  <div class="action-grid">
+    <div class="action-card blocker">
+      <div class="action-card-header">
+        <span class="action-badge blocker-badge">🚨 BLOCKER</span>
+        <span class="action-due">Due: Jul 15</span>
+      </div>
+      <div class="action-card-title">Define Model Tuning Process</div>
+      <div class="action-card-meta">Owner: Jerry Wu • Blocks Phase 1</div>
+    </div>
+    <div class="action-card critical">
+      <div class="action-card-header">
+        <span class="action-badge critical-badge">🔴 CRITICAL</span>
+        <span class="action-due">Due: Jul 31</span>
+      </div>
+      <div class="action-card-title">Hire SecTech Worker 2</div>
+      <div class="action-card-meta">Owner: Gary Lunetta • Staffing gap</div>
+    </div>
+    <div class="action-card high">
+      <div class="action-card-header">
+        <span class="action-badge high-badge">🟠 HIGH</span>
+        <span class="action-due">Due: Jul 31</span>
+      </div>
+      <div class="action-card-title">GOC Capacity Assessment</div>
+      <div class="action-card-meta">Owner: Suzanne Paleologos • At Risk</div>
+    </div>
+    <div class="action-card high">
+      <div class="action-card-header">
+        <span class="action-badge high-badge">🟠 HIGH</span>
+        <span class="action-due">Due: Jul 15</span>
+      </div>
+      <div class="action-card-title">Define SLA Chain</div>
+      <div class="action-card-meta">Owner: Jerry Wu • Planning</div>
+    </div>
+    <div class="action-card medium">
+      <div class="action-card-header">
+        <span class="action-badge medium-badge">🟡 MEDIUM</span>
+        <span class="action-due">Due: Jul 6</span>
+      </div>
+      <div class="action-card-title">PO/Budget Confirmation</div>
+      <div class="action-card-meta">Owner: Rob Mirakaj & Gary Lunetta</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .action-required-block {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .action-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .action-icon { font-size: 1.2rem; }
+  .action-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; flex: 1; }
+  .action-count { font-size: 0.75rem; color: #fc8181; font-weight: 600; background: rgba(252,129,129,0.15); padding: 4px 10px; border-radius: 12px; }
+  .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .action-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #2d3748;
+    border-left: 3px solid;
+    border-radius: 8px;
+    padding: 14px 16px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .action-card:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .action-card.blocker { border-left-color: #fc8181; }
+  .action-card.critical { border-left-color: #f56565; }
+  .action-card.high { border-left-color: #f6ad55; }
+  .action-card.medium { border-left-color: #ecc94b; }
+  .action-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .action-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .blocker-badge { background: rgba(252,129,129,0.2); color: #fc8181; }
+  .critical-badge { background: rgba(245,101,101,0.2); color: #f56565; }
+  .high-badge { background: rgba(246,173,85,0.2); color: #f6ad55; }
+  .medium-badge { background: rgba(236,201,75,0.2); color: #ecc94b; }
+  .action-due { font-size: 0.7rem; color: #718096; }
+  .action-card-title { font-size: 0.875rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px; line-height: 1.3; }
+  .action-card-meta { font-size: 0.72rem; color: #718096; }
+</style>
+
+<!-- ══════════════════════════════════════════════════════ BUDGET BURN RATE -->
+<div class="budget-block">
+  <div class="budget-header">
+    <div>
+      <div class="budget-title">💰 Budget Burn Rate — FY27</div>
+      <div class="budget-subtitle">Q2-Q4 Budget: $400,140 • FY28 Planned: $1,612,800</div>
+    </div>
+  </div>
+  <div class="budget-content">
+    <div class="budget-gauge-section">
+      <div class="budget-gauge-wrap">
+        <svg viewBox="0 0 200 200" style="width:100%;height:100%;">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#2d3748" stroke-width="16"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#63b3ed" stroke-width="16"
+                  stroke-dasharray="502" stroke-dashoffset="175"
+                  transform="rotate(-90 100 100)" stroke-linecap="round"
+                  style="transition: stroke-dashoffset 0.6s ease;"/>
+          <text x="100" y="90" text-anchor="middle" fill="#e2e8f0" font-size="28" font-weight="700">65%</text>
+          <text x="100" y="110" text-anchor="middle" fill="#718096" font-size="11">COMMITTED</text>
+          <text x="100" y="125" text-anchor="middle" fill="#63b3ed" font-size="14" font-weight="600">$260K</text>
+        </svg>
+      </div>
+      <div class="budget-status">
+        <div class="budget-status-item">
+          <span class="budget-status-label">Committed</span>
+          <span class="budget-status-value">$260,090</span>
+        </div>
+        <div class="budget-status-item">
+          <span class="budget-status-label">Remaining</span>
+          <span class="budget-status-value" style="color:#68d391;">$140,050</span>
+        </div>
+        <div class="budget-status-item">
+          <span class="budget-status-label">Burn Rate</span>
+          <span class="budget-status-value">$43K/month</span>
+        </div>
+        <div class="budget-status-item">
+          <span class="budget-status-label">Runway</span>
+          <span class="budget-status-value" style="color:#ecc94b;">3.3 months</span>
+        </div>
+      </div>
+    </div>
+    <div class="budget-breakdown">
+      <div class="budget-breakdown-title">Spending Breakdown</div>
+      <div class="budget-bar-row">
+        <span class="budget-bar-label">Cobalt Licenses</span>
+        <div class="budget-bar-track">
+          <div class="budget-bar-fill" style="width:60%;background:linear-gradient(90deg,#2c5282,#63b3ed);">
+            <span>$240K (60%)</span>
+          </div>
+        </div>
+      </div>
+      <div class="budget-bar-row">
+        <span class="budget-bar-label">AWS Infrastructure</span>
+        <div class="budget-bar-track">
+          <div class="budget-bar-fill" style="width:3%;background:linear-gradient(90deg,#276749,#68d391);">
+            <span style="color:#cbd5e0;padding-left:8px;">$12K (3%)</span>
+          </div>
+        </div>
+      </div>
+      <div class="budget-bar-row">
+        <span class="budget-bar-label">Lenel Licenses</span>
+        <div class="budget-bar-track">
+          <div class="budget-bar-fill" style="width:2%;background:linear-gradient(90deg,#2d3748,#4a5568);">
+            <span style="color:#cbd5e0;padding-left:8px;">$8K (2%)</span>
+          </div>
+        </div>
+      </div>
+      <div class="budget-bar-row">
+        <span class="budget-bar-label">Contingency (Reserved)</span>
+        <div class="budget-bar-track">
+          <div class="budget-bar-fill" style="width:35%;background:rgba(255,255,255,0.08);border:1px dashed #4a5568;">
+            <span style="color:#a0aec0;">$140K (35%)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .budget-block {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .budget-header { margin-bottom: 20px; }
+  .budget-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #a0aec0; margin-bottom: 4px; }
+  .budget-subtitle { font-size: 0.73rem; color: #718096; }
+  .budget-content { display: flex; gap: 32px; flex-wrap: wrap; }
+  .budget-gauge-section { display: flex; gap: 24px; align-items: center; }
+  .budget-gauge-wrap { width: 180px; height: 180px; flex-shrink: 0; }
+  .budget-status { display: flex; flex-direction: column; gap: 10px; }
+  .budget-status-item { display: flex; justify-content: space-between; gap: 20px; font-size: 0.8rem; }
+  .budget-status-label { color: #718096; }
+  .budget-status-value { color: #e2e8f0; font-weight: 600; }
+  .budget-breakdown { flex: 1; min-width: 300px; }
+  .budget-breakdown-title { font-size: 0.75rem; font-weight: 600; color: #a0aec0; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.07em; }
+  .budget-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .budget-bar-label { font-size: 0.72rem; color: #cbd5e0; width: 140px; flex-shrink: 0; }
+  .budget-bar-track { flex: 1; height: 28px; background: rgba(255,255,255,0.03); border: 1px solid #2d3748; border-radius: 4px; overflow: hidden; }
+  .budget-bar-fill { height: 100%; display: flex; align-items: center; padding: 0 10px; font-size: 0.7rem; font-weight: 600; color: #fff; transition: width 0.6s ease; }
+</style>
+
+<!-- ══════════════════════════════════════════════════════ FILTERS -->
+<div class="filter-controls">
+  <div class="filter-group">
+    <label class="filter-label">🔍 Filter by Status:</label>
+    <select id="filterStatus" class="filter-select" onchange="applyFilters()">
+      <option value="all">All Statuses</option>
+      <option value="completed">✅ Completed</option>
+      <option value="inprogress">🔵 In Progress</option>
+      <option value="notstarted">⚪ Not Started</option>
+      <option value="atrisk">🔴 At Risk / Blocked</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">📂 Filter by Phase:</label>
+    <select id="filterPhase" class="filter-select" onchange="applyFilters()">
+      <option value="all">All Phases</option>
+      <option value="predeployment">Pre-Deployment</option>
+      <option value="phase1">Phase 1: APAC</option>
+      <option value="phase2">Phase 2: AMER</option>
+      <option value="phase3">Phase 3: EMEA</option>
+      <option value="integrations">Integrations</option>
+      <option value="violations">Violation Workflows</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">👤 Filter by Owner:</label>
+    <select id="filterOwner" class="filter-select" onchange="applyFilters()">
+      <option value="all">All Owners</option>
+      <option value="jerry">Jerry Wu</option>
+      <option value="gary">Gary Lunetta</option>
+      <option value="suzanne">Suzanne Paleologos</option>
+      <option value="rob">Robert Mirakaj</option>
+      <option value="wes">Wes White</option>
+    </select>
+  </div>
+  <button class="filter-reset" onclick="resetFilters()">🔄 Reset All</button>
+</div>
+
+<style>
+  .filter-controls {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-group { display: flex; align-items: center; gap: 8px; }
+  .filter-label { font-size: 0.75rem; color: #a0aec0; white-space: nowrap; }
+  .filter-select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #2d3748;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-select:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: #4a5568;
+  }
+  .filter-select:focus {
+    outline: none;
+    border-color: #63b3ed;
+    background: rgba(255,255,255,0.08);
+  }
+  .filter-reset {
+    background: rgba(236,201,75,0.15);
+    color: #ecc94b;
+    border: 1px solid rgba(236,201,75,0.3);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: auto;
+  }
+  .filter-reset:hover {
+    background: rgba(236,201,75,0.25);
+    border-color: #ecc94b;
+  }
+</style>
+
+<script>
+  function applyFilters() {
+    const statusFilter = document.getElementById('filterStatus').value;
+    const phaseFilter = document.getElementById('filterPhase').value;
+    const ownerFilter = document.getElementById('filterOwner').value;
+
+    // Apply filters to task sections and detail rows
+    const sections = document.querySelectorAll('.section, .phase-detail');
+    sections.forEach(section => {
+      let visible = true;
+
+      // Phase filter logic
+      if (phaseFilter !== 'all') {
+        const sectionTitle = section.querySelector('.section-title, .phase-name')?.textContent.toLowerCase() || '';
+        if (phaseFilter === 'predeployment' && !sectionTitle.includes('pre-deployment')) visible = false;
+        if (phaseFilter === 'phase1' && !sectionTitle.includes('phase 1') && !sectionTitle.includes('apac')) visible = false;
+        if (phaseFilter === 'phase2' && !sectionTitle.includes('phase 2') && !sectionTitle.includes('amer deployment')) visible = false;
+        if (phaseFilter === 'phase3' && !sectionTitle.includes('phase 3') && !sectionTitle.includes('emea')) visible = false;
+        if (phaseFilter === 'integrations' && !sectionTitle.includes('integration')) visible = false;
+        if (phaseFilter === 'violations' && !sectionTitle.includes('violation')) visible = false;
+      }
+
+      section.style.display = visible ? '' : 'none';
+    });
+
+    // Status filter for individual tasks
+    if (statusFilter !== 'all') {
+      const tasks = document.querySelectorAll('.task, .gantt-detail-row');
+      tasks.forEach(task => {
+        const badge = task.querySelector('.badge, .gantt-detail-meta')?.textContent.toLowerCase() || '';
+        let visible = true;
+        if (statusFilter === 'completed' && !badge.includes('completed')) visible = false;
+        if (statusFilter === 'inprogress' && !badge.includes('in progress')) visible = false;
+        if (statusFilter === 'notstarted' && !badge.includes('not started')) visible = false;
+        if (statusFilter === 'atrisk' && !badge.includes('risk') && !badge.includes('blocker') && !badge.includes('stopper')) visible = false;
+        task.style.display = visible ? '' : 'none';
+      });
+    } else {
+      document.querySelectorAll('.task, .gantt-detail-row').forEach(t => t.style.display = '');
+    }
+  }
+
+  function resetFilters() {
+    document.getElementById('filterStatus').value = 'all';
+    document.getElementById('filterPhase').value = 'all';
+    document.getElementById('filterOwner').value = 'all';
+    document.querySelectorAll('.section, .phase-detail, .task, .gantt-detail-row').forEach(el => el.style.display = '');
+  }
+
+  function exportToCSV() {
+    const data = [
+      ['Phase', 'Task', 'Status', 'Timeline', 'Owner'],
+      ['Pre-Deployment', 'Budget Approval', 'Completed', 'Apr-May 2026', 'Bill Inzeo'],
+      ['Pre-Deployment', 'Model Tuning Process', 'BLOCKER', 'Jun-Jul 2026', 'Jerry Wu'],
+      ['Phase 1: APAC', 'San Francisco', 'Live', 'Nov 2025-Apr 2026', 'Wes White'],
+      ['Phase 1: APAC', 'Hyderabad', 'In Progress', 'Jul-Sep 2026', 'Jerry Wu'],
+      // Add more rows as needed
+    ];
+
+    let csv = data.map(row => row.join(',')).join('\\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'video-ai-project-export.csv';
+    a.click();
+  }
+</script>
+
 <!-- ══════════════════════════════════════════════════════ LEGEND -->
 <div class="legend">
   <span class="legend-title">Status Key</span>
@@ -498,6 +958,718 @@
     </div>
 
   </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ GANTT CHART -->
+<div class="risk-chart-block" style="margin-bottom:28px;">
+  <div class="risk-chart-title">📅 Project Timeline — Gantt Chart</div>
+
+  <!-- Timeline header -->
+  <div style="display:flex;gap:12px;margin-bottom:16px;font-size:0.7rem;color:#718096;padding-left:180px;">
+    <div style="flex:1;text-align:center;border-left:1px solid #2d3748;padding:4px 0;">Q2 FY27<br>(Apr-Jun '26)</div>
+    <div style="flex:1;text-align:center;border-left:1px solid #2d3748;padding:4px 0;">Q3 FY27<br>(Jul-Sep '26)</div>
+    <div style="flex:1;text-align:center;border-left:1px solid #2d3748;padding:4px 0;">Q4 FY27<br>(Oct-Dec '26)</div>
+    <div style="flex:1;text-align:center;border-left:1px solid #2d3748;padding:4px 0;">Q1 FY28<br>(Jan-Mar '27)</div>
+    <div style="flex:1;text-align:center;border-left:1px solid #2d3748;border-right:1px solid #2d3748;padding:4px 0;">FY28<br>(Apr '27+)</div>
+  </div>
+
+  <!-- Gantt rows -->
+  <div class="gantt-rows">
+    <!-- Pre-Deployment -->
+    <div class="gantt-row">
+      <div class="gantt-label">Pre-Deployment</div>
+      <div class="gantt-track">
+        <div class="gantt-bar completed" style="left:10%;width:30%;" title="Budget & Pilot: Completed">
+          <span>Budget & Pilot ✓</span>
+        </div>
+        <div class="gantt-bar inprog" style="left:45%;width:25%;" title="GOC Training, SOPs: In Progress">
+          <span>Training & SOPs</span>
+        </div>
+        <div class="gantt-milestone blocked" style="left:42%;" title="⚠️ Model Tuning - BLOCKER">⚠️</div>
+        <div class="gantt-milestone blocked" style="left:48%;" title="⚠️ SecTech Hire - SHOW STOPPER">⚠️</div>
+      </div>
+    </div>
+
+    <!-- Phase 1: APAC -->
+    <div class="gantt-row">
+      <div class="gantt-label">Phase 1: APAC</div>
+      <div class="gantt-track">
+        <div class="gantt-bar completed" style="left:0%;width:35%;" title="SF & Seattle: Live">
+          <span>SF & Seattle ✓</span>
+        </div>
+        <div class="gantt-bar inprog" style="left:45%;width:30%;" title="Hyderabad, Bangalore, Tokyo, Sydney">
+          <span>4 Sites Deploy</span>
+        </div>
+        <div class="gantt-milestone" style="left:75%;" title="Sep 30, 2026: Phase 1 Go-Live">📍</div>
+      </div>
+    </div>
+
+    <!-- Phase 2: AMER -->
+    <div class="gantt-row">
+      <div class="gantt-label">Phase 2: AMER</div>
+      <div class="gantt-track">
+        <div class="gantt-bar notstarted" style="left:50%;width:30%;" title="Chicago, Indy, NYC, Toronto, Atlanta">
+          <span>5 Sites</span>
+        </div>
+        <div class="gantt-milestone" style="left:80%;" title="Dec 31, 2026: Phase 2 Complete">📍</div>
+      </div>
+    </div>
+
+    <!-- Phase 3: EMEA -->
+    <div class="gantt-row">
+      <div class="gantt-label">Phase 3: EMEA</div>
+      <div class="gantt-track">
+        <div class="gantt-bar inprog" style="left:50%;width:15%;" title="GDPR/CCPA Approvals: In Progress">
+          <span style="font-size:0.65rem;">GDPR Prep</span>
+        </div>
+        <div class="gantt-bar notstarted" style="left:75%;width:20%;" title="Dublin, London, Paris">
+          <span>3 EU Sites</span>
+        </div>
+        <div class="gantt-milestone" style="left:95%;" title="Mar 31, 2027: Phase 3 Complete">📍</div>
+      </div>
+    </div>
+
+    <!-- Phase 4: Global -->
+    <div class="gantt-row">
+      <div class="gantt-label">Phase 4: Global</div>
+      <div class="gantt-track">
+        <div class="gantt-bar notstarted" style="left:80%;width:20%;" title="FY28 Budget & Planning">
+          <span style="font-size:0.65rem;">Planning</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Integrations -->
+    <div class="gantt-row">
+      <div class="gantt-label">Integrations</div>
+      <div class="gantt-track">
+        <div class="gantt-bar completed" style="left:0%;width:25%;" title="Lenel & Slack: Completed">
+          <span style="font-size:0.65rem;">Lenel, Slack ✓</span>
+        </div>
+        <div class="gantt-bar inprog" style="left:30%;width:45%;" title="Milestone, Agentforce, OnGuard">
+          <span>Milestone, Agentforce</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:20px;margin-top:20px;padding-top:16px;border-top:1px solid #2d3748;font-size:0.72rem;color:#a0aec0;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <div style="width:16px;height:8px;background:linear-gradient(90deg,#276749,#68d391);border-radius:2px;"></div>
+      <span>Completed</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <div style="width:16px;height:8px;background:linear-gradient(90deg,#2c5282,#63b3ed);border-radius:2px;"></div>
+      <span>In Progress</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <div style="width:16px;height:8px;background:rgba(255,255,255,0.1);border:1px solid #4a5568;border-radius:2px;"></div>
+      <span>Not Started</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:1rem;">⚠️</span>
+      <span>Blocker / At Risk</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:1rem;">📍</span>
+      <span>Milestone</span>
+    </div>
+  </div>
+
+  <style>
+    .gantt-rows { display: flex; flex-direction: column; gap: 8px; }
+    .gantt-row { display: flex; align-items: center; gap: 12px; min-height: 36px; }
+    .gantt-label {
+      width: 160px;
+      flex-shrink: 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #cbd5e0;
+      text-align: right;
+      padding-right: 12px;
+    }
+    .gantt-track {
+      flex: 1;
+      height: 32px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid #2d3748;
+      border-radius: 6px;
+      position: relative;
+      overflow: visible;
+    }
+    .gantt-bar {
+      position: absolute;
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .gantt-bar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .gantt-bar.completed {
+      background: linear-gradient(90deg, #276749, #68d391);
+      color: #fff;
+      border: 1px solid #48bb78;
+    }
+    .gantt-bar.inprog {
+      background: linear-gradient(90deg, #2c5282, #63b3ed);
+      color: #fff;
+      border: 1px solid #4299e1;
+    }
+    .gantt-bar.notstarted {
+      background: rgba(255,255,255,0.08);
+      color: #a0aec0;
+      border: 1px solid #4a5568;
+    }
+    .gantt-bar.atrisk {
+      background: linear-gradient(90deg, #c53030, #fc8181);
+      color: #fff;
+      border: 1px solid #f56565;
+      animation: pulse-risk 2s infinite;
+    }
+    @keyframes pulse-risk {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .gantt-milestone {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.1rem;
+      cursor: pointer;
+      z-index: 5;
+      transition: transform 0.2s ease;
+    }
+    .gantt-milestone:hover {
+      transform: translate(-50%, -50%) scale(1.3);
+    }
+    .gantt-milestone.blocked {
+      animation: pulse-warn 1.5s infinite;
+    }
+    @keyframes pulse-warn {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.2); }
+    }
+  </style>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ DETAILED PHASE VIEWS -->
+<div class="risk-chart-block" style="margin-bottom:28px;">
+  <div class="risk-chart-title">📊 Detailed Phase Breakdown</div>
+
+  <!-- Phase sections with collapsible details -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+
+    <!-- PRE-DEPLOYMENT PHASE -->
+    <details class="phase-detail" open>
+      <summary class="phase-summary">
+        <span class="phase-icon">🔧</span>
+        <span class="phase-name">Pre-Deployment Tasks (Q2 FY27)</span>
+        <span class="phase-status">77% Complete • 2 Blockers</span>
+        <span class="chevron">▼</span>
+      </summary>
+      <div class="phase-content">
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Budget Approval</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:10%;width:20%;" title="Apr-May 2026"><span>Apr-May ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Completed</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">SF & Seattle Pilot</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:0%;width:65%;" title="Jun 2025-Jul 2026"><span>Jun '25 - Jul '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Live</div>
+        </div>
+        <div class="gantt-detail-row atrisk-row">
+          <div class="gantt-detail-label">Model Tuning Process</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar atrisk" style="left:45%;width:15%;" title="Jun-Jul 2026"><span>Jun-Jul ⚠️</span></div>
+          </div>
+          <div class="gantt-detail-meta">🚨 BLOCKER</div>
+        </div>
+        <div class="gantt-detail-row atrisk-row">
+          <div class="gantt-detail-label">GOC Capacity Assessment</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar atrisk" style="left:45%;width:20%;" title="Jun-Jul 2026"><span>Jun-Jul 🔴</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔴 At Risk</div>
+        </div>
+        <div class="gantt-detail-row atrisk-row">
+          <div class="gantt-detail-label">Define SLA Chain</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar atrisk" style="left:45%;width:20%;" title="Jun-Jul 2026"><span>Jun-Jul 🔴</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔴 At Risk</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">GOC Training</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:47%;width:5%;" title="Jun 29, 2026"><span>Jun 29</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Develop Global SOPs</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:45%;width:25%;" title="Jun-Aug 2026"><span>Jun-Aug</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">SecOps Escalation</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:45%;width:20%;" title="Jun-Jul 2026"><span>Jun-Jul</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row atrisk-row">
+          <div class="gantt-detail-label">Hire SecTech Worker 2</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar atrisk" style="left:45%;width:20%;" title="Jun-Jul 2026"><span>Jun-Jul ⚠️</span></div>
+          </div>
+          <div class="gantt-detail-meta">🚨 SHOW STOPPER</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- PHASE 1: APAC -->
+    <details class="phase-detail" open>
+      <summary class="phase-summary">
+        <span class="phase-icon">🌏</span>
+        <span class="phase-name">Phase 1: APAC Deployment (Q2-Q3 FY27)</span>
+        <span class="phase-status">50% Complete • Target: Sep 30, 2026</span>
+        <span class="chevron">▼</span>
+      </summary>
+      <div class="phase-content">
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">San Francisco</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:0%;width:35%;" title="Nov 2025-Apr 2026"><span>Nov '25 - Apr '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Live</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Seattle/Bellevue</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:0%;width:35%;" title="Nov 2025-Apr 2026"><span>Nov '25 - Apr '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Live</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Hyderabad</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:52%;width:25%;" title="Jul-Sep 2026"><span>Jul-Sep '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Hyderabad DPIA</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:45%;width:27%;" title="Jun-Aug 2026"><span>Jun-Aug '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Bangalore</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:52%;width:25%;" title="Jul-Sep 2026"><span>Jul-Sep '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Tokyo</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:52%;width:25%;" title="Jul-Sep 2026"><span>Jul-Sep '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Sydney</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:52%;width:25%;" title="Jul-Sep 2026"><span>Jul-Sep '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">AWS Infrastructure (AMER)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:45%;width:27%;" title="Jun-Aug 2026"><span>Jun-Aug '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Open Network Bridge VM</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:45%;width:20%;" title="Jun-Jul 2026"><span>Jun-Jul '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Lenel License (AMER East)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:52%;width:10%;" title="Jul 2026"><span>Jul '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Agentforce Go-Live</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:52%;width:30%;" title="Jul-Sep 2026"><span>Jul-Sep '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row atrisk-row">
+          <div class="gantt-detail-label">Validate Auto-Close Threshold</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar atrisk" style="left:65%;width:20%;" title="Aug-Sep 2026"><span>Aug-Sep 🔴</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔴 At Risk</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- PHASE 2: AMER -->
+    <details class="phase-detail">
+      <summary class="phase-summary">
+        <span class="phase-icon">🇺🇸</span>
+        <span class="phase-name">Phase 2: AMER Deployment (Q3-Q4 FY27)</span>
+        <span class="phase-status">0% Complete • Target: Dec 31, 2026</span>
+        <span class="chevron">▼</span>
+      </summary>
+      <div class="phase-content">
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Chicago</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:50%;width:30%;" title="Oct-Dec 2026"><span>Oct-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Indianapolis</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:50%;width:30%;" title="Oct-Dec 2026"><span>Oct-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">New York</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:50%;width:30%;" title="Oct-Dec 2026"><span>Oct-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Toronto (+ CCPA)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:50%;width:30%;" title="Oct-Dec 2026"><span>Oct-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Atlanta</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:50%;width:30%;" title="Oct-Dec 2026"><span>Oct-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">AWS Infrastructure (East)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:47%;width:15%;" title="Sep-Oct 2026"><span>Sep-Oct '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Change Mgmt Execution</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:47%;width:35%;" title="Sep-Dec 2026"><span>Sep-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Training 100% Personnel</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:47%;width:35%;" title="Sep-Dec 2026"><span>Sep-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- PHASE 3: EMEA -->
+    <details class="phase-detail">
+      <summary class="phase-summary">
+        <span class="phase-icon">🇪🇺</span>
+        <span class="phase-name">Phase 3: EMEA Deployment (Q4 FY27 - Q1 FY28)</span>
+        <span class="phase-status">43% Complete • Target: Mar 31, 2027</span>
+        <span class="chevron">▼</span>
+      </summary>
+      <div class="phase-content">
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Dublin (+ GDPR)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:75%;width:20%;" title="Jan-Mar 2027"><span>Jan-Mar '27</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">London (+ GDPR)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:75%;width:20%;" title="Jan-Mar 2027"><span>Jan-Mar '27</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Paris (+ GDPR)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:75%;width:20%;" title="Jan-Mar 2027"><span>Jan-Mar '27</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Bangalore Tower</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:75%;width:20%;" title="Jan-Mar 2027"><span>Jan-Mar '27</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">GDPR Sign-Off (EU)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:50%;width:30%;" title="Oct-Dec 2026"><span>Oct-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">CCPA Sign-Off (Toronto)</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:50%;width:30%;" title="Oct-Dec 2026"><span>Oct-Dec '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row atrisk-row">
+          <div class="gantt-detail-label">InfoSec/Privacy Approvals</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar atrisk" style="left:50%;width:35%;" title="Oct 2026-Jan 2027"><span>Oct '26 - Jan '27 🔴</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔴 At Risk</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- INTEGRATIONS -->
+    <details class="phase-detail">
+      <summary class="phase-summary">
+        <span class="phase-icon">🔌</span>
+        <span class="phase-name">System Integrations (Nov 2025 - Sep 2026)</span>
+        <span class="phase-status">50% Complete</span>
+        <span class="chevron">▼</span>
+      </summary>
+      <div class="phase-content">
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Lenel OnGuard</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:0%;width:35%;" title="Nov 2025-Mar 2026"><span>Nov '25 - Mar '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Completed</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Milestone VMS</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:30%;width:45%;" title="Apr-Aug 2026"><span>Apr-Aug '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Service Cloud</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:7%;width:33%;" title="Dec 2025-Apr 2026"><span>Dec '25 - Apr '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Completed</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Agentforce</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:37%;width:45%;" title="May-Sep 2026"><span>May-Sep '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Slack Integration</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:0%;width:33%;" title="Jan-Apr 2026"><span>Jan-Apr '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Completed</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">ADA Door Systems</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:45%;width:10%;" title="TBD"><span>TBD</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ TBD</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Logical Device Structure Fix</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:45%;width:27%;" title="Jun-Aug 2026"><span>Jun-Aug '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">OnGuard Connectivity Validation</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar inprog" style="left:45%;width:27%;" title="Jun-Aug 2026"><span>Jun-Aug '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">🔵 In Progress</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- VIOLATION WORKFLOWS -->
+    <details class="phase-detail">
+      <summary class="phase-summary">
+        <span class="phase-icon">⚡</span>
+        <span class="phase-name">Violation Workflow Development (Feb-Nov 2026)</span>
+        <span class="phase-status">33% Complete</span>
+        <span class="chevron">▼</span>
+      </summary>
+      <div class="phase-content">
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Tailgating/Piggybacking</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:17%;width:20%;" title="Feb-Apr 2026"><span>Feb-Apr '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Completed</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Weapons Detection</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:17%;width:20%;" title="Feb-Apr 2026"><span>Feb-Apr '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Completed</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Doors Forced/Propped Open</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar completed" style="left:20%;width:23%;" title="Mar-May 2026"><span>Mar-May '26 ✓</span></div>
+          </div>
+          <div class="gantt-detail-meta">✅ Completed</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Unauthorized Access</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:52%;width:25%;" title="Jul-Sep 2026"><span>Jul-Sep '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Medical Emergency</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:52%;width:25%;" title="Jul-Sep 2026"><span>Jul-Sep '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">After-Hours Anomalies</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:62%;width:27%;" title="Aug-Oct 2026"><span>Aug-Oct '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Loitering Detection</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:62%;width:27%;" title="Aug-Oct 2026"><span>Aug-Oct '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Object Left/Removed</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:70%;width:30%;" title="Sep-Nov 2026"><span>Sep-Nov '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+        <div class="gantt-detail-row">
+          <div class="gantt-detail-label">Crowd Detection</div>
+          <div class="gantt-detail-track">
+            <div class="gantt-bar notstarted" style="left:70%;width:30%;" title="Sep-Nov 2026"><span>Sep-Nov '26</span></div>
+          </div>
+          <div class="gantt-detail-meta">⚪ Not Started</div>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <style>
+    .phase-detail { background: rgba(255,255,255,0.02); border: 1px solid #2d3748; border-radius: 8px; overflow: hidden; }
+    .phase-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+      transition: background 0.15s;
+      background: rgba(255,255,255,0.04);
+    }
+    .phase-summary::-webkit-details-marker { display: none; }
+    .phase-summary:hover { background: rgba(255,255,255,0.07); }
+    .phase-icon { font-size: 1.1rem; }
+    .phase-name { font-size: 0.8rem; font-weight: 700; color: #cbd5e0; flex: 1; }
+    .phase-status { font-size: 0.73rem; color: #718096; }
+    .phase-content { padding: 16px; background: rgba(0,0,0,0.15); }
+
+    .gantt-detail-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 32px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(45,55,72,0.3);
+    }
+    .gantt-detail-row:last-child { border-bottom: none; }
+    .gantt-detail-row.atrisk-row { background: rgba(252,129,129,0.05); border-left: 2px solid #fc8181; padding-left: 8px; }
+
+    .gantt-detail-label {
+      width: 180px;
+      flex-shrink: 0;
+      font-size: 0.73rem;
+      color: #cbd5e0;
+      padding-right: 8px;
+    }
+    .gantt-detail-track {
+      flex: 1;
+      height: 24px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid #2d3748;
+      border-radius: 4px;
+      position: relative;
+    }
+    .gantt-detail-meta {
+      width: 110px;
+      flex-shrink: 0;
+      font-size: 0.68rem;
+      color: #718096;
+      text-align: right;
+    }
+  </style>
 </div>
 
 <!-- ══════════════════════════════════════════════════════ STATS -->

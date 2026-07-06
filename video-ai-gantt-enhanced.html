@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – Enhanced Gantt Chart</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f7fafc;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .header h1 span {
+      color: #63b3ed;
+      background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Filter Controls */
+    .controls {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .controls-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #cbd5e0;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .filter-btn, .expand-btn {
+      background: #2d3748;
+      color: #cbd5e0;
+      border: 2px solid #4a5568;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .filter-btn:hover, .expand-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .filter-btn.active {
+      border-color: #63b3ed;
+      background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+      color: white;
+      box-shadow: 0 0 12px rgba(99, 179, 237, 0.4);
+    }
+
+    .filter-btn.completed.active {
+      border-color: #68d391;
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      box-shadow: 0 0 12px rgba(104, 211, 145, 0.4);
+    }
+
+    .filter-btn.in-progress.active {
+      border-color: #ecc94b;
+      background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+      box-shadow: 0 0 12px rgba(236, 201, 75, 0.4);
+    }
+
+    .filter-btn.at-risk.active {
+      border-color: #fc8181;
+      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+      box-shadow: 0 0 12px rgba(252, 129, 129, 0.4);
+    }
+
+    .filter-btn.blocked.active {
+      border-color: #f6ad55;
+      background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+      box-shadow: 0 0 12px rgba(246, 173, 85, 0.4);
+    }
+
+    .expand-btn {
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    }
+
+    /* Phase Section */
+    .phase-section {
+      background: linear-gradient(135deg, #1a1f2e 0%, #161b26 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .phase-section:nth-child(2) { animation-delay: 0.1s; }
+    .phase-section:nth-child(3) { animation-delay: 0.2s; }
+
+    .phase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      margin: -24px -24px 20px -24px;
+      border-bottom: 2px solid #2d3748;
+      cursor: pointer;
+      user-select: none;
+      background: linear-gradient(135deg, rgba(99, 179, 237, 0.1) 0%, rgba(66, 153, 225, 0.05) 100%);
+      border-radius: 12px 12px 0 0;
+      transition: all 0.3s ease;
+    }
+
+    .phase-header:hover {
+      background: linear-gradient(135deg, rgba(99, 179, 237, 0.15) 0%, rgba(66, 153, 225, 0.08) 100%);
+    }
+
+    .phase-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #63b3ed;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .phase-toggle {
+      font-size: 1.2rem;
+      color: #718096;
+      transition: transform 0.3s ease;
+    }
+
+    .phase-section.collapsed .phase-toggle {
+      transform: rotate(-90deg);
+    }
+
+    .phase-stats {
+      font-size: 0.875rem;
+      color: #a0aec0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .phase-completion {
+      background: #2d3748;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      color: #68d391;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .phase-content {
+      max-height: 5000px;
+      overflow: hidden;
+      transition: max-height 0.5s ease, opacity 0.3s ease;
+    }
+
+    .phase-section.collapsed .phase-content {
+      max-height: 0;
+      opacity: 0;
+    }
+
+    /* Timeline */
+    .timeline {
+      background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .timeline-header {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      color: #718096;
+      white-space: pre;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    /* Today Marker */
+    .today-marker {
+      position: absolute;
+      top: 40px;
+      bottom: 16px;
+      width: 2px;
+      background: linear-gradient(180deg, #fc8181 0%, #e53e3e 100%);
+      z-index: 10;
+      box-shadow: 0 0 8px rgba(252, 129, 129, 0.6);
+    }
+
+    .today-marker::before {
+      content: 'TODAY';
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #e53e3e;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Task Row */
+    .task-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #1a1f2e;
+      transition: all 0.3s ease;
+      opacity: 1;
+    }
+
+    .task-row.filtered-out {
+      display: none;
+    }
+
+    .task-row:hover {
+      background: rgba(99, 179, 237, 0.08);
+      transform: translateX(4px);
+    }
+
+    .task-label {
+      width: 300px;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+      padding-right: 12px;
+    }
+
+    .task-id {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+      color: #63b3ed;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      border: 1px solid #3182ce;
+    }
+
+    .status-icon {
+      font-size: 0.9rem;
+    }
+
+    .task-name {
+      color: #cbd5e0;
+      font-size: 0.75rem;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* Task Timeline & Bars */
+    .task-timeline {
+      flex: 1;
+      height: 28px;
+      position: relative;
+      background: #0d1117;
+      border-radius: 4px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .task-bar {
+      position: absolute;
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .task-bar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      z-index: 5;
+    }
+
+    /* Completed - Green gradient with checkmark */
+    .bar-completed {
+      background: linear-gradient(135deg, #38a169 0%, #2f855a 50%, #276749 100%);
+      color: white;
+      border: 1px solid #68d391;
+    }
+
+    /* In Progress - Gold gradient with shimmer animation */
+    .bar-in-progress {
+      background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+      color: #1a1208;
+      border: 1px solid #ecc94b;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bar-in-progress::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    /* Not Started - Gray gradient */
+    .bar-not-started {
+      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+      color: #cbd5e0;
+      border: 1px solid #718096;
+      opacity: 0.8;
+    }
+
+    /* At Risk - Red gradient with pulse animation */
+    .bar-at-risk {
+      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+      color: white;
+      border: 1px solid #fc8181;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Blocked - Orange diagonal stripes with sliding animation */
+    .bar-blocked {
+      background: repeating-linear-gradient(
+        45deg,
+        #ed8936,
+        #ed8936 12px,
+        #c05621 12px,
+        #c05621 24px
+      );
+      color: #1a0e00;
+      border: 1px solid #f6ad55;
+      background-size: 200% 200%;
+      animation: slideStripes 3s linear infinite;
+    }
+
+    @keyframes slideStripes {
+      0% { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
+    }
+
+    .task-dates {
+      width: 200px;
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      color: #718096;
+      padding-left: 12px;
+      text-align: right;
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: fixed;
+      background: linear-gradient(135deg, #1a1f2e 0%, #0f1419 100%);
+      border: 2px solid #3182ce;
+      border-radius: 8px;
+      padding: 12px;
+      color: #e2e8f0;
+      font-size: 0.8rem;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+      max-width: 300px;
+    }
+
+    .tooltip.visible {
+      opacity: 1;
+    }
+
+    .tooltip-title {
+      font-weight: 700;
+      color: #63b3ed;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+
+    .tooltip-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 4px 0;
+      padding: 2px 0;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    .tooltip-row:last-child {
+      border-bottom: none;
+    }
+
+    .tooltip-label {
+      color: #a0aec0;
+      font-weight: 600;
+    }
+
+    .tooltip-value {
+      color: #e2e8f0;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #1a1f2e 0%, #161b26 100%);
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .stat-num {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+
+    .legend-box {
+      width: 32px;
+      height: 18px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Buttons */
+    .print-button {
+      background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .print-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Navigation */
+    .nav-links {
+      padding: 16px;
+      background: linear-gradient(135deg, #1a1f2e 0%, #161b26 100%);
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      margin-top: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-links a {
+      color: #63b3ed;
+      text-decoration: none;
+      margin-right: 20px;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: #90cdf4;
+      text-decoration: underline;
+    }
+
+    @media print {
+      body { background: white; color: black; }
+      .controls, .nav-links, .print-button, .tooltip { display: none; }
+      .phase-section.collapsed .phase-content { max-height: none; opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Video AI – <span>Enhanced Gantt Chart</span></h1>
+    <div style="font-size: 0.875rem; color: #718096; margin-top: 8px;">
+      Cobalt Video Analytics · Tier 1 Global Office Rollout · Interactive Timeline View
+    </div>
+    <div style="margin-top: 16px;">
+      <button class="print-button" onclick="window.print()">🖨️ Print / PDF</button>
+      <button class="print-button" onclick="window.location.href='video-ai-gantt.html'">🔄 Sync Version</button>
+      <button class="print-button" onclick="window.location.href='video-ai-dashboard.html'">📊 Main Dashboard</button>
+      <button class="print-button" onclick="window.location.href='video-ai-tasks.html'">📋 Task Details</button>
+    </div>
+  </div>
+
+  <!-- Filter Controls -->
+  <div class="controls">
+    <span class="controls-label">Filter by Status:</span>
+    <div class="button-group">
+      <button class="filter-btn active" data-filter="all">All Tasks</button>
+      <button class="filter-btn completed" data-filter="completed">✓ Completed</button>
+      <button class="filter-btn in-progress" data-filter="in-progress">⚡ In Progress</button>
+      <button class="filter-btn" data-filter="not-started">○ Not Started</button>
+      <button class="filter-btn at-risk" data-filter="at-risk">🔴 At Risk</button>
+      <button class="filter-btn blocked" data-filter="blocked">⚠️ Blocked</button>
+    </div>
+    <span class="controls-label">Phase Controls:</span>
+    <div class="button-group">
+      <button class="expand-btn" onclick="expandAll()">📂 Expand All</button>
+      <button class="expand-btn" onclick="collapseAll()">📁 Collapse All</button>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num" style="color: #63b3ed;">69</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #68d391;">12</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #ecc94b;">18</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #4a5568;">31</div>
+      <div class="stat-label">Not Started</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #fc8181;">7</div>
+      <div class="stat-label">At Risk</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color: #f6ad55;">1</div>
+      <div class="stat-label">Blocked</div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-box bar-completed"></div>
+      <span>✓ Completed</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box bar-in-progress"></div>
+      <span>⚡ In Progress</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box bar-not-started"></div>
+      <span>○ Not Started</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box bar-at-risk"></div>
+      <span>🔴 At Risk</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-box bar-blocked"></div>
+      <span>⚠️ Blocked</span>
+    </div>
+  </div>
+
+  <!-- Pre-Deployment Tasks -->
+  <div class="phase-section" data-phase="pre-deployment">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <span class="phase-toggle">▼</span>
+        📋 Pre-Deployment Tasks
+      </div>
+      <div class="phase-stats">
+        <span>9 tasks | Jun 2026 - Aug 2026</span>
+        <span class="phase-completion">33% Complete</span>
+      </div>
+    </div>
+    <div class="phase-content">
+      <div class="timeline">
+        <div class="timeline-header">Timeline: April 2026 ─────────────────────────────────────────────────────────────── August 2026</div>
+        <div class="today-marker" style="left: 58%;"></div>
+
+        <div class="task-row" data-status="completed">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">✓</span>
+              PRE-01
+            </div>
+            <div class="task-name">Budget Approval ($400K)</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-completed" style="left: 0%; width: 15%;"
+                 data-task="PRE-01"
+                 data-name="Budget Approval ($400K)"
+                 data-status="Completed"
+                 data-start="2026-04-01"
+                 data-end="2026-05-15"
+                 data-duration="45 days">
+              Apr-May 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-04-01 → 2026-05-15</div>
+        </div>
+
+        <div class="task-row" data-status="in-progress">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">⚡</span>
+              PRE-02
+            </div>
+            <div class="task-name">SF Tower & Seattle Pilot</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-in-progress" style="left: 0%; width: 85%;"
+                 data-task="PRE-02"
+                 data-name="SF Tower & Seattle Pilot"
+                 data-status="In Progress"
+                 data-start="2025-06-15"
+                 data-end="2026-07-03"
+                 data-duration="384 days">
+              Jun 2025 - Jul 2026
+            </div>
+          </div>
+          <div class="task-dates">2025-06-15 → 2026-07-03</div>
+        </div>
+
+        <div class="task-row" data-status="not-started">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">○</span>
+              PRE-03
+            </div>
+            <div class="task-name">Model Tuning Process BLOCKER</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-not-started" style="left: 50%; width: 15%;"
+                 data-task="PRE-03"
+                 data-name="Model Tuning Process"
+                 data-status="Not Started"
+                 data-start="2026-06-01"
+                 data-end="2026-07-15"
+                 data-duration="45 days"
+                 data-notes="BLOCKER - Dependency for multiple downstream tasks">
+              Jun-Jul 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-01 → 2026-07-15</div>
+        </div>
+
+        <div class="task-row" data-status="at-risk">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">🔴</span>
+              PRE-04
+            </div>
+            <div class="task-name">GOC Capacity Assessment</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-at-risk" style="left: 50%; width: 20%;"
+                 data-task="PRE-04"
+                 data-name="GOC Capacity Assessment"
+                 data-status="At Risk"
+                 data-start="2026-06-01"
+                 data-end="2026-07-31"
+                 data-duration="61 days"
+                 data-notes="Resource allocation concerns">
+              Jun-Jul 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-01 → 2026-07-31</div>
+        </div>
+
+        <div class="task-row" data-status="at-risk">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">🔴</span>
+              PRE-05
+            </div>
+            <div class="task-name">Define SLA Chain</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-at-risk" style="left: 50%; width: 15%;"
+                 data-task="PRE-05"
+                 data-name="Define SLA Chain"
+                 data-status="At Risk"
+                 data-start="2026-06-01"
+                 data-end="2026-07-15"
+                 data-duration="45 days"
+                 data-notes="Stakeholder alignment needed">
+              Jun-Jul 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-01 → 2026-07-15</div>
+        </div>
+
+        <div class="task-row" data-status="in-progress">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">⚡</span>
+              PRE-06
+            </div>
+            <div class="task-name">GOC Training (1hr)</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-in-progress" style="left: 58%; width: 1%;"
+                 data-task="PRE-06"
+                 data-name="GOC Training (1hr)"
+                 data-status="In Progress"
+                 data-start="2026-06-29"
+                 data-end="2026-06-29"
+                 data-duration="1 day"
+                 data-notes="Training session scheduled for today">
+              Jun 29
+            </div>
+          </div>
+          <div class="task-dates">2026-06-29 → 2026-06-29</div>
+        </div>
+
+        <div class="task-row" data-status="not-started">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">○</span>
+              PRE-07
+            </div>
+            <div class="task-name">Develop Global SOPs</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-not-started" style="left: 50%; width: 40%;"
+                 data-task="PRE-07"
+                 data-name="Develop Global SOPs"
+                 data-status="Not Started"
+                 data-start="2026-06-15"
+                 data-end="2026-08-31"
+                 data-duration="78 days">
+              Jun-Aug 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-15 → 2026-08-31</div>
+        </div>
+
+        <div class="task-row" data-status="not-started">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">○</span>
+              PRE-08
+            </div>
+            <div class="task-name">SecOps Escalation Process</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-not-started" style="left: 50%; width: 20%;"
+                 data-task="PRE-08"
+                 data-name="SecOps Escalation Process"
+                 data-status="Not Started"
+                 data-start="2026-06-15"
+                 data-end="2026-07-31"
+                 data-duration="47 days">
+              Jun-Jul 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-15 → 2026-07-31</div>
+        </div>
+
+        <div class="task-row" data-status="at-risk">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">🔴</span>
+              PRE-09
+            </div>
+            <div class="task-name">Hire SecTech Worker 2</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-at-risk" style="left: 50%; width: 20%;"
+                 data-task="PRE-09"
+                 data-name="Hire SecTech Worker 2"
+                 data-status="At Risk"
+                 data-start="2026-06-01"
+                 data-end="2026-07-31"
+                 data-duration="61 days"
+                 data-notes="Critical hire - recruiting delays">
+              Jun-Jul 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-01 → 2026-07-31</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 1: APAC Deployment -->
+  <div class="phase-section" data-phase="phase-1">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <span class="phase-toggle">▼</span>
+        🌏 Phase 1: APAC Deployment (Q2 FY27)
+      </div>
+      <div class="phase-stats">
+        <span>12 tasks | Nov 2025 - Sep 2026</span>
+        <span class="phase-completion">17% Complete</span>
+      </div>
+    </div>
+    <div class="phase-content">
+      <div class="timeline">
+        <div class="timeline-header">Timeline: November 2025 ────────────────────────────────────────────────────── September 2026</div>
+        <div class="today-marker" style="left: 73%;"></div>
+
+        <div class="task-row" data-status="completed">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">✓</span>
+              P1-01
+            </div>
+            <div class="task-name">San Francisco Deployment</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-completed" style="left: 0%; width: 40%;"
+                 data-task="P1-01"
+                 data-name="San Francisco Deployment"
+                 data-status="Completed"
+                 data-start="2025-11-01"
+                 data-end="2026-04-30"
+                 data-duration="181 days"
+                 data-notes="Live - Pilot site operational">
+              Nov 2025 - Apr 2026 ✓ Live
+            </div>
+          </div>
+          <div class="task-dates">2025-11-01 → 2026-04-30</div>
+        </div>
+
+        <div class="task-row" data-status="completed">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">✓</span>
+              P1-02
+            </div>
+            <div class="task-name">Seattle/Bellevue Deployment</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-completed" style="left: 0%; width: 40%;"
+                 data-task="P1-02"
+                 data-name="Seattle/Bellevue Deployment"
+                 data-status="Completed"
+                 data-start="2025-11-01"
+                 data-end="2026-04-30"
+                 data-duration="181 days"
+                 data-notes="Live - Pilot site operational">
+              Nov 2025 - Apr 2026 ✓ Live
+            </div>
+          </div>
+          <div class="task-dates">2025-11-01 → 2026-04-30</div>
+        </div>
+
+        <div class="task-row" data-status="in-progress">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">⚡</span>
+              P1-03
+            </div>
+            <div class="task-name">Hyderabad Re-Deployment</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-in-progress" style="left: 55%; width: 45%;"
+                 data-task="P1-03"
+                 data-name="Hyderabad Re-Deployment"
+                 data-status="In Progress"
+                 data-start="2026-07-01"
+                 data-end="2026-12-31"
+                 data-duration="184 days"
+                 data-notes="Upgraded deployment following DPIA approval">
+              Jul-Dec 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-07-01 → 2026-12-31</div>
+        </div>
+
+        <div class="task-row" data-status="in-progress">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">⚡</span>
+              P1-04
+            </div>
+            <div class="task-name">Hyderabad DPIA Approval</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-in-progress" style="left: 52%; width: 15%;"
+                 data-task="P1-04"
+                 data-name="Hyderabad DPIA Approval"
+                 data-status="In Progress"
+                 data-start="2026-06-26"
+                 data-end="2026-08-15"
+                 data-duration="51 days"
+                 data-notes="Data Privacy Impact Assessment in review">
+              Jun-Aug 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-26 → 2026-08-15</div>
+        </div>
+
+        <div class="task-row" data-status="not-started">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">○</span>
+              P1-05
+            </div>
+            <div class="task-name">Bangalore Deployment</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-not-started" style="left: 60%; width: 25%;"
+                 data-task="P1-05"
+                 data-name="Bangalore Deployment"
+                 data-status="Not Started"
+                 data-start="2026-07-01"
+                 data-end="2026-09-30"
+                 data-duration="92 days">
+              Jul-Sep 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-07-01 → 2026-09-30</div>
+        </div>
+
+        <div class="task-row" data-status="not-started">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">○</span>
+              P1-06
+            </div>
+            <div class="task-name">Tokyo Deployment</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-not-started" style="left: 60%; width: 25%;"
+                 data-task="P1-06"
+                 data-name="Tokyo Deployment"
+                 data-status="Not Started"
+                 data-start="2026-07-01"
+                 data-end="2026-09-30"
+                 data-duration="92 days">
+              Jul-Sep 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-07-01 → 2026-09-30</div>
+        </div>
+
+        <div class="task-row" data-status="not-started">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">○</span>
+              P1-07
+            </div>
+            <div class="task-name">Sydney Deployment</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-not-started" style="left: 60%; width: 25%;"
+                 data-task="P1-07"
+                 data-name="Sydney Deployment"
+                 data-status="Not Started"
+                 data-start="2026-07-01"
+                 data-end="2026-09-30"
+                 data-duration="92 days">
+              Jul-Sep 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-07-01 → 2026-09-30</div>
+        </div>
+
+        <div class="task-row" data-status="in-progress">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">⚡</span>
+              P1-08
+            </div>
+            <div class="task-name">AWS Infrastructure (580 cams)</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-in-progress" style="left: 55%; width: 22%;"
+                 data-task="P1-08"
+                 data-name="AWS Infrastructure (580 cams)"
+                 data-status="In Progress"
+                 data-start="2026-06-15"
+                 data-end="2026-08-31"
+                 data-duration="78 days"
+                 data-notes="Cloud infrastructure provisioning for 580 cameras">
+              Jun-Aug 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-15 → 2026-08-31</div>
+        </div>
+
+        <div class="task-row" data-status="in-progress">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">⚡</span>
+              P1-09
+            </div>
+            <div class="task-name">Open Network Bridge VM</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-in-progress" style="left: 55%; width: 12%;"
+                 data-task="P1-09"
+                 data-name="Open Network Bridge VM"
+                 data-status="In Progress"
+                 data-start="2026-06-15"
+                 data-end="2026-07-31"
+                 data-duration="47 days"
+                 data-notes="Network bridge configuration for secure connectivity">
+              Jun-Jul 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-06-15 → 2026-07-31</div>
+        </div>
+
+        <div class="task-row" data-status="not-started">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">○</span>
+              P1-10
+            </div>
+            <div class="task-name">Lenel License (AMER East)</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-not-started" style="left: 62%; width: 8%;"
+                 data-task="P1-10"
+                 data-name="Lenel License (AMER East)"
+                 data-status="Not Started"
+                 data-start="2026-07-01"
+                 data-end="2026-07-31"
+                 data-duration="31 days"
+                 data-notes="Physical access control system licensing">
+              Jul 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-07-01 → 2026-07-31</div>
+        </div>
+
+        <div class="task-row" data-status="in-progress">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">⚡</span>
+              P1-11
+            </div>
+            <div class="task-name">Agentforce Go-Live</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-in-progress" style="left: 65%; width: 20%;"
+                 data-task="P1-11"
+                 data-name="Agentforce Go-Live"
+                 data-status="In Progress"
+                 data-start="2026-07-15"
+                 data-end="2026-09-30"
+                 data-duration="78 days"
+                 data-notes="AI automation platform integration and launch">
+              Jul-Sep 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-07-15 → 2026-09-30</div>
+        </div>
+
+        <div class="task-row" data-status="at-risk">
+          <div class="task-label">
+            <div class="task-id">
+              <span class="status-icon">🔴</span>
+              P1-12
+            </div>
+            <div class="task-name">Auto-Close Threshold</div>
+          </div>
+          <div class="task-timeline">
+            <div class="task-bar bar-at-risk" style="left: 72%; width: 13%;"
+                 data-task="P1-12"
+                 data-name="Auto-Close Threshold"
+                 data-status="At Risk"
+                 data-start="2026-08-01"
+                 data-end="2026-09-15"
+                 data-duration="46 days"
+                 data-notes="Automated case closure threshold configuration - needs validation">
+              Aug-Sep 2026
+            </div>
+          </div>
+          <div class="task-dates">2026-08-01 → 2026-09-15</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; padding: 24px; color: #718096; font-size: 0.8rem; margin-top: 40px;">
+    <strong>Note:</strong> This enhanced view shows Pre-Deployment and Phase 1. Additional phases can be added following the same pattern.<br>
+    <strong>Video AI Project Gantt Chart</strong> | Last Updated: June 29, 2026 | Generated by Wes White (PMP)
+  </div>
+
+  <!-- Tooltip Container -->
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    // Filter functionality
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const taskRows = document.querySelectorAll('.task-row');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const filter = this.getAttribute('data-filter');
+
+        // Update active button
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+
+        // Filter tasks
+        taskRows.forEach(row => {
+          const status = row.getAttribute('data-status');
+          if (filter === 'all' || status === filter) {
+            row.classList.remove('filtered-out');
+          } else {
+            row.classList.add('filtered-out');
+          }
+        });
+      });
+    });
+
+    // Phase toggle functionality
+    function togglePhase(header) {
+      const section = header.parentElement;
+      section.classList.toggle('collapsed');
+    }
+
+    // Expand/Collapse all functionality
+    function expandAll() {
+      document.querySelectorAll('.phase-section').forEach(section => {
+        section.classList.remove('collapsed');
+      });
+    }
+
+    function collapseAll() {
+      document.querySelectorAll('.phase-section').forEach(section => {
+        section.classList.add('collapsed');
+      });
+    }
+
+    // Tooltip functionality - SECURITY: Using only DOM methods createElement/textContent
+    const tooltip = document.getElementById('tooltip');
+    const taskBars = document.querySelectorAll('.task-bar');
+
+    taskBars.forEach(bar => {
+      bar.addEventListener('mouseenter', function(e) {
+        // Clear previous content safely
+        while (tooltip.firstChild) {
+          tooltip.removeChild(tooltip.firstChild);
+        }
+
+        // Create title element
+        const title = document.createElement('div');
+        title.className = 'tooltip-title';
+        title.textContent = this.getAttribute('data-name');
+        tooltip.appendChild(title);
+
+        // Helper function to create a row
+        function createRow(label, value) {
+          const row = document.createElement('div');
+          row.className = 'tooltip-row';
+
+          const labelSpan = document.createElement('span');
+          labelSpan.className = 'tooltip-label';
+          labelSpan.textContent = label;
+
+          const valueSpan = document.createElement('span');
+          valueSpan.className = 'tooltip-value';
+          valueSpan.textContent = value;
+
+          row.appendChild(labelSpan);
+          row.appendChild(valueSpan);
+          return row;
+        }
+
+        // Add rows
+        tooltip.appendChild(createRow('Task ID:', this.getAttribute('data-task')));
+        tooltip.appendChild(createRow('Status:', this.getAttribute('data-status')));
+        tooltip.appendChild(createRow('Start Date:', this.getAttribute('data-start')));
+        tooltip.appendChild(createRow('End Date:', this.getAttribute('data-end')));
+        tooltip.appendChild(createRow('Duration:', this.getAttribute('data-duration')));
+
+        // Add notes if they exist
+        const notes = this.getAttribute('data-notes');
+        if (notes) {
+          const notesDiv = document.createElement('div');
+          notesDiv.style.marginTop = '8px';
+          notesDiv.style.paddingTop = '8px';
+          notesDiv.style.borderTop = '1px solid #2d3748';
+          notesDiv.style.fontStyle = 'italic';
+          notesDiv.style.color = '#a0aec0';
+          notesDiv.textContent = notes;
+          tooltip.appendChild(notesDiv);
+        }
+
+        // Show tooltip
+        tooltip.classList.add('visible');
+      });
+
+      bar.addEventListener('mousemove', function(e) {
+        tooltip.style.left = (e.pageX + 15) + 'px';
+        tooltip.style.top = (e.pageY + 15) + 'px';
+      });
+
+      bar.addEventListener('mouseleave', function() {
+        tooltip.classList.remove('visible');
+      });
+    });
+  </script>
+
+</body>
+</html>

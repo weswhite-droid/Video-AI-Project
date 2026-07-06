@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video AI – Gantt Chart & Timeline</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Courier New', monospace;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #1e2538 100%);
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f7fafc;
+    }
+
+    .header h1 span { color: #63b3ed; }
+
+    .sync-controls {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .sync-button {
+      background: #3182ce;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .sync-button:hover { background: #2c5aa0; }
+
+    .sync-status {
+      display: inline-block;
+      margin-left: 10px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+
+    .sync-status.success { background: rgba(104,211,145,0.15); color: #68d391; }
+    .sync-status.error { background: rgba(252,129,129,0.15); color: #fc8181; }
+
+    .instructions {
+      background: rgba(99,179,237,0.1);
+      border: 1px solid rgba(99,179,237,0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    .gantt-container {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .gantt-section {
+      margin-bottom: 32px;
+    }
+
+    .gantt-section h2 {
+      font-size: 1.1rem;
+      color: #63b3ed;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    .gantt-chart {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      color: #cbd5e0;
+    }
+
+    .legend {
+      background: rgba(99,179,237,0.1);
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.8rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .stat-card .num {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+    }
+
+    .stat-card.red .num { color: #fc8181; }
+    .stat-card.green .num { color: #68d391; }
+    .stat-card.blue .num { color: #63b3ed; }
+    .stat-card.orange .num { color: #f6ad55; }
+
+    .critical-items {
+      background: rgba(252,129,129,0.1);
+      border: 1px solid rgba(252,129,129,0.3);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .critical-items h3 {
+      color: #fc8181;
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    .critical-items ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .critical-items li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(252,129,129,0.2);
+    }
+
+    .critical-items li:last-child { border-bottom: none; }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      background: #1a1f2e;
+      color: #e2e8f0;
+      border: 1px solid #2d3748;
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      margin-top: 12px;
+    }
+
+    .nav-links {
+      margin-top: 24px;
+      padding: 16px;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+    }
+
+    .nav-links a {
+      color: #63b3ed;
+      text-decoration: none;
+      margin-right: 20px;
+      font-size: 0.875rem;
+    }
+
+    .nav-links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Video AI – <span>Gantt Chart & Timeline</span></h1>
+    <div style="font-size: 0.875rem; color: #718096; margin-top: 8px;">
+      Cobalt Video Analytics · Tier 1 Global Office Rollout
+    </div>
+  </div>
+
+  <div class="sync-controls">
+    <h3 style="margin-bottom: 12px; color: #e2e8f0;">🔄 Sync from Slack Canvas</h3>
+    <button class="sync-button" onclick="showSyncInstructions()">📋 Sync from Canvas</button>
+    <button class="sync-button" onclick="downloadGanttChart()">💾 Save to File</button>
+    <span id="syncStatus" class="sync-status" style="display: none;"></span>
+
+    <div class="instructions" id="syncInstructions" style="display: none;">
+      <strong>How to Sync from Slack Canvas:</strong>
+      <ol style="margin: 12px 0; padding-left: 20px;">
+        <li>Go to Slack Canvas: Project Plan & Milestones (Channel: #proj-gss-video-ai-working-group)</li>
+        <li>Copy the entire "Tasks and Milestones" table from the canvas</li>
+        <li>Paste the table data into the textarea below</li>
+        <li>Click "Apply & Generate Gantt Chart"</li>
+      </ol>
+      <textarea id="canvasData" placeholder="Paste your Slack Canvas table data here...
+
+Example format:
+|Task ID|Task/Milestone|Start Date|End Date|Status|Owner|Notes|
+|PRE-01|Secure FY27 Budget|2026-04-01|2026-05-15|🟢 Completed|Jeff Toler|Budget approved|
+..."></textarea>
+      <button class="sync-button" style="margin-top: 12px;" onclick="parseCanvasData()">✅ Apply & Generate Gantt Chart</button>
+      <button class="sync-button" style="background: #718096;" onclick="closeSync()">❌ Cancel</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="num" id="totalTasks">69</div>
+      <div class="label">Total Tasks</div>
+    </div>
+    <div class="stat-card green">
+      <div class="num" id="completedTasks">12</div>
+      <div class="label">Completed</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="num" id="inProgressTasks">18</div>
+      <div class="label">In Progress</div>
+    </div>
+    <div class="stat-card red">
+      <div class="num" id="blockedTasks">2</div>
+      <div class="label">Critical Blockers</div>
+    </div>
+  </div>
+
+  <div class="critical-items">
+    <h3>🚨 Critical Blockers (Next 30 Days)</h3>
+    <ul>
+      <li><strong>DEP-01 / PRE-03:</strong> Model Tuning Feedback Loop ⚠️ BLOCKER - Due Jul 15, 2026</li>
+      <li><strong>PRE-09 / DEP-04:</strong> SecTech SOW Worker 2 Hire ⚠️ SHOW STOPPER - Due Jul 31, 2026</li>
+      <li><strong>PRE-04 / DEP-02:</strong> GOC Capacity Assessment 🔴 At Risk - Due Jul 31, 2026</li>
+    </ul>
+  </div>
+
+  <div class="gantt-container">
+    <div class="legend">Legend: ████ Completed | ▓▓▓▓ In Progress | ░░░░ Not Started | ▒▒▒▒ At Risk | ⚠ Blocked</div>
+
+    <div id="ganttContent">
+      <!-- Gantt chart will be rendered here -->
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <strong>📊 Dashboard Navigation:</strong><br><br>
+    <a href="video-ai-dashboard.html">← Back to Main Dashboard</a>
+    <a href="video-ai-raid-log.html">RAID Log</a>
+    <a href="video-ai-raci.html">RACI Matrix</a>
+    <a href="video-ai-requirements.html">Requirements</a>
+    <a href="video-ai-budget.html">Budget</a>
+  </div>
+
+  <script>
+    // Default Gantt Chart Template
+    const ganttTemplate = {
+      preDeployment: `
+<div class="gantt-section">
+  <h2>📋 Pre-Deployment Tasks (2026 Q2-Q3)</h2>
+  <div class="gantt-chart">
+2025                2026                               2027                2028
+Jun|Jul|Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar
+                                   ├───────────────────────────────────────┤
+
+PRE-01: Budget Approval ($400K)
+                                   █████████ (Apr-May 2026) ✓ Completed
+
+PRE-02: SF Tower & Seattle Pilot
+   ███████████████████████████████████████████████▓▓▓ (Jun 2025-Jul 2026) In Progress
+
+PRE-03: Model Tuning Process ⚠ BLOCKER
+                                               ░░░░ (Jun-Jul 2026) Not Started
+
+PRE-04: GOC Capacity Assessment 🔴 At Risk
+                                               ▒▒▒▒▒▒▒ (Jun-Jul 2026) At Risk
+
+PRE-05: Define SLA Chain 🔴 At Risk
+                                               ▒▒▒░░░ (Jun-Jul 2026) At Risk
+
+PRE-06: GOC Training
+                                                         ▓ (Jun 29, 2026) In Progress
+
+PRE-07: Develop Global SOPs
+                                               ░░░░░░░░░░░░░ (Jun-Aug 2026) Not Started
+
+PRE-08: SecOps Escalation Process
+                                               ░░░░░░░░░ (Jun-Jul 2026) Not Started
+
+PRE-09: Hire SecTech Worker 2 ⚠ SHOW STOPPER
+                                               ▒▒▒▒▒▒▒ (Jun-Jul 2026) At Risk
+  </div>
+</div>`,
+
+      phase1: `
+<div class="gantt-section">
+  <h2>🌏 Phase 1: APAC Deployment (Q2 FY27: Apr-Sep 2026)</h2>
+  <div class="gantt-chart">
+2025                2026                               2027                2028
+Jun|Jul|Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar
+                       ├──────────────────────────────────────────────┤
+
+P1-01: San Francisco
+                  ████████████████████ (Nov 2025-Apr 2026) ✓ Live
+
+P1-02: Seattle/Bellevue
+                  ████████████████████ (Nov 2025-Apr 2026) ✓ Live
+
+P1-03: Hyderabad
+                                                       ▓▓▓▓▓▓▓▓▓▓▓▓▓ (Jul-Dec 2026) In Progress
+
+P1-04: Hyderabad DPIA
+                                                     ▓▓▓▓▓▓▓ (Jun-Aug 2026) In Progress
+
+P1-05: Bangalore
+                                                       ░░░░░░░░░ (Jul-Sep 2026) Not Started
+
+P1-06: Tokyo
+                                                       ░░░░░░░░░ (Jul-Sep 2026) Not Started
+
+P1-07: Sydney
+                                                       ░░░░░░░░░ (Jul-Sep 2026) Not Started
+
+P1-08: AWS Infrastructure (AMER W&E)
+                                               ▓▓▓▓▓▓▓▓▓▓▓▓ (Jun-Aug 2026) In Progress
+
+P1-09: Open Network Bridge VM
+                                               ▓▓▓▓▓▓▓ (Jun-Jul 2026) In Progress
+
+P1-10: Lenel License (AMER East)
+                                                       ░░░░ (Jul 2026) Not Started
+
+P1-11: Agentforce Go-Live
+                                                       ▓▓▓▓▓▓▓▓▓▓▓ (Jul-Sep 2026) In Progress
+
+P1-12: Validate Auto-Close Threshold 🔴
+                                                           ▒▒▒▒▒ (Aug-Sep 2026) At Risk
+  </div>
+</div>`,
+
+      summary: `
+<div class="gantt-section">
+  <h2>📊 Project Health Summary</h2>
+  <div class="gantt-chart">
+Overall Status: 🟡 CAUTION - 2 Critical Blockers
+
+Progress by Phase:
+├─ Pre-Deployment:     [████████▒▒] 77% (7/9 complete or in progress)
+├─ Phase 1 (APAC):     [████▓▓░░░░] 50% (6/12 in progress or complete)
+├─ Phase 2 (AMER):     [░░░░░░░░░░] 0%  (0/7 started)
+└─ Phase 3 (EMEA):     [▓▓░░░░░░░░] 43% (3/7 in progress)
+
+Last Updated: June 29, 2026
+Next Review: July 6, 2026
+  </div>
+</div>`
+    };
+
+    // Load default Gantt chart
+    window.onload = function() {
+      renderDefaultGantt();
+    };
+
+    function renderDefaultGantt() {
+      const container = document.getElementById('ganttContent');
+      container.textContent = ''; // Clear safely
+
+      const sections = [ganttTemplate.preDeployment, ganttTemplate.phase1, ganttTemplate.summary];
+      sections.forEach(section => {
+        const div = document.createElement('div');
+        div.textContent = section;
+        div.style.whiteSpace = 'pre-wrap';
+        container.appendChild(div);
+      });
+    }
+
+    function showSyncInstructions() {
+      document.getElementById('syncInstructions').style.display = 'block';
+    }
+
+    function closeSync() {
+      document.getElementById('syncInstructions').style.display = 'none';
+      document.getElementById('canvasData').value = '';
+    }
+
+    function showStatus(message, type) {
+      const status = document.getElementById('syncStatus');
+      status.textContent = message;
+      status.className = 'sync-status ' + type;
+      status.style.display = 'inline-block';
+      setTimeout(() => { status.style.display = 'none'; }, 5000);
+    }
+
+    function parseCanvasData() {
+      const canvasText = document.getElementById('canvasData').value.trim();
+
+      if (!canvasText) {
+        showStatus('Please paste canvas data first!', 'error');
+        return;
+      }
+
+      try {
+        // Parse table data
+        const lines = canvasText.split('\n').filter(l => l.trim());
+        const tasks = [];
+
+        lines.forEach(line => {
+          if (line.includes('|') && !line.includes('---') && !line.includes('Task ID')) {
+            const cols = line.split('|').map(c => c.trim()).filter(c => c);
+            if (cols.length >= 7) {
+              tasks.push({
+                id: cols[0],
+                name: cols[1],
+                start: cols[2],
+                end: cols[3],
+                status: cols[4],
+                owner: cols[5],
+                notes: cols[6]
+              });
+            }
+          }
+        });
+
+        if (tasks.length === 0) {
+          showStatus('No valid tasks found!', 'error');
+          return;
+        }
+
+        // Update stats
+        const completed = tasks.filter(t => t.status.includes('Completed')).length;
+        const inProgress = tasks.filter(t => t.status.includes('In Progress')).length;
+        const blocked = tasks.filter(t => t.status.includes('Blocked') || t.status.includes('BLOCKER')).length;
+
+        document.getElementById('totalTasks').textContent = tasks.length;
+        document.getElementById('completedTasks').textContent = completed;
+        document.getElementById('inProgressTasks').textContent = inProgress;
+        document.getElementById('blockedTasks').textContent = blocked;
+
+        showStatus('Successfully synced ' + tasks.length + ' tasks!', 'success');
+        closeSync();
+
+        // Save to localStorage
+        localStorage.setItem('videoAITasks', JSON.stringify(tasks));
+      } catch (error) {
+        showStatus('Error: ' + error.message, 'error');
+      }
+    }
+
+    function downloadGanttChart() {
+      const content = document.getElementById('ganttContent').textContent;
+      const blob = new Blob([content], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'video-ai-gantt-' + new Date().toISOString().split('T')[0] + '.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+
+</body>
+</html>

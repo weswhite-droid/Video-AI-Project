@@ -9,10 +9,10 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-// Paths
-const PROJECT_DIR = '/c/Users/wes.white/Documents/Video AI Project';
+// Paths - use process.cwd() to avoid path issues on Windows
+const PROJECT_DIR = process.cwd();
 const DASHBOARD_FILE = path.join(PROJECT_DIR, 'video-ai-dashboard.html');
-const LOG_FILE = path.join(PROJECT_DIR, '.agents/logs/canvas-sync.log');
+const LOG_FILE = path.join(PROJECT_DIR, '.agents', 'logs', 'canvas-sync.log');
 
 // Canvas IDs
 const CANVAS_IDS = {
@@ -27,23 +27,24 @@ function log(message) {
   const logMessage = `[${timestamp}] ${message}`;
   console.log(logMessage);
 
+  // Ensure log directory exists
+  const logDir = path.dirname(LOG_FILE);
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+
   // Append to log file
   fs.appendFileSync(LOG_FILE, logMessage + '\n');
 }
 
 // Read Canvas via Claude MCP
+// NOTE: This function is a placeholder. The actual Canvas reading happens via MCP tools
+// which are not directly accessible from Node.js scripts. For automated sync, use the
+// cron job to call canvas-sync-now.js with pre-parsed Canvas data instead.
 function readCanvas(canvasId) {
-  try {
-    log(`Reading Canvas ${canvasId}...`);
-    const result = execFileSync('claude', ['--format', 'json', '--', `Read canvas ${canvasId}`], {
-      encoding: 'utf-8',
-      cwd: PROJECT_DIR
-    });
-    return JSON.parse(result);
-  } catch (error) {
-    log(`ERROR reading Canvas ${canvasId}: ${error.message}`);
-    return null;
-  }
+  log(`Canvas ${canvasId} requires MCP Slack tools which are not available in Node.js context`);
+  log(`Please use canvas-sync-now.js with manually parsed Canvas counts instead`);
+  return null;
 }
 
 // Parse RAID data from Canvas
